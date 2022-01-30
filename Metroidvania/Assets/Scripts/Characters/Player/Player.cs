@@ -49,7 +49,11 @@ public class Player : MonoBehaviour
 
 
 	[SerializeField] private  Inventory			m_Inventory;
-	public Inventory GetInventory =>			m_Inventory;
+	public Inventory							GetInventory =>			m_Inventory;
+
+	[SerializeField] private GameObject			m_InventoryUI;
+
+	public GameObject							GetInventoryUI => m_InventoryUI;
 
 
 
@@ -131,6 +135,7 @@ public class Player : MonoBehaviour
 
     void DecideInput()
     {
+		// Temporary reset function. Once a loading screen has been implemented, play the loading screen and respawn player at last checkpoint.
         if ( Keyboard.current.rKey.wasPressedThisFrame )
         {
             m_ActiveInput = true;
@@ -178,6 +183,13 @@ public class Player : MonoBehaviour
         }
 
         // if (Input.GetAxisRaw("Vertical") < 0.0f)    { m_Crouching = true; }
+
+
+		if ( Keyboard.current.iKey.wasPressedThisFrame)
+		{
+			m_InventoryUI.SetActive( !m_InventoryUI.activeSelf );
+		}
+
 
 
         // Button ups

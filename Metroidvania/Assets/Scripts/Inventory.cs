@@ -7,7 +7,8 @@ public class Inventory : MonoBehaviour
 	public delegate void OnItemsChange();
 	public OnItemsChange m_ItemsChangedCallback;
 
-	public int m_AmountOfSlots = 64;
+	private int m_AmountOfSlots = 16;
+	public int AmountOfSlots { get { return m_AmountOfSlots; } }
 	
 	public List<InventoryItem> m_Items = new List<InventoryItem>();
 
@@ -25,7 +26,7 @@ public class Inventory : MonoBehaviour
 
 			m_Items.Add( pr_ItemToAdd );
 
-			if( m_ItemsChangedCallback != null ) 
+			if ( m_ItemsChangedCallback != null ) 
 			{
 				m_ItemsChangedCallback.Invoke();
 			}

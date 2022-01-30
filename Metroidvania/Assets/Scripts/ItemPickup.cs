@@ -26,7 +26,7 @@ public class ItemPickup : Interactable
 
 		GameManager manager = GameManager.Instance;
 
-		Debug.Log( "Picking up " + m_ItemToGive.m_Name );
+		Debug.Log( "Picking up " + m_ItemToGive.m_ItemName );
 
 		if( manager.Player1.GetInventory.AddItem( m_ItemToGive ) )
 		{
