@@ -14,7 +14,7 @@ public class Inventory : MonoBehaviour
 
 	public bool AddItem( InventoryItem pr_ItemToAdd )
 	{
-		// Is it stackable? Is there space in that stack? Is the inventory full?
+		// Is it stackable? Is there space in that stack? Is the inventory full? TODO:: Check these stuff.
 
 		if ( !pr_ItemToAdd.m_DefaultItem )
 		{
