@@ -39,7 +39,7 @@ public class GameManager : MonoBehaviour
 
 
 
-		// Find player if not already set inside the inspector
+		// TODO: Instead of doing this, search through an array or vector after the players, and assign them from there. This will make it easier for multiplayer.
 		if ( !g_Player1 )
 		{
 			g_Player1 = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();

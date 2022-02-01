@@ -12,16 +12,20 @@ public class InventoryUI : MonoBehaviour
 	//private InventorySlot[][]					m_InventorySlots;		// An array of references to all of the inventory slots inside the "InventoryPanel"-object in the scene.
 	private InventorySlot[]						m_InventorySlots;		// An array of references to all of the inventory slots inside the "InventoryPanel"-object in the scene.
 
+	[ SerializeField ] private GameObject		m_SlotMenuCurrent;		//	The current slot-menu.
 	[ SerializeField ] private GameObject		m_SlotMenuMisc;			//	The Slot-Menu for ITEMTYPE_MISC items. 
 	[ SerializeField ] private GameObject		m_SlotMenuConsumable;	//	The Slot-Menu for ITEMTYPE_CONSUMABLE items. 
 	[ SerializeField ] private GameObject		m_SlotMenuEquippable;	//	The Slot-Menu for ITEMTYPE_EQUIPPABLE items. 
 	[ SerializeField ] private GameObject		m_SlotMenuQuest;		//	The Slot-Menu for ITEMTYPE_QUEST items. 
 
 
-	public GameObject SlotMenuMisc			{ get { return m_SlotMenuMisc; } }
-	public GameObject SlotMenuConsumable	{ get { return m_SlotMenuConsumable; } }
-	public GameObject SlotMenuEquippable	{ get { return m_SlotMenuEquippable; } }
-	public GameObject SlotMenuQuest			{ get { return m_SlotMenuQuest; } }
+	public GameObject SlotMenuCurrent	{
+		get { return m_SlotMenuCurrent; } 
+		set { if ( value != null ) m_SlotMenuCurrent = value; } }
+	public GameObject SlotMenuMisc			{ get { return m_SlotMenuMisc;			} }
+	public GameObject SlotMenuConsumable	{ get { return m_SlotMenuConsumable;	} }
+	public GameObject SlotMenuEquippable	{ get { return m_SlotMenuEquippable;	} }
+	public GameObject SlotMenuQuest			{ get { return m_SlotMenuQuest;			} }
 
 
 	// Start is called before the first frame update
@@ -101,7 +105,7 @@ public class InventoryUI : MonoBehaviour
 			}
 		}
 
-
+		m_SlotMenuCurrent = m_SlotMenuMisc;
 
 	}
 

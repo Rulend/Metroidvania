@@ -5,14 +5,19 @@ public class InventorySlot : MonoBehaviour
 {
 	private InventoryItem					m_Item;		// The item stored in the slot.
 
-	[ SerializeField ] private Image		m_Icon;		// The icon of the item.
+	[ SerializeField ] private Image		m_Icon;     // The icon of the item.
 
 
+	InventoryUI m_rInventoryUI;
 
-	public Button m_EquipButton;
-	public Button m_DiscardButton;
+	void Start()
+	{
+		// TODO: Instead of doing player 1, do it the correct way (which includes being able to handle multiple players and not showing each others inventory).
+		if ( !m_rInventoryUI )
+			m_rInventoryUI = GameManager.Instance.Player1.GetInventoryUI.GetComponent<InventoryUI>();
+	}
 
-	
+
 
 
 	// Add item to slot, set image to that item's icon, then enable the image component.
@@ -39,20 +44,27 @@ public class InventorySlot : MonoBehaviour
 	{
 		if ( m_Item )	// Check item type to decide which menu to bring up.
 		{
-			// Bring up a different menu based on what kind of item it is.	// TODO: Fix this ASAP. 31/01/2022
+			m_rInventoryUI.SlotMenuCurrent.SetActive( false );
+
+
+			// Bring up a different menu based on what kind of item it is.	// TODO: Another way to do this, is to assign a different submenu to a slot
+			// based on what kind of item is in it. The submenu could be assignd when adding/removing an item from that slot. For now though, this works.
 			switch ( m_Item.m_ItemType )
 			{
 				case InventoryItem.ITEMTYPE.ITEMTYPE_MISC:
-					GameManager.Instance.Player1.GetInventoryUI.GetComponent<InventoryUI>().SlotMenuMisc.SetActive( true );
+					m_rInventoryUI.SlotMenuCurrent = m_rInventoryUI.SlotMenuMisc;
 					Debug.Log( "Left-clicking an item of type MISC. " );
 					break;
 				case InventoryItem.ITEMTYPE.ITEMTYPE_CONSUMABLE:
+					m_rInventoryUI.SlotMenuCurrent = m_rInventoryUI.SlotMenuConsumable;
 					Debug.Log( "Left-clicking an item of type CONSUMABLE. " );
 					break;
 				case InventoryItem.ITEMTYPE.ITEMTYPE_EQUIPMENT:
+					m_rInventoryUI.SlotMenuCurrent = m_rInventoryUI.SlotMenuEquippable;
 					Debug.Log( "Left-clicking an item of type EQUIPMENT. " );
 					break;
 				case InventoryItem.ITEMTYPE.ITEMTYPE_QUEST:
+					m_rInventoryUI.SlotMenuCurrent = m_rInventoryUI.SlotMenuQuest;
 					Debug.Log( "Left-clicking an item of type QUEST. " );
 					break;
 				default:
@@ -60,13 +72,14 @@ public class InventorySlot : MonoBehaviour
 					break;
 			}
 
-
+			m_rInventoryUI.SlotMenuCurrent.SetActive( true );
+			//m_rInventoryUI.SlotMenuCurrent.SetActive( !m_rInventoryUI.SlotMenuCurrent.activeSelf );
 
 		}
-
-		m_EquipButton.interactable = true;
-		m_DiscardButton.interactable = true;
 	}
+
+
+	// Button-functions to be called from the UI
 
 
 	// Removes the item from your inventory. TODO:: Removing an item from your inventory should either destroy it or leave it on the ground. Decide which one to go with, or make a toggle to switch between them.
