@@ -10,8 +10,7 @@ public class BetterButton : MonoBehaviour, IPointerClickHandler
 	{
 		if ( pr_EventData.button == PointerEventData.InputButton.Left )
 		{
-			// Bring up submenu
-			Debug.Log( "Hey this is lego city!" );
+			GetComponent<InventorySlot>().ShowItemSlotOptions();
 		}
 
 		else if ( pr_EventData.button == PointerEventData.InputButton.Right )

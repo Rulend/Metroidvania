@@ -14,7 +14,7 @@ public class InventorySlot : MonoBehaviour
 	{
 		// TODO: Instead of doing player 1, do it the correct way (which includes being able to handle multiple players and not showing each others inventory).
 		if ( !m_rInventoryUI )
-			m_rInventoryUI = GameManager.Instance.Player1.GetInventoryUI.GetComponent<InventoryUI>();
+			m_rInventoryUI = GameManager.Instance.Player1.InventoryUI.GetComponent<InventoryUI>();
 	}
 
 
@@ -44,8 +44,8 @@ public class InventorySlot : MonoBehaviour
 	{
 		if ( m_Item )	// Check item type to decide which menu to bring up.
 		{
-			m_rInventoryUI.SlotMenuCurrent.SetActive( false );
-
+			if ( m_rInventoryUI.SlotMenuMisc.activeSelf )
+				m_rInventoryUI.SlotMenuMisc.SetActive( false );
 
 			// Bring up a different menu based on what kind of item it is.	// TODO: Another way to do this, is to assign a different submenu to a slot
 			// based on what kind of item is in it. The submenu could be assignd when adding/removing an item from that slot. For now though, this works.
@@ -72,6 +72,7 @@ public class InventorySlot : MonoBehaviour
 					break;
 			}
 
+			Debug.Log( "SlotMenuCurrent: " + m_rInventoryUI.SlotMenuCurrent );
 			m_rInventoryUI.SlotMenuCurrent.SetActive( true );
 			//m_rInventoryUI.SlotMenuCurrent.SetActive( !m_rInventoryUI.SlotMenuCurrent.activeSelf );
 

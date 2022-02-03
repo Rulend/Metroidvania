@@ -4,56 +4,56 @@ using UnityEngine.InputSystem;
 public class Player : MonoBehaviour
 {
 	// < Member variables>
-	[SerializeField] private LayerMask			m_WhatIsGround;                          // A mask determining what is ground to the character
+	[SerializeField] private LayerMask m_WhatIsGround;                          // A mask determining what is ground to the character
 
-    public Vector3								m_PositionToApply;
-    public Vector3								m_GroundCollisionPosition;
+	public Vector3 m_PositionToApply;
+	public Vector3 m_GroundCollisionPosition;
 
-    private Vector3								m_Velocity = new Vector3(0.0f, 0.0f, 0.0f);
-	[SerializeField] private float				m_Gravity = 6.0f;
+	private Vector3 m_Velocity = new Vector3( 0.0f, 0.0f, 0.0f );
+	[SerializeField] private float m_Gravity = 6.0f;
 
-    private bool								m_Grounded;            // Whether or not the player is grounded.
-    private bool								m_FacingRight = true;  // For determining which way the player is currently facing.
+	private bool m_Grounded;            // Whether or not the player is grounded.
+	private bool m_FacingRight = true;  // For determining which way the player is currently facing.
 
-    // Player's stats
-    private ushort								m_MaxHealth = 5;
-    private short								m_CurrentHealth = 5;
+	// Player's stats
+	private ushort m_MaxHealth = 5;
+	private short m_CurrentHealth = 5;
 
-    private float								m_BaseMovementSpeed = 5.0f;
-    private float								m_CurrentMovementSpeed = 9.0f;
+	private float m_BaseMovementSpeed = 5.0f;
+	private float m_CurrentMovementSpeed = 9.0f;
 
-    // Movement variables.
-    private bool								m_ActiveInput = true;
-    private float								m_LRInput = 0.0f;
-    private float								m_UDInput = 0.0f;
+	// Movement variables.
+	private bool m_ActiveInput = true;
+	private float m_LRInput = 0.0f;
+	private float m_UDInput = 0.0f;
 
 	// The player's jump
-	[SerializeField] private float				m_MaxJumpHeight = 3.3f;
-    private bool								m_JumpWindowActive = false;
-    [SerializeField] private float				m_JumpWindowDuration = 0.214f; // Static as this value only needs to be set once
-    private float								m_JumpWindowTimeLeft = 0.214f;
-    private float								m_CoyoteDuration = 0.2f;
-    private float								m_CoyoteTimeLeft = 0.2f;
+	[SerializeField] private float m_MaxJumpHeight = 3.3f;
+	private bool m_JumpWindowActive = false;
+	[SerializeField] private float m_JumpWindowDuration = 0.214f; // Static as this value only needs to be set once
+	private float m_JumpWindowTimeLeft = 0.214f;
+	private float m_CoyoteDuration = 0.2f;
+	private float m_CoyoteTimeLeft = 0.2f;
 
-    // The player's slide move.
-    private float								m_SlideCooldownDuration = 0.75f;
-    private float								m_SlideCooldownTimeLeft = 0.0f;
-	[SerializeField] private float				m_SlideDuration = 0.5f;
-	[SerializeField] private float				m_SlideDistanceTotal = 2.0f;
-    private float								m_SlideDistanceLeft = 0.0f;
-    private										Vector3 m_SlideDirection = Vector3.zero;
+	// The player's slide move.
+	private float m_SlideCooldownDuration = 0.75f;
+	private float m_SlideCooldownTimeLeft = 0.0f;
+	[SerializeField] private float m_SlideDuration = 0.5f;
+	[SerializeField] private float m_SlideDistanceTotal = 2.0f;
+	private float m_SlideDistanceLeft = 0.0f;
+	private Vector3 m_SlideDirection = Vector3.zero;
 
 	// The currently focused interactable.
-	[SerializeField] private  Interactable		m_CurrentlyFocusedInteractable;
+	[SerializeField] private Interactable m_CurrentlyFocusedInteractable;
 
 
 
-	[SerializeField] private  Inventory			m_Inventory;
-	public Inventory							GetInventory =>			m_Inventory;
+	[SerializeField] private Inventory m_Inventory;
+	public Inventory GetInventory => m_Inventory;
 
-	[SerializeField] private GameObject			m_InventoryUI;
+	[SerializeField] private GameObject m_InventoryUI;
 
-	public GameObject							GetInventoryUI => m_InventoryUI;
+	public GameObject InventoryUI { get { return m_InventoryUI; } }
 
 
 

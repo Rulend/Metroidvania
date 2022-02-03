@@ -19,9 +19,11 @@ public class InventoryUI : MonoBehaviour
 	[ SerializeField ] private GameObject		m_SlotMenuQuest;		//	The Slot-Menu for ITEMTYPE_QUEST items. 
 
 
-	public GameObject SlotMenuCurrent	{
+	public GameObject SlotMenuCurrent	
+	{
 		get { return m_SlotMenuCurrent; } 
-		set { if ( value != null ) m_SlotMenuCurrent = value; } }
+		set { if ( value != null ) m_SlotMenuCurrent = value; } 
+	}
 	public GameObject SlotMenuMisc			{ get { return m_SlotMenuMisc;			} }
 	public GameObject SlotMenuConsumable	{ get { return m_SlotMenuConsumable;	} }
 	public GameObject SlotMenuEquippable	{ get { return m_SlotMenuEquippable;	} }
@@ -106,6 +108,15 @@ public class InventoryUI : MonoBehaviour
 		}
 
 		m_SlotMenuCurrent = m_SlotMenuMisc;
+		//m_SlotMenuMisc.SetActive( false );
+		SlotMenuConsumable.SetActive( false );
+		SlotMenuEquippable.SetActive( false );
+		SlotMenuQuest.SetActive( false );
+
+		if ( m_SlotMenuCurrent )
+			Debug.Log( "There is a current slot menu!" );
+
+		gameObject.SetActive( false );
 
 	}
 
