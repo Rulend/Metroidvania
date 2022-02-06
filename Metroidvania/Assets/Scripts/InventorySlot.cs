@@ -44,8 +44,7 @@ public class InventorySlot : MonoBehaviour
 	{
 		if ( m_Item )	// Check item type to decide which menu to bring up.
 		{
-			if ( m_rInventoryUI.SlotMenuMisc.activeSelf )
-				m_rInventoryUI.SlotMenuMisc.SetActive( false );
+			HideItemSlotOptions();
 
 			// Bring up a different menu based on what kind of item it is.	// TODO: Another way to do this, is to assign a different submenu to a slot
 			// based on what kind of item is in it. The submenu could be assignd when adding/removing an item from that slot. For now though, this works.
@@ -73,8 +72,44 @@ public class InventorySlot : MonoBehaviour
 			}
 
 			Debug.Log( "SlotMenuCurrent: " + m_rInventoryUI.SlotMenuCurrent );
+			float SlotMenuWidth = m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.width;
+			float SlotMenuHeight = m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.height;
+
+			float NewSlotMenuXPos = gameObject.transform.position.x + ( SlotMenuWidth / 4.0f ) + ( gameObject.GetComponent<RectTransform>().rect.width / 3.0f ) + 5.0f;
+			float NewSlotMenuYPos = gameObject.transform.position.y - ( SlotMenuHeight / 4.0f );
+
+			if ( NewSlotMenuXPos > Screen.width )	
+			{
+				NewSlotMenuXPos = gameObject.transform.position.x - ( m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.width / 3.0f ) - 5.0f;
+				Debug.Log( "Had to move xposition of slotmenu options, it would have been outside the screen." );
+			}
+
+			if ( NewSlotMenuYPos + m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.height > Screen.height )
+			{
+				NewSlotMenuYPos += 100.0f;
+				Debug.Log( "Had to move yposition of slotmenu options, it would have been outside the screen." );
+			}
+
+			Vector3 NewSlotMenuPos = new Vector3( NewSlotMenuXPos, NewSlotMenuYPos, 0.0f );
+
+			m_rInventoryUI.SlotMenuCurrent.transform.position = NewSlotMenuPos;
+
 			m_rInventoryUI.SlotMenuCurrent.SetActive( true );
-			//m_rInventoryUI.SlotMenuCurrent.SetActive( !m_rInventoryUI.SlotMenuCurrent.activeSelf );
+
+		}
+		else
+		{
+			HideItemSlotOptions();
+		}
+	}
+
+	public void HideItemSlotOptions()
+	{
+		if ( m_rInventoryUI.SlotMenuCurrent.activeSelf )
+		{
+			m_rInventoryUI.SlotMenuCurrent.SetActive( false );
+
+			Debug.Log( "Hiding the current inventory slot options... (-w- )" );
 
 		}
 	}
