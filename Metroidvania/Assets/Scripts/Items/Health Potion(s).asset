@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7e24d7840b8314489f47e6961b131ae, type: 3}
   m_Name: Health Potion(s)
   m_EditorClassIdentifier: 
-  m_ItemName: Worn Helmet
-  m_Icon: {fileID: 0}
+  m_ItemName: Health Potion(s)
+  m_Icon: {fileID: 21300000, guid: a8e09ab83d7f2904b9e892c0aeed0821, type: 3}
   m_DefaultItem: 0
-  m_ItemType: 0
+  m_ItemType: 1
