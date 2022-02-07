@@ -74,18 +74,19 @@ public class InventorySlot : MonoBehaviour
 					break;
 			}
 
-			m_rInventoryUI.m_CurrentlySelectedSlot = this;
+			m_rInventoryUI.m_CurrentSlot = this;
+			m_rInventoryUI.m_CurrentSlotBorder.transform.position = gameObject.transform.position;
+			m_rInventoryUI.m_CurrentSlotBorder.SetActive( true );
 
-			Debug.Log( "SlotMenuCurrent: " + m_rInventoryUI.SlotMenuCurrent );
-			float SlotMenuWidth = m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.width;
-			float SlotMenuHeight = m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.height;
+			float SlotMenuWidth		= m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.width;
+			float SlotMenuHeight	= m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.height;
 
-			float NewSlotMenuXPos = gameObject.transform.position.x + ( SlotMenuWidth / 4.0f ) + ( gameObject.GetComponent<RectTransform>().rect.width / 3.0f ) + 5.0f;
-			float NewSlotMenuYPos = gameObject.transform.position.y - ( SlotMenuHeight / 4.0f );
+			float NewSlotMenuXPos	= gameObject.transform.position.x + ( SlotMenuWidth / 2.0f ) + ( gameObject.GetComponent<RectTransform>().rect.width / 2.0f ) + 5.0f;
+			float NewSlotMenuYPos	= gameObject.transform.position.y - ( SlotMenuHeight * 0.75f );
 
 			if ( NewSlotMenuXPos > Screen.width )	
 			{
-				NewSlotMenuXPos = gameObject.transform.position.x - ( m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.width / 3.0f ) - 5.0f;
+				NewSlotMenuXPos = gameObject.transform.position.x - ( SlotMenuWidth / 2.0f ) - ( gameObject.GetComponent<RectTransform>().rect.width / 2.0f ) - 5.0f;
 				Debug.Log( "Had to move xposition of slotmenu options, it would have been outside the screen on the right." );
 			}
 
@@ -113,6 +114,7 @@ public class InventorySlot : MonoBehaviour
 		if ( m_rInventoryUI.SlotMenuCurrent.activeSelf )
 		{
 			m_rInventoryUI.SlotMenuCurrent.SetActive( false );
+			m_rInventoryUI.m_CurrentSlotBorder.SetActive( false );
 
 			Debug.Log( "Hiding the current inventory slot options... (-w- )" );
 
@@ -136,6 +138,7 @@ public class InventorySlot : MonoBehaviour
 		if ( m_Item )
 		{
 			m_Item.Use();
+			HideItemSlotOptions();
 		}
 	}
 }
