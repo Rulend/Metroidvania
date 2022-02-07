@@ -16,7 +16,9 @@ public class InventoryUI : MonoBehaviour
 	[ SerializeField ] private GameObject		m_SlotMenuMisc;			//	The Slot-Menu for ITEMTYPE_MISC items. 
 	[ SerializeField ] private GameObject		m_SlotMenuConsumable;	//	The Slot-Menu for ITEMTYPE_CONSUMABLE items. 
 	[ SerializeField ] private GameObject		m_SlotMenuEquippable;	//	The Slot-Menu for ITEMTYPE_EQUIPPABLE items. 
-	[ SerializeField ] private GameObject		m_SlotMenuQuest;		//	The Slot-Menu for ITEMTYPE_QUEST items. 
+	[ SerializeField ] private GameObject		m_SlotMenuQuest;        //	The Slot-Menu for ITEMTYPE_QUEST items. 
+
+	public InventorySlot						m_CurrentlySelectedSlot;	// The slot was lastly left-clicked.
 
 
 	public GameObject SlotMenuCurrent	
@@ -145,5 +147,17 @@ public class InventoryUI : MonoBehaviour
 
 		}
 
+	}
+
+
+
+	public void UseCurrentlySelectedItem() // An ugly workaround to the problem where the item slot menus need to target a specific slot in order to trigger their functions. Since they can't access this gameobject in their button functions, this was the only way I found.
+	{
+		m_CurrentlySelectedSlot.OnUseItemButton();
+	}
+
+	public void RemoveCurrentlySelectedItem() // An ugly workaround to the problem where the item slot menus need to target a specific slot in order to trigger their functions. Since they can't access this gameobject in their button functions, this was the only way I found.
+	{
+		m_CurrentlySelectedSlot.OnRemoveButton(); // Change this later so it brings up an "Are you sure?"-menu. Also change discard to actually put the gameobject back into the scene.
 	}
 }

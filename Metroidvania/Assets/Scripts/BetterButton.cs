@@ -1,26 +1,29 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 public class BetterButton : MonoBehaviour, IPointerClickHandler
 {
+
+	public UnityEvent m_LeftMouseButton;
+	public UnityEvent m_RightMouseButton;
+	public UnityEvent m_MiddleMouseButton;
 
 
 	public void OnPointerClick( PointerEventData pr_EventData )
 	{
 		if ( pr_EventData.button == PointerEventData.InputButton.Left )
 		{
-			GetComponent<InventorySlot>().ShowItemSlotOptions(); // TODO: Make some sort of "CanInteractWith"-class that uses the mouse, and so this button can be used for other stuff too. Or rename this class. Whichever.
+			m_LeftMouseButton.Invoke();
 		}
 		else if ( pr_EventData.button == PointerEventData.InputButton.Right )
 		{
-			// Equip/use an item without submenu
-			Debug.Log( "Directly equip or use item." );
-			GetComponent<InventorySlot>().OnUseItemButton();
+			m_RightMouseButton.Invoke();
 		}
 		else
 		{
-			GetComponent<InventorySlot>().HideItemSlotOptions();
+			m_MiddleMouseButton.Invoke();
 		}
 	}
 

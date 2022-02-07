@@ -8,13 +8,15 @@ public class InventorySlot : MonoBehaviour
 	[ SerializeField ] private Image		m_Icon;     // The icon of the item.
 
 
-	InventoryUI m_rInventoryUI;
+	InventoryUI								m_rInventoryUI;	// A reference to the InventoryUI
 
 	void Start()
 	{
 		// TODO: Instead of doing player 1, do it the correct way (which includes being able to handle multiple players and not showing each others inventory).
 		if ( !m_rInventoryUI )
 			m_rInventoryUI = GameManager.Instance.Player1.InventoryUI.GetComponent<InventoryUI>();
+
+		// TODO: Add so that the slot menu options buttons get assigned their functions automatically if it's not filled in.
 	}
 
 
@@ -32,10 +34,11 @@ public class InventorySlot : MonoBehaviour
 	// Remove item from slot, set image to null, and disable the image component.
 	public void RemoveItemFromSlot()
 	{
-		m_Item = null;
+		m_Item = null; // TODO: Maybe use destroy in order to destroy it? Or add it to an unload queue.
 
 		m_Icon.sprite = null;
 		m_Icon.enabled = false;
+		HideItemSlotOptions();
 	}
 
 
@@ -71,6 +74,8 @@ public class InventorySlot : MonoBehaviour
 					break;
 			}
 
+			m_rInventoryUI.m_CurrentlySelectedSlot = this;
+
 			Debug.Log( "SlotMenuCurrent: " + m_rInventoryUI.SlotMenuCurrent );
 			float SlotMenuWidth = m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.width;
 			float SlotMenuHeight = m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.height;
@@ -81,13 +86,13 @@ public class InventorySlot : MonoBehaviour
 			if ( NewSlotMenuXPos > Screen.width )	
 			{
 				NewSlotMenuXPos = gameObject.transform.position.x - ( m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.width / 3.0f ) - 5.0f;
-				Debug.Log( "Had to move xposition of slotmenu options, it would have been outside the screen." );
+				Debug.Log( "Had to move xposition of slotmenu options, it would have been outside the screen on the right." );
 			}
 
 			if ( NewSlotMenuYPos + m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.height > Screen.height )
 			{
 				NewSlotMenuYPos += 100.0f;
-				Debug.Log( "Had to move yposition of slotmenu options, it would have been outside the screen." );
+				Debug.Log( "Had to move yposition of slotmenu options, it would have been below the screen." );
 			}
 
 			Vector3 NewSlotMenuPos = new Vector3( NewSlotMenuXPos, NewSlotMenuYPos, 0.0f );
