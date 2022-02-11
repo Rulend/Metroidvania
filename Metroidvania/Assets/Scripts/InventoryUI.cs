@@ -10,7 +10,7 @@ public class InventoryUI : MonoBehaviour
 
 
 	//private InventorySlot[][]					m_InventorySlots;		// An array of references to all of the inventory slots inside the "InventoryPanel"-object in the scene.
-	private InventorySlot[]						m_InventorySlots;		// An array of references to all of the inventory slots inside the "InventoryPanel"-object in the scene.
+	private InventorySlot[]						m_Slots;		// An array of references to all of the inventory slots inside the "InventoryPanel"-object in the scene.
 
 	[ SerializeField ] private GameObject		m_SlotMenuCurrent;		//	The current slot-menu.
 	[ SerializeField ] private GameObject		m_SlotMenuMisc;			//	The Slot-Menu for ITEMTYPE_MISC items. 
@@ -20,6 +20,7 @@ public class InventoryUI : MonoBehaviour
 
 	public InventorySlot						m_CurrentSlot;	// The slot was lastly left-clicked.
 	public GameObject							m_CurrentSlotBorder;	// The slot was lastly left-clicked.
+	public GameObject							m_InteractableAlert;    //	The Slot-Menu for ITEMTYPE_QUEST items. 
 
 
 	public GameObject SlotMenuCurrent	
@@ -36,10 +37,8 @@ public class InventoryUI : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
 	{
-		m_Inventory = GameManager.Instance.Player1.GetInventory;
-		m_Inventory.m_ItemsChangedCallback += UpdateUI;
-
-		m_InventorySlots = m_InventorySlotsParent.GetComponentsInChildren<InventorySlot>(); // I do not enjoy doing things in this manner, I would rather create them via code. TODO:: Do this via code. Example below.
+		m_Inventory		= GameManager.Instance.Player1.GetInventory;
+		m_Slots			= m_Inventory.m_InventorySlots; // I do not enjoy doing things in this manner, I would rather create them via code. TODO:: Do this via code. Example below.
 
 		// Example
 		//for ( int RowIndex = 0; RowIndex < 4; ++RowIndex)
@@ -118,31 +117,6 @@ public class InventoryUI : MonoBehaviour
 
 		gameObject.SetActive( false );
 	}
-
-
-
-	void UpdateUI()
-	{
-		Debug.Log("Updating UI!");
-
-		for ( int SlotsIndex = 0; SlotsIndex < m_InventorySlots.Length; ++SlotsIndex )
-		{
-			if ( SlotsIndex < m_Inventory.m_Items.Count)
-			{
-				//m_InventorySlots[RowIndex][ColumnIndex].AddItemToSlot( m_Inventory.m_Items[SlotsIndex] );
-				m_InventorySlots[SlotsIndex].AddItemToSlot( m_Inventory.m_Items[SlotsIndex] );
-			}
-			else
-			{
-				//m_InventorySlots[RowIndex][ColumnIndex].RemoveItemFromSlot();
-				m_InventorySlots[SlotsIndex].RemoveItemFromSlot();
-			}
-
-		}
-
-	}
-
-
 
 	public void UseCurrentlySelectedItem() // An ugly workaround to the problem where the item slot menus need to target a specific slot in order to trigger their functions. Since they can't access this gameobject in their button functions, this was the only way I found.
 	{

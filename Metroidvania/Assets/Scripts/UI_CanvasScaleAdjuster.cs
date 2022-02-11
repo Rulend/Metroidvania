@@ -17,7 +17,7 @@ public class UI_CanvasScaleAdjuster : MonoBehaviour
 		//}
 
 		//Vector2 ScreenSize = new Vector2( Screen.currentResolution.width, Screen.currentResolution.height );
-		m_rUICanvasScaler.referenceResolution.Set( Screen.currentResolution.width, Screen.currentResolution.height );
+		m_rUICanvasScaler.referenceResolution.Set( Screen.width, Screen.height );
 	}
 
     // Update is called once per frame

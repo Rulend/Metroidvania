@@ -37,7 +37,7 @@ public class Interactable : MonoBehaviour
 	// Start is called after creation, if the gameobject or component is not disabled
 	void Start()
     {
-		m_rPlayer			= GameObject.Find( "TempPlayer" ).GetComponent<Player>();
+		m_rPlayer			= GameManager.Instance.Player1;
 	}
 
     // Update is called once per frame
@@ -54,8 +54,14 @@ public class Interactable : MonoBehaviour
 			// If player is not currently focusing another interactable, or if this interactable is closer, set this as current
 			if ( !m_rPlayer.GetCurrentInteractable() || m_DistanceToPlayer < m_rPlayer.GetCurrentInteractable().m_DistanceToPlayer )
 			{
-				m_rPlayer.SetCurrentInteractable(this);
+				m_rPlayer.SetCurrentInteractable( this );
+				m_rPlayer.InventoryUI.GetComponent<InventoryUI>().m_InteractableAlert.SetActive( true );
 			}
+			else if ( m_rPlayer.GetCurrentInteractable() )
+			{
+				m_rPlayer.InventoryUI.GetComponent<InventoryUI>().m_InteractableAlert.SetActive( true );
+			}
+
 
 			if ( m_rPlayer.GetCurrentInteractable() == this )
 			{

@@ -3,7 +3,9 @@ using UnityEngine.UI;
 
 public class InventorySlot : MonoBehaviour
 {
-	private InventoryItem					m_Item;		// The item stored in the slot.
+	private InventoryItem					m_Item;     // The item stored in the slot.
+
+	public InventoryItem Item => m_Item;
 
 	[ SerializeField ] private Image		m_Icon;     // The icon of the item.
 
@@ -78,10 +80,10 @@ public class InventorySlot : MonoBehaviour
 			m_rInventoryUI.m_CurrentSlotBorder.transform.position = gameObject.transform.position;
 			m_rInventoryUI.m_CurrentSlotBorder.SetActive( true );
 
-			float SlotMenuWidth		= m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.width;
-			float SlotMenuHeight	= m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.height;
+			float SlotMenuWidth		= m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.width * m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().localScale.x;
+			float SlotMenuHeight	= m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.height * m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().localScale.y;
 
-			float NewSlotMenuXPos	= gameObject.transform.position.x + ( SlotMenuWidth / 2.0f ) + ( gameObject.GetComponent<RectTransform>().rect.width / 2.0f ) + 5.0f;
+			float NewSlotMenuXPos	= gameObject.transform.position.x + ( SlotMenuWidth / 2.0f )  + ( gameObject.GetComponent<RectTransform>().rect.width / 2.0f ) + 5.0f;
 			float NewSlotMenuYPos	= gameObject.transform.position.y - ( SlotMenuHeight * 0.75f );
 
 			if ( NewSlotMenuXPos > Screen.width )	
@@ -92,7 +94,7 @@ public class InventorySlot : MonoBehaviour
 
 			if ( NewSlotMenuYPos + m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.height > Screen.height )
 			{
-				NewSlotMenuYPos += 100.0f;
+				NewSlotMenuYPos += 100.0f; // TODO: Don't let this be static.
 				Debug.Log( "Had to move yposition of slotmenu options, it would have been below the screen." );
 			}
 

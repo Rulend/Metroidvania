@@ -28,9 +28,13 @@ public class ItemPickup : Interactable
 
 		Debug.Log( "Picking up " + m_ItemToGive.m_ItemName );
 
-		if( manager.Player1.GetInventory.AddItem( m_ItemToGive ) )
+		if ( manager.Player1.GetInventory.AddItem( m_ItemToGive ) )
 		{
 			Destroy( gameObject );
+		}
+		else
+		{
+			// Add some velocity to the item, so it looks like it got picked up then dropped
 		}
 		
 	}
