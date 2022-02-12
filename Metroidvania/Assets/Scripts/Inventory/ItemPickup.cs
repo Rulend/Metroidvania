@@ -3,18 +3,21 @@ using UnityEngine;
 public class ItemPickup : Interactable
 {
 	public InventoryItem m_ItemToGive;
+
+	
 	//GameManager manager; // Replaced with a local variable futher down. TODO: Remove this.
 
 	private void Awake()
 	{
 		//manager = GameManager.Instance; // Replaced with a local variable futher down. TODO: Remove this.
+		m_InteractableAlertText = "Press E to Pick up item...";
 	}
 
 	public override void Interact()
 	{
 		base.Interact();
-		// Pick up item
 
+		// Pick up item and display that it has been picked up.
 		PickUp();
 	}
 
@@ -30,10 +33,13 @@ public class ItemPickup : Interactable
 
 		if ( manager.Player1.GetInventory.AddItem( m_ItemToGive ) )
 		{
+
+			
 			Destroy( gameObject );
 		}
 		else
 		{
+
 			// Add some velocity to the item, so it looks like it got picked up then dropped
 		}
 		

@@ -161,7 +161,7 @@ public class Player : MonoBehaviour
 		// Interact
 		if ( Keyboard.current.eKey.wasPressedThisFrame && m_CurrentlyFocusedInteractable ) 
 		{ 
-			m_CurrentlyFocusedInteractable.Interact(); 
+			m_CurrentlyFocusedInteractable.Interact();
 		}
 
 

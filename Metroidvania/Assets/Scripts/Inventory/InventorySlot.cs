@@ -3,9 +3,10 @@ using UnityEngine.UI;
 
 public class InventorySlot : MonoBehaviour
 {
-	private InventoryItem					m_Item;     // The item stored in the slot.
+	private InventoryItem					m_Item;			// The item stored in the slot.
+	[SerializeField] private GameObject		m_ItemDrop;		// Used when removing an item from the inventory.
 
-	public InventoryItem Item => m_Item;
+	public InventoryItem					Item => m_Item;
 
 	[ SerializeField ] private Image		m_Icon;     // The icon of the item.
 
@@ -31,11 +32,16 @@ public class InventorySlot : MonoBehaviour
 
 		m_Icon.sprite = m_Item.m_Icon;
 		m_Icon.enabled = true;
+
+
 	}
 
 	// Remove item from slot, set image to null, and disable the image component.
 	public void RemoveItemFromSlot()
 	{
+		m_ItemDrop.GetComponent<ItemPickup>().m_ItemToGive = m_Item;
+		Instantiate( m_ItemDrop, GameManager.Instance.Player1.transform.position, Quaternion.identity );
+
 		m_Item = null; // TODO: Maybe use destroy in order to destroy it? Or add it to an unload queue.
 
 		m_Icon.sprite = null;
@@ -80,27 +86,7 @@ public class InventorySlot : MonoBehaviour
 			m_rInventoryUI.m_CurrentSlotBorder.transform.position = gameObject.transform.position;
 			m_rInventoryUI.m_CurrentSlotBorder.SetActive( true );
 
-			float SlotMenuWidth		= m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.width * m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().localScale.x;
-			float SlotMenuHeight	= m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.height * m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().localScale.y;
-
-			float NewSlotMenuXPos	= gameObject.transform.position.x + ( SlotMenuWidth / 2.0f )  + ( gameObject.GetComponent<RectTransform>().rect.width / 2.0f ) + 5.0f;
-			float NewSlotMenuYPos	= gameObject.transform.position.y - ( SlotMenuHeight * 0.75f );
-
-			if ( NewSlotMenuXPos > Screen.width )	
-			{
-				NewSlotMenuXPos = gameObject.transform.position.x - ( SlotMenuWidth / 2.0f ) - ( gameObject.GetComponent<RectTransform>().rect.width / 2.0f ) - 5.0f;
-				Debug.Log( "Had to move xposition of slotmenu options, it would have been outside the screen on the right." );
-			}
-
-			if ( NewSlotMenuYPos + m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.height > Screen.height )
-			{
-				NewSlotMenuYPos += 100.0f; // TODO: Don't let this be static.
-				Debug.Log( "Had to move yposition of slotmenu options, it would have been below the screen." );
-			}
-
-			Vector3 NewSlotMenuPos = new Vector3( NewSlotMenuXPos, NewSlotMenuYPos, 0.0f );
-
-			m_rInventoryUI.SlotMenuCurrent.transform.position = NewSlotMenuPos;
+			PositionSlotMenuCurrent();
 
 			m_rInventoryUI.SlotMenuCurrent.SetActive( true );
 
@@ -124,13 +110,41 @@ public class InventorySlot : MonoBehaviour
 	}
 
 
+	private void PositionSlotMenuCurrent()
+	{
+		RectTransform SlotMenuCurrentRectTransform = m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>();
+
+		float SlotMenuWidth		= SlotMenuCurrentRectTransform.rect.width	* SlotMenuCurrentRectTransform.localScale.x;
+		float SlotMenuHeight	= SlotMenuCurrentRectTransform.rect.height	* SlotMenuCurrentRectTransform.localScale.y;
+
+		float NewSlotMenuXPos	= gameObject.transform.position.x + ( SlotMenuWidth / 2.0f ) + ( gameObject.GetComponent<RectTransform>().rect.width / 2.0f ) + 5.0f;
+		float NewSlotMenuYPos	= gameObject.transform.position.y - ( SlotMenuHeight * 0.75f );
+
+		if ( NewSlotMenuXPos + ( SlotMenuWidth * 0.25f ) > Screen.width )
+		{
+			NewSlotMenuXPos = gameObject.transform.position.x - ( SlotMenuWidth / 2.0f ) - ( gameObject.GetComponent<RectTransform>().rect.width / 2.0f ) - 5.0f;
+			Debug.Log( "Had to move xposition of slotmenu options, it would have been outside the screen on the right." );
+		}
+
+		if ( NewSlotMenuYPos + m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.height > Screen.height )
+		{
+			NewSlotMenuYPos += 100.0f; // TODO: Don't let this be static.
+			Debug.Log( "Had to move yposition of slotmenu options, it would have been below the screen." );
+		}
+
+		Vector3 NewSlotMenuPos = new Vector3( NewSlotMenuXPos, NewSlotMenuYPos, 0.0f );
+
+		m_rInventoryUI.SlotMenuCurrent.transform.position = NewSlotMenuPos;
+	}
+
+
 	// Button-functions to be called from the UI
 
 
 	// Removes the item from your inventory. TODO:: Removing an item from your inventory should either destroy it or leave it on the ground. Decide which one to go with, or make a toggle to switch between them.
 	public void OnRemoveButton()
 	{
-		GameManager.Instance.Player1.GetInventory.RemoveItem( m_Item );
+		RemoveItemFromSlot();
 	}
 
 

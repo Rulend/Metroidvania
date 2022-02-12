@@ -20,7 +20,8 @@ public class InventoryUI : MonoBehaviour
 
 	public InventorySlot						m_CurrentSlot;	// The slot was lastly left-clicked.
 	public GameObject							m_CurrentSlotBorder;	// The slot was lastly left-clicked.
-	public GameObject							m_InteractableAlert;    //	The Slot-Menu for ITEMTYPE_QUEST items. 
+	public GameObject							m_InteractableAlert;    // A panel that shows up when close to an interactable. Will show different text based on what kind it is. 
+	public GameObject							m_ItemPickedUpNotice;	// After picking up an item, this panel will be shown in order to let the player see what they've picked up.
 
 
 	public GameObject SlotMenuCurrent	
