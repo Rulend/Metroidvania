@@ -55,7 +55,7 @@ public class Player : MonoBehaviour
 
 	public GameObject InventoryUI { get { return m_InventoryUI; } }
 
-
+	public InputActionAsset ActionAsset;
 
 	// </End of Member variables>
 
@@ -135,6 +135,38 @@ public class Player : MonoBehaviour
 
     void DecideInput()
     {
+
+		// TODO: Look up how to handle the input from a joystick based on how much it's being tilted in a direction. Tilting it fully should move the player faster than tilting it just a small bit.
+		InputActionMap ActionMap = ActionAsset.FindActionMap("MainGameMap");
+		ActionMap.Enable();
+
+		InputAction Movement = ActionMap.FindAction( "Move" );
+		Movement.Enable();
+
+		if ( Movement.triggered )
+		{
+			Debug.Log( "Move-action triggered...(-w- ')??" );
+			//if ( Movement.ReadValue<Vector2>().x < 0  ) 
+			//	m_LRInput -= 1.0f; 
+			//else
+			//	m_LRInput += 1.0f;
+
+			//if ( Movement.ReadValue<Vector2>().x == 0 )
+			//{
+			//	m_LRInput = 0.0f;
+			//}
+
+			m_LRInput = Movement.ReadValue<Vector2>().x;
+			//if ( Movement.ReadValue<Vector2>().y > 0  ) m_LRInput += 1.0f; 
+
+		}
+
+		if ( Movement.WasReleasedThisFrame() )
+		{
+			m_LRInput = 0;
+		}
+
+
 		// Temporary reset function. Once a loading screen has been implemented, play the loading screen and respawn player at last checkpoint.
         if ( Keyboard.current.rKey.wasPressedThisFrame )
         {
@@ -152,8 +184,8 @@ public class Player : MonoBehaviour
         // Button downs
 
 		// Movement
-        if ( Keyboard.current.aKey.wasPressedThisFrame ) { m_LRInput -= 1.0f; }
-        if ( Keyboard.current.dKey.wasPressedThisFrame ) { m_LRInput += 1.0f; }
+        //if ( Keyboard.current.aKey.wasPressedThisFrame ) { m_LRInput -= 1.0f; }
+        //if ( Keyboard.current.dKey.wasPressedThisFrame ) { m_LRInput += 1.0f; }
         if ( Keyboard.current.wKey.wasPressedThisFrame ) { m_UDInput += 1.0f; }
         if ( Keyboard.current.sKey.wasPressedThisFrame ) { m_UDInput -= 1.0f; }
 
@@ -185,7 +217,7 @@ public class Player : MonoBehaviour
         // if (Input.GetAxisRaw("Vertical") < 0.0f)    { m_Crouching = true; }
 
 
-		if ( Keyboard.current.iKey.wasPressedThisFrame)
+		if ( Keyboard.current.iKey.wasPressedThisFrame  )
 		{
 			m_InventoryUI.SetActive( !m_InventoryUI.activeSelf );
 		}
@@ -193,8 +225,8 @@ public class Player : MonoBehaviour
 
 
         // Button ups
-        if ( Keyboard.current.aKey.wasReleasedThisFrame )       { m_LRInput += 1.0f; }
-        if ( Keyboard.current.dKey.wasReleasedThisFrame )       { m_LRInput -= 1.0f; }
+       // if ( Keyboard.current.aKey.wasReleasedThisFrame )       { m_LRInput += 1.0f; }
+        //if ( Keyboard.current.dKey.wasReleasedThisFrame )       { m_LRInput -= 1.0f; }
         if ( Keyboard.current.wKey.wasReleasedThisFrame )       { m_UDInput -= 1.0f; }
         if ( Keyboard.current.sKey.wasReleasedThisFrame )       { m_UDInput += 1.0f; }
 
