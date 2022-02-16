@@ -55,7 +55,8 @@ public class Player : MonoBehaviour
 
 	public GameObject InventoryUI { get { return m_InventoryUI; } }
 
-	public InputActionAsset ActionAsset;
+	// Used for controlling stuff, move to controller script later.
+	[SerializeField] private InputActionAsset ActionAsset;
 
 	// </End of Member variables>
 
@@ -140,35 +141,14 @@ public class Player : MonoBehaviour
 		InputActionMap ActionMap = ActionAsset.FindActionMap("MainGameMap");
 		ActionMap.Enable();
 
-		InputAction Movement = ActionMap.FindAction( "Move" );
-		Movement.Enable();
-
-		if ( Movement.triggered )
-		{
-			Debug.Log( "Move-action triggered...(-w- ')??" );
-			//if ( Movement.ReadValue<Vector2>().x < 0  ) 
-			//	m_LRInput -= 1.0f; 
-			//else
-			//	m_LRInput += 1.0f;
-
-			//if ( Movement.ReadValue<Vector2>().x == 0 )
-			//{
-			//	m_LRInput = 0.0f;
-			//}
-
-			m_LRInput = Movement.ReadValue<Vector2>().x;
-			//if ( Movement.ReadValue<Vector2>().y > 0  ) m_LRInput += 1.0f; 
-
-		}
-
-		if ( Movement.WasReleasedThisFrame() )
-		{
-			m_LRInput = 0;
-		}
+		InputAction Movement	= ActionMap.FindAction( "Move" );
+		InputAction Jump		= ActionMap.FindAction( "Jump" );
+		InputAction Interact	= ActionMap.FindAction( "Interact" );
+		InputAction Reset		= ActionMap.FindAction( "Reset" );
 
 
 		// Temporary reset function. Once a loading screen has been implemented, play the loading screen and respawn player at last checkpoint.
-        if ( Keyboard.current.rKey.wasPressedThisFrame )
+		if ( Keyboard.current.rKey.wasPressedThisFrame )
         {
             m_ActiveInput = true;
             m_PositionToApply = new Vector3( 0.0f, 0.0f, 0.0f );
@@ -177,17 +157,34 @@ public class Player : MonoBehaviour
         if ( !m_ActiveInput )
             return;
 
-        // The movement we want to apply is the input multiplied by our chosen speed.
-        // As we want to apply the movement at a fixed rate, we calculate the movement here based on input, and apply it do it inside FixedUpdate.
-        //m_LRInput = Input.GetAxisRaw("Horizontal") * m_CurrentMovementSpeed;
+		// The movement we want to apply is the input multiplied by our chosen speed.
+		// As we want to apply the movement at a fixed rate, we calculate the movement here based on input, and apply it do it inside FixedUpdate.
+		//m_LRInput = Input.GetAxisRaw("Horizontal") * m_CurrentMovementSpeed;
 
-        // Button downs
+		// Button downs
+		if ( Movement.triggered )
+		{
+			Debug.Log( "Move-action triggered...(-w- ')??" );
 
-		// Movement
-        //if ( Keyboard.current.aKey.wasPressedThisFrame ) { m_LRInput -= 1.0f; }
-        //if ( Keyboard.current.dKey.wasPressedThisFrame ) { m_LRInput += 1.0f; }
-        if ( Keyboard.current.wKey.wasPressedThisFrame ) { m_UDInput += 1.0f; }
-        if ( Keyboard.current.sKey.wasPressedThisFrame ) { m_UDInput -= 1.0f; }
+			m_LRInput = Movement.ReadValue<Vector2>().x;
+			m_UDInput = Movement.ReadValue<Vector2>().y;
+		}
+
+		if ( Jump.triggered )
+		{
+			if ( m_UDInput < 0.0f && m_Grounded /*&& m_SlideCooldownTimeLeft <= 0.0f*/ ) // Don't put this here.
+			{
+				if ( m_SlideCooldownTimeLeft <= 0.0f ) // This approach makes it so we don't have to check for down press again in the if statement below.
+				{
+					StartSlide();
+				}
+			}
+			else if ( m_CoyoteTimeLeft > 0.0f )
+			{
+				m_JumpWindowActive = true;
+				m_CoyoteTimeLeft = 0.0f;
+			}
+		}
 
 
 		// Interact
@@ -197,43 +194,30 @@ public class Player : MonoBehaviour
 		}
 
 
-		// Jump / slide
-		if ( Keyboard.current.spaceKey.wasPressedThisFrame )
-        { 
-            if ( m_UDInput < 0.0f && m_Grounded /*&& m_SlideCooldownTimeLeft <= 0.0f*/ ) // Don't put this here.
-			{   
-                if ( m_SlideCooldownTimeLeft <= 0.0f ) // This approach makes it so we don't have to check for down press again in the if statement below.
-				{
-                    StartSlide();
-                }
-            }
-            else if ( m_CoyoteTimeLeft > 0.0f )
-			{
-                m_JumpWindowActive = true;
-                m_CoyoteTimeLeft = 0.0f;
-            }
-        }
-
         // if (Input.GetAxisRaw("Vertical") < 0.0f)    { m_Crouching = true; }
 
 
 		if ( Keyboard.current.iKey.wasPressedThisFrame  )
 		{
 			m_InventoryUI.SetActive( !m_InventoryUI.activeSelf );
+
+
 		}
 
 
 
         // Button ups
-       // if ( Keyboard.current.aKey.wasReleasedThisFrame )       { m_LRInput += 1.0f; }
-        //if ( Keyboard.current.dKey.wasReleasedThisFrame )       { m_LRInput -= 1.0f; }
-        if ( Keyboard.current.wKey.wasReleasedThisFrame )       { m_UDInput -= 1.0f; }
-        if ( Keyboard.current.sKey.wasReleasedThisFrame )       { m_UDInput += 1.0f; }
 
-        if ( Keyboard.current.spaceKey.wasReleasedThisFrame )   { m_JumpWindowActive = false; }
+		if ( Movement.WasReleasedThisFrame() )
+		{
+			Debug.Log( "Move-action released!!(-w- ')!" );
+			m_LRInput = 0;
+		}
 
+		if ( Jump.WasReleasedThisFrame() ) { m_JumpWindowActive = false; }
 
-    }
+		//if ( Keyboard.current.spaceKey.wasReleasedThisFrame )   { m_JumpWindowActive = false; }
+	}
 
 
     void StartSlide()
