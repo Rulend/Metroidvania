@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ItemPickup : Interactable
 {
@@ -27,14 +28,14 @@ public class ItemPickup : Interactable
 		// If there is enough space, add item to inventory
 		// If added to inventory, remove from scene
 
-		GameManager manager = GameManager.Instance;
+		GameManager rGameManager = GameManager.Instance;
 
 		Debug.Log( "Picking up " + m_ItemToGive.m_ItemName );
 
-		if ( manager.Player1.GetInventory.AddItem( m_ItemToGive ) )
+		if ( rGameManager.Player1.GetInventory.AddItem( m_ItemToGive ) ) // If its possible to pickup the item...
 		{
+			rGameManager.Player1.InventoryUI.GetComponent<InventoryUI>().ShowItemPickedUpNotice( m_ItemToGive );
 
-			
 			Destroy( gameObject );
 		}
 		else

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InventoryUI : MonoBehaviour
 {
@@ -128,4 +129,13 @@ public class InventoryUI : MonoBehaviour
 	{
 		m_CurrentSlot.OnRemoveButton(); // Change this later so it brings up an "Are you sure?"-menu. Also change discard to actually put the gameobject back into the scene.
 	}
+
+	public void ShowItemPickedUpNotice( InventoryItem pr_PickedUpItem )
+	{
+		m_ItemPickedUpNotice.transform.GetChild( 0 ).gameObject.transform.GetChild(0).GetComponent<Image>().sprite		= pr_PickedUpItem.m_Icon;
+		m_ItemPickedUpNotice.GetComponentInChildren<Text>().text														= pr_PickedUpItem.m_ItemName;
+		m_ItemPickedUpNotice.SetActive( true );
+	}
+
+
 }

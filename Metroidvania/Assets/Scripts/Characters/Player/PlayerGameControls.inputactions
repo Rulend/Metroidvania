@@ -42,7 +42,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "InventoryToggle",
+                    "name": "MenuToggle",
                     "type": "Button",
                     "id": "e2d76ba7-9946-4f4d-8b85-0a586f53eadf",
                     "expectedControlType": "Button",
@@ -231,11 +231,44 @@
                 {
                     "name": "",
                     "id": "6c374f96-8b72-4ec3-b479-f8dc7b48962c",
-                    "path": "",
+                    "path": "<Keyboard>/b",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "MenuToggle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "47412ff8-d7e6-45d8-be8f-3fd78dd1ff5a",
+                    "path": "<Keyboard>/i",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "MenuToggle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "93b9ea12-7b97-410a-aa9e-397dadfbeec0",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "MenuToggle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "895ed971-b0ca-42b2-8c10-359028a66e84",
+                    "path": "<Gamepad>/start",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "InventoryToggle",
+                    "action": "MenuToggle",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

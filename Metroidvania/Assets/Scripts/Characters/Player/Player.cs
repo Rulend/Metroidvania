@@ -141,14 +141,15 @@ public class Player : MonoBehaviour
 		InputActionMap ActionMap = ActionAsset.FindActionMap("MainGameMap");
 		ActionMap.Enable();
 
-		InputAction Movement	= ActionMap.FindAction( "Move" );
-		InputAction Jump		= ActionMap.FindAction( "Jump" );
-		InputAction Interact	= ActionMap.FindAction( "Interact" );
-		InputAction Reset		= ActionMap.FindAction( "Reset" );
+		InputAction Movement			= ActionMap.FindAction( "Move" );
+		InputAction Jump				= ActionMap.FindAction( "Jump" );
+		InputAction Interact			= ActionMap.FindAction( "Interact" );
+		InputAction Reset				= ActionMap.FindAction( "Reset" );
+		InputAction MenuToggle			= ActionMap.FindAction( "MenuToggle" );
 
 
 		// Temporary reset function. Once a loading screen has been implemented, play the loading screen and respawn player at last checkpoint.
-		if ( Keyboard.current.rKey.wasPressedThisFrame )
+		if ( Reset.triggered )
         {
             m_ActiveInput = true;
             m_PositionToApply = new Vector3( 0.0f, 0.0f, 0.0f );
@@ -188,7 +189,7 @@ public class Player : MonoBehaviour
 
 
 		// Interact
-		if ( Keyboard.current.eKey.wasPressedThisFrame && m_CurrentlyFocusedInteractable ) 
+		if ( Interact.triggered && m_CurrentlyFocusedInteractable ) 
 		{ 
 			m_CurrentlyFocusedInteractable.Interact();
 		}
@@ -197,11 +198,9 @@ public class Player : MonoBehaviour
         // if (Input.GetAxisRaw("Vertical") < 0.0f)    { m_Crouching = true; }
 
 
-		if ( Keyboard.current.iKey.wasPressedThisFrame  )
+		if (MenuToggle.triggered  )
 		{
 			m_InventoryUI.SetActive( !m_InventoryUI.activeSelf );
-
-
 		}
 
 
