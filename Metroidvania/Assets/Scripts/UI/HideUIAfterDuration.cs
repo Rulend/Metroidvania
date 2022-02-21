@@ -5,7 +5,7 @@ using UnityEngine;
 public class HideUIAfterDuration : MonoBehaviour
 {
 
-	public float m_AliveDuration = 2.0f;
+	public float m_AliveDuration = 1.5f;
 	private float m_AliveTimeLeft;
 
     // Start is called before the first frame update
