@@ -5,13 +5,13 @@ using UnityEngine;
 public class Character : MonoBehaviour
 {
     // Protected member variables
-    protected ushort  m_MaxHealth;
-    protected short   m_CurrentHealth;
+    protected ushort				m_MaxHealth;
+    protected short					m_CurrentHealth;
 
-    protected float m_BaseMovementSpeed;
-    protected float m_CurrentMovementSpeed;
+    protected float					m_BaseMovementSpeed;
+    protected float					m_CurrentMovementSpeed;
 
-    protected CharacterController m_MovementController;
+    protected CharacterController	m_MovementController;
 
     
 

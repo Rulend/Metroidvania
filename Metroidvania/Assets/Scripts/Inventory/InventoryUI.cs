@@ -22,8 +22,11 @@ public class InventoryUI : MonoBehaviour
 	public InventorySlot						m_CurrentSlot;	// The slot was lastly left-clicked.
 	public GameObject							m_CurrentSlotBorder;	// The slot was lastly left-clicked.
 	public GameObject							m_InteractableAlert;    // A panel that shows up when close to an interactable. Will show different text based on what kind it is. 
-	public GameObject							m_ItemPickedUpNotice;	// After picking up an item, this panel will be shown in order to let the player see what they've picked up.
+	public GameObject							m_ItemPickedUpNotice;   // After picking up an item, this panel will be shown in order to let the player see what they've picked up.
 
+	private Vector3								m_InteractableAlertStartPos;
+
+	public Vector3 InteractableAlertStartPos =>		m_InteractableAlertStartPos;
 
 	public GameObject SlotMenuCurrent	
 	{
@@ -41,6 +44,8 @@ public class InventoryUI : MonoBehaviour
 	{
 		m_Inventory		= GameManager.Instance.Player1.GetInventory;
 		m_Slots			= m_Inventory.m_InventorySlots; // I do not enjoy doing things in this manner, I would rather create them via code. TODO:: Do this via code. Example below.
+
+		m_InteractableAlertStartPos = m_InteractableAlert.transform.position;
 
 		// Example
 		//for ( int RowIndex = 0; RowIndex < 4; ++RowIndex)
@@ -120,20 +125,11 @@ public class InventoryUI : MonoBehaviour
 		gameObject.SetActive( false );
 	}
 
-	public void UseCurrentlySelectedItem() // An ugly workaround to the problem where the item slot menus need to target a specific slot in order to trigger their functions. Since they can't access this gameobject in their button functions, this was the only way I found.
-	{
-		m_CurrentSlot.OnUseItemButton();
-	}
-
-	public void RemoveCurrentlySelectedItem() // An ugly workaround to the problem where the item slot menus need to target a specific slot in order to trigger their functions. Since they can't access this gameobject in their button functions, this was the only way I found.
-	{
-		m_CurrentSlot.OnRemoveButton(); // Change this later so it brings up an "Are you sure?"-menu. Also change discard to actually put the gameobject back into the scene.
-	}
-
 	public void ShowItemPickedUpNotice( InventoryItem pr_PickedUpItem )
 	{
 		m_ItemPickedUpNotice.transform.GetChild( 0 ).gameObject.transform.GetChild(0).GetComponent<Image>().sprite		= pr_PickedUpItem.m_Icon;
 		m_ItemPickedUpNotice.GetComponentInChildren<Text>().text														= pr_PickedUpItem.m_ItemName;
+		m_ItemPickedUpNotice.GetComponent<HideUIAfterDuration>().ResetAliveTimeLeft();
 		m_ItemPickedUpNotice.SetActive( true );
 	}
 

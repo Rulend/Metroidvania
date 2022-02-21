@@ -51,7 +51,7 @@ public class InventorySlot : MonoBehaviour
 
 
 	// Brings up the submenu for an item.
-	public void ShowItemSlotOptions()
+	public void ButtonShowItemSlotOptions()
 	{
 		if ( m_Item )	// Check item type to decide which menu to bring up.
 		{
@@ -142,14 +142,14 @@ public class InventorySlot : MonoBehaviour
 
 
 	// Removes the item from your inventory. TODO:: Removing an item from your inventory should either destroy it or leave it on the ground. Decide which one to go with, or make a toggle to switch between them.
-	public void OnRemoveButton()
+	public void ButtonRemoveItem()
 	{
 		RemoveItemFromSlot();
 	}
 
 
 	// "Uses" the item. For a consumable, this will consume it. For an equipment, this will equip it, etc.
-	public void OnUseItemButton()
+	public void ButtonUseItem()
 	{
 		if ( m_Item )
 		{

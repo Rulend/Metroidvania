@@ -49,6 +49,13 @@ public class Interactable : MonoBehaviour
 			{
 				m_rPlayer.SetCurrentInteractable( this );
 				m_rInteractableAlert.GetComponentInChildren<Text>().text = m_InteractableAlertText;
+
+				// Set position of the interactable text based on whether the player recently picked up an item or not.
+				if ( m_rPlayer.InventoryUI.GetComponent<InventoryUI>().m_ItemPickedUpNotice.activeSelf )
+					m_rInteractableAlert.transform.position = m_rPlayer.InventoryUI.GetComponent<InventoryUI>().InteractableAlertStartPos - new Vector3( 0.0f, 200.0f, 0.0f );
+				else
+					m_rInteractableAlert.transform.position = m_rPlayer.InventoryUI.GetComponent<InventoryUI>().InteractableAlertStartPos;
+
 				m_rInteractableAlert.SetActive( true );
 			}
 
