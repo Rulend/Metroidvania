@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Player : MonoBehaviour
+public class Player : Character
 {
 	// < Member variables>
 	[SerializeField] private LayerMask m_WhatIsGround;                          // A mask determining what is ground to the character
@@ -12,35 +12,30 @@ public class Player : MonoBehaviour
 	private Vector3 m_Velocity = new Vector3( 0.0f, 0.0f, 0.0f );
 	[SerializeField] private float m_Gravity = 6.0f;
 
-	private bool m_Grounded;            // Whether or not the player is grounded.
-	private bool m_FacingRight = true;  // For determining which way the player is currently facing.
+	private bool m_Grounded;			// Whether or not the player is grounded.
+	private bool m_FacingRight = true;	// For determining which way the player is currently facing.
 
 	// Player's stats
-	private ushort m_MaxHealth = 5;
-	private short m_CurrentHealth = 5;
-
-	private float m_BaseMovementSpeed = 5.0f;
-	private float m_CurrentMovementSpeed = 9.0f;
 
 	// Movement variables.
-	private bool m_ActiveInput = true;
-	private float m_LRInput = 0.0f;
-	private float m_UDInput = 0.0f;
+	private bool	m_ActiveInput = true;
+	private float	m_LRInput = 0.0f;
+	private float	m_UDInput = 0.0f;
 
 	// The player's jump
 	[SerializeField] private float m_MaxJumpHeight = 3.3f;
-	private bool m_JumpWindowActive = false;
+	private bool	m_JumpWindowActive = false;
 	[SerializeField] private float m_JumpWindowDuration = 0.214f; // Static as this value only needs to be set once
-	private float m_JumpWindowTimeLeft = 0.214f;
-	private float m_CoyoteDuration = 0.2f;
-	private float m_CoyoteTimeLeft = 0.2f;
+	private float	m_JumpWindowTimeLeft = 0.214f;
+	private float	m_CoyoteDuration = 0.2f;
+	private float	m_CoyoteTimeLeft = 0.2f;
 
 	// The player's slide move.
-	private float m_SlideCooldownDuration = 0.75f;
-	private float m_SlideCooldownTimeLeft = 0.0f;
+	private float	m_SlideCooldownDuration = 0.75f;
+	private float	m_SlideCooldownTimeLeft = 0.0f;
 	[SerializeField] private float m_SlideDuration = 0.5f;
 	[SerializeField] private float m_SlideDistanceTotal = 2.0f;
-	private float m_SlideDistanceLeft = 0.0f;
+	private float	m_SlideDistanceLeft = 0.0f;
 	private Vector3 m_SlideDirection = Vector3.zero;
 
 	// The currently focused interactable.
@@ -63,7 +58,11 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+		m_BaseMovementSpeed = 9.0f;
+		//m_CurrentMovementSpeed = m_BaseMovementSpeed /* * speedMultiplier */ ;
+		m_CurrentMovementSpeed = 9.0f;
+
+		//m_Velocity = gameObject.GetComponent<Rigidbody>().velocity;
     }
 
 	void Awake()
@@ -78,23 +77,24 @@ public class Player : MonoBehaviour
 	// Update is called once per frame
 	void Update()
     {
-        DecideInput();
+		// Takes input from the player
+		DecideInput();
 
 
-        if ( m_CoyoteTimeLeft > 0.0f )
+		if ( m_CoyoteTimeLeft > 0.0f )
 		{
-            m_CoyoteTimeLeft -= Time.deltaTime;
+			m_CoyoteTimeLeft -= Time.deltaTime;
 		}
 		else
 		{
-            m_CoyoteTimeLeft = 0.0f;
+			m_CoyoteTimeLeft = 0.0f;
 		}
     }
 
     private void FixedUpdate()
     {
         // Add -9.82 multiplied by a modifiable gravity-variable multiplied by time.fixedDeltaTime to make the player fall at a good speed.
-        m_Velocity.y += m_Gravity * ( -9.82f ) * Time.fixedDeltaTime;
+		m_Velocity.y += m_Gravity * ( -9.82f ) * Time.fixedDeltaTime;
         m_Velocity.y = Mathf.Clamp( m_Velocity.y, -50.0f, 20.0f );
 
         // Set to false if player is jumping, set to true if collision is found underneath the player
@@ -130,7 +130,8 @@ public class Player : MonoBehaviour
         m_PositionToApply += ( m_Velocity * Time.fixedDeltaTime );
 
         // Apply the position to the player.
-        gameObject.transform.position = m_PositionToApply;
+        gameObject.transform.position = m_PositionToApply; // The way to do it if Rigidbodies were not needed. They are needed though, since for whatever reason hitboxes get anygry otherwise.
+        //gameObject.transform.position += new Vector3( m_LRInput * Time.fixedDeltaTime * m_CurrentMovementSpeed, 0.0f, 0.0f );
 
     }
 
@@ -159,8 +160,6 @@ public class Player : MonoBehaviour
             return;
 
 		// The movement we want to apply is the input multiplied by our chosen speed.
-		// As we want to apply the movement at a fixed rate, we calculate the movement here based on input, and apply it do it inside FixedUpdate.
-		//m_LRInput = Input.GetAxisRaw("Horizontal") * m_CurrentMovementSpeed;
 
 		// Button downs
 		if ( Movement.triggered )
@@ -214,8 +213,6 @@ public class Player : MonoBehaviour
 		}
 
 		if ( Jump.WasReleasedThisFrame() ) { m_JumpWindowActive = false; }
-
-		//if ( Keyboard.current.spaceKey.wasReleasedThisFrame )   { m_JumpWindowActive = false; }
 	}
 
 
@@ -225,35 +222,35 @@ public class Player : MonoBehaviour
         m_SlideDistanceLeft		= m_SlideDistanceTotal;
     }
 
-    void Slide()
-    {
-        // Dividing the distance by (duration / fixedDeltaTime) will make sure the dash is complete by the specified time.
-        // The further you want the character to go during the time frame, the faster they will go to get there.
+	void Slide()
+	{
+		// Dividing the distance by (duration / fixedDeltaTime) will make sure the dash is complete by the specified time.
+		// The further you want the character to go during the time frame, the faster they will go to get there.
 
-        if ( m_SlideDistanceLeft > 0.0f ) // Doing this is better than a clamp, as a clamp has 2 if-statements, this has one.
-        {
-            Debug.Log( "Sliding!" );
+		if ( m_SlideDistanceLeft > 0.0f ) // Doing this is better than a clamp, as a clamp has 2 if-statements, this has one.
+		{
+			Debug.Log( "Sliding!" );
+			
+			// Change this formula later, the dash should have more speed during ~80% of the duration, and close to the end it should halt quickly.
+			m_SlideDistanceLeft -= m_SlideDistanceTotal / ( m_SlideDuration / Time.fixedDeltaTime );
+			
+			Vector3 DesiredSlidePosition = m_SlideDistanceLeft * m_SlideDirection;
+			DesiredSlidePosition.z = 0.0f;
+			
+			m_PositionToApply += DesiredSlidePosition;
+		}
 
-            // Change this formula later, the dash should have more speed during ~80% of the duration, and close to the end it should halt quickly.
-            m_SlideDistanceLeft -= m_SlideDistanceTotal / ( m_SlideDuration / Time.fixedDeltaTime );
-
-            Vector3 DesiredSlidePosition = m_SlideDistanceLeft * m_SlideDirection;
-            DesiredSlidePosition.z = 0.0f;
-
-            m_PositionToApply += DesiredSlidePosition;
-        }
-
-        // Tick down the cooldown by the same amount every time if it's more than 0.
-        if (m_SlideCooldownTimeLeft > 0.0f)
-        {
-            m_SlideCooldownTimeLeft -= Time.fixedDeltaTime;
-            Debug.Log("SlideCooldown: " + m_SlideCooldownTimeLeft);
-            // Cooldown has to reach 0 in combined time of itself + duration.
-            // If duration is 0.5f, and cooldown is 0.5f, then we need to have:
-            // Awake() m_CoolDown = 1;
-            // FixedUpdate() m_CurrentCooldown -= (m_CoolDown * time.fixedDeltaTime) /time.fixedDeltaTime;
-        }
-    }
+		// Tick down the cooldown by the same amount every time if it's more than 0.
+		if (m_SlideCooldownTimeLeft > 0.0f)
+		{
+			m_SlideCooldownTimeLeft -= Time.fixedDeltaTime;
+			Debug.Log("SlideCooldown: " + m_SlideCooldownTimeLeft);
+			// Cooldown has to reach 0 in combined time of itself + duration.
+			// If duration is 0.5f, and cooldown is 0.5f, then we need to have:
+			// Awake() m_CoolDown = 1;
+			// FixedUpdate() m_CurrentCooldown -= (m_CoolDown * time.fixedDeltaTime) /time.fixedDeltaTime;
+		}
+	}
 
 
     public void Move( float pr_Movement )
