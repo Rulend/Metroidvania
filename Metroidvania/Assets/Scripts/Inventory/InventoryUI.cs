@@ -125,6 +125,17 @@ public class InventoryUI : MonoBehaviour
 		gameObject.SetActive( false );
 	}
 
+	public void UseCurrentlySelectedItem() // An ugly workaround to the problem where the item slot menus need to target a specific slot in order to trigger their functions. Since they can't access this gameobject in their button functions, this was the only way I found.
+	{
+		m_CurrentSlot.ButtonUseItem();
+	}
+
+	public void RemoveCurrentlySelectedItem() // An ugly workaround to the problem where the item slot menus need to target a specific slot in order to trigger their functions. Since they can't access this gameobject in their button functions, this was the only way I found.
+	{
+		m_CurrentSlot.ButtonRemoveItem(); // Change this later so it brings up an "Are you sure?"-menu. Also change discard to actually put the gameobject back into the scene.
+	}
+
+
 	public void ShowItemPickedUpNotice( InventoryItem pr_PickedUpItem )
 	{
 		m_ItemPickedUpNotice.transform.GetChild( 0 ).gameObject.transform.GetChild(0).GetComponent<Image>().sprite		= pr_PickedUpItem.m_Icon;

@@ -13,9 +13,17 @@ public class Player : Character
 	[SerializeField] private float m_Gravity = 6.0f;
 
 	private bool m_Grounded;			// Whether or not the player is grounded.
-	private bool m_FacingRight = true;	// For determining which way the player is currently facing.
+	private bool m_FacingRight = true;  // For determining which way the player is currently facing.
 
 	// Player's stats
+	// Derived from Character
+
+	// Rigidbody used for movement
+	Rigidbody m_Rigidbody;
+	Vector3 m_KnockBackVelocity;
+	Vector3 m_MovementVelocity;
+	Vector3 m_GravityVelocity;
+
 
 	// Movement variables.
 	private bool	m_ActiveInput = true;
@@ -41,8 +49,6 @@ public class Player : Character
 	// The currently focused interactable.
 	[SerializeField] private Interactable m_CurrentlyFocusedInteractable;
 
-
-
 	[SerializeField] private Inventory m_Inventory;
 	public Inventory GetInventory => m_Inventory;
 
@@ -63,7 +69,8 @@ public class Player : Character
 		m_CurrentMovementSpeed = 9.0f;
 
 		//m_Velocity = gameObject.GetComponent<Rigidbody>().velocity;
-    }
+		m_Rigidbody				= gameObject.GetComponent<Rigidbody>(); // Might be able to delete this if not neccessary
+	}
 
 	void Awake()
 	{
@@ -103,36 +110,46 @@ public class Player : Character
         if ( m_Grounded )
         {
             m_Velocity.y = 0.0f;
-            m_PositionToApply.y = m_GroundCollisionPosition.y;
-            m_JumpWindowTimeLeft = m_JumpWindowDuration;
+            //m_PositionToApply.y = m_GroundCollisionPosition.y; // Not Rigidbody way
+			gameObject.transform.position = new Vector3( transform.position.x, m_GroundCollisionPosition.y, transform.position.z ); // Rigidbody way
+			m_JumpWindowTimeLeft = m_JumpWindowDuration;
             m_CoyoteTimeLeft = m_CoyoteDuration;
         }
         else if ( m_JumpWindowActive ) // this inside here could be made into a Jump()-function
-        {
-            m_JumpWindowTimeLeft -= Time.fixedDeltaTime;
-            m_Velocity.y = 0.0f; // Set new velocity so player goes upwards
-            m_PositionToApply.y += ( m_MaxJumpHeight / m_JumpWindowDuration ) * Time.fixedDeltaTime; // Set new velocity so player goes upwards
+		{
+			m_JumpWindowTimeLeft -= Time.fixedDeltaTime;
+			//m_Velocity.y = 0.0f; // Set velocity to 0 so player isn't pushed down ( non rigidbody way)
+			//m_PositionToApply.y += ( m_MaxJumpHeight / m_JumpWindowDuration ) * Time.fixedDeltaTime; // Set position to move upwards
+			m_Rigidbody.AddForce( new Vector3( 0.0f, ( m_MaxJumpHeight / m_JumpWindowDuration ) , 0.0f ), ForceMode.VelocityChange ); // Use velocity in order to move the player upwards // This way sucks, because the jump becomes really floaty
 
-            if ( m_JumpWindowTimeLeft < 0.0f )
-            {
-                m_JumpWindowActive = false;
-            }
-        }
+			if ( m_JumpWindowTimeLeft < 0.0f )
+			{
+			    m_JumpWindowActive = false;
+			}
+		}
 
         // If not being knocked back by something, allow movement.
-        if ( m_Velocity.x == 0.0f ) // Can check for exactly 0.0f, as velocity.x is set to exactly 0.0f if within a threshold.
+  //      if ( m_Velocity.x == 0.0f ) // Can check for exactly 0.0f, as velocity.x is set to exactly 0.0f if within a threshold.
+		//{
+  //          Move( m_LRInput * m_CurrentMovementSpeed );
+  //          Slide();
+		//}
+
+		if (  m_KnockBackVelocity.x == 0.0f )
 		{
-            Move( m_LRInput * m_CurrentMovementSpeed );
-            Slide();
+			Move( m_LRInput * m_CurrentMovementSpeed );
+			Slide();
 		}
 
         // Add velocity to the position.
         m_PositionToApply += ( m_Velocity * Time.fixedDeltaTime );
 
-        // Apply the position to the player.
-        gameObject.transform.position = m_PositionToApply; // The way to do it if Rigidbodies were not needed. They are needed though, since for whatever reason hitboxes get anygry otherwise.
-        //gameObject.transform.position += new Vector3( m_LRInput * Time.fixedDeltaTime * m_CurrentMovementSpeed, 0.0f, 0.0f );
+		// Apply the position to the player.
+		//gameObject.transform.position = m_PositionToApply; // The way to do it if Rigidbodies were not needed. They are needed though, since for whatever reason hitboxes get anygry otherwise.
 
+		// Below is the rigidbody way
+		//m_Velocity.x = m_LRInput * m_CurrentMovementSpeed ;
+		m_Rigidbody.velocity = m_Velocity;
     }
 
     void DecideInput()
@@ -273,7 +290,8 @@ public class Player : Character
         }
 
         // Set position to apply to player's movement
-        m_PositionToApply.x += pr_Movement * Time.fixedDeltaTime;
+//		m_PositionToApply.x += pr_Movement * Time.fixedDeltaTime;	// Not Rigidbody way
+		m_Velocity.x = pr_Movement * Time.fixedDeltaTime * 20.0f;	// Rigidbody way
     }
 
 
@@ -302,7 +320,8 @@ public class Player : Character
 			return false;
 		}
 
-        Vector3 RayStartPos = m_PositionToApply + new Vector3( 0.0f, 0.5f, 0.0f );
+        //Vector3 RayStartPos = m_PositionToApply + new Vector3( 0.0f, 0.5f, 0.0f ); // Not using rigidbody
+        Vector3 RayStartPos = transform.position + new Vector3( 0.0f, 0.5f, 0.0f ); // Using rigidbody
         float RayMaxDistance = 0.55f;
 
         Vector3 DebugRayStart = m_PositionToApply + new Vector3( 0.0f, 0.5f, 0.0f );
