@@ -5,21 +5,19 @@ using UnityEngine.UI;
 
 public class Interactable : MonoBehaviour
 {
-	public float	m_InteractionRadius = 1.5f;
+	public		float			m_InteractionRadius = 1.5f;
+	private		GameObject		m_rInteractableAlert;		// A reference to the Alert that shows up on the screen when the player comes close. Found inside the UI-canvas.
+	protected	string			m_InteractableAlertText = "Press E to \n ";	// The text that will be when the player is within InteractionRadius. Add to this in derived classes.
 
-	private Player	m_rPlayer;
 
-	private float	m_DistanceToPlayer;
-
-	private GameObject m_rInteractableAlert;
-	protected string m_InteractableAlertText = "Interactable \n Text";
-	
+	protected	Player			m_rPlayer;			// A reference to the player.
+	private		float			m_DistanceToPlayer;	// Distance to the player.
 
 
 	// Start is called after creation, if the gameobject or component is not disabled
 	void Start()
     {
-		m_rPlayer				= GameManager.Instance.Player1;
+		m_rPlayer				= GameManager.Instance.rPlayer1;
 		m_rInteractableAlert	= m_rPlayer.InventoryUI.GetComponent<InventoryUI>().m_InteractableAlert;
 	}
 
@@ -31,7 +29,6 @@ public class Interactable : MonoBehaviour
 		m_rPlayer.SetCurrentInteractable( null );
 		m_rInteractableAlert.SetActive( false );
 	}
-
 
 	// The range to the player has to always be checked, as we don't know how far away the object is from the player otherwise.
 	// If the player is within the interactable range, let them interact with the object if they press E.

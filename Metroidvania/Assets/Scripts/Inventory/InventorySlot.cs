@@ -17,7 +17,7 @@ public class InventorySlot : MonoBehaviour
 	{
 		// TODO: Instead of doing player 1, do it the correct way (which includes being able to handle multiple players and not showing each others inventory).
 		if ( !m_rInventoryUI )
-			m_rInventoryUI = GameManager.Instance.Player1.InventoryUI.GetComponent<InventoryUI>();
+			m_rInventoryUI = GameManager.Instance.rPlayer1.InventoryUI.GetComponent<InventoryUI>();
 
 		// TODO: Add so that the slot menu options buttons get assigned their functions automatically if it's not filled in.
 	}
@@ -40,7 +40,7 @@ public class InventorySlot : MonoBehaviour
 	public void RemoveItemFromSlot()
 	{
 		m_ItemDrop.GetComponent<ItemPickup>().m_ItemToGive = m_Item;
-		Instantiate( m_ItemDrop, GameManager.Instance.Player1.transform.position, Quaternion.identity );
+		Instantiate( m_ItemDrop, GameManager.Instance.rPlayer1.transform.position, Quaternion.identity );
 
 		m_Item = null; // TODO: Maybe use destroy in order to destroy it? Or add it to an unload queue.
 

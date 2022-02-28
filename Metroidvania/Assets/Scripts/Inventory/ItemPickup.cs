@@ -11,7 +11,7 @@ public class ItemPickup : Interactable
 	private void Awake()
 	{
 		//manager = GameManager.Instance; // Replaced with a local variable futher down. TODO: Remove this.
-		m_InteractableAlertText = "Press E to Pick up item...";
+		m_InteractableAlertText += "Pick up item...";
 	}
 
 	public override void Interact()
@@ -28,13 +28,12 @@ public class ItemPickup : Interactable
 		// If there is enough space, add item to inventory
 		// If added to inventory, remove from scene
 
-		GameManager rGameManager = GameManager.Instance;
 
 		Debug.Log( "Picking up " + m_ItemToGive.m_ItemName );
 
-		if ( rGameManager.Player1.GetInventory.AddItem( m_ItemToGive ) ) // If its possible to pickup the item...
+		if ( m_rPlayer.GetInventory.AddItem( m_ItemToGive ) ) // If its possible to pickup the item...
 		{
-			rGameManager.Player1.InventoryUI.GetComponent<InventoryUI>().ShowItemPickedUpNotice( m_ItemToGive );
+			m_rPlayer.InventoryUI.GetComponent<InventoryUI>().ShowItemPickedUpNotice( m_ItemToGive );
 
 			Destroy( gameObject );
 		}

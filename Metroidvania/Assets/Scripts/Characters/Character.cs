@@ -15,10 +15,10 @@ public class Character : MonoBehaviour
     protected float					m_BaseMovementSpeed;
     protected float					m_CurrentMovementSpeed;
 
-//	protected uint					m_Strength;
-//	protected uint					m_Dexterity;
-//	protected uint					m_Intelligence;
-//	protected uint					m_Endurance;
+//	protected uint					m_Strength;		// Increase sword damage.
+//	protected uint					m_Dexterity;	// Increase bow damage.
+//	protected uint					m_Intelligence;	// Increase magic damage.
+//	protected uint					m_Endurance;	// For increasing stamina and health.
 //	protected uint					m_Adaptability; // For using throwing weapons that are limited, such as knives, bombs, shuriken, etc. 
 
 //	protected int					m_PhysicalResistance;

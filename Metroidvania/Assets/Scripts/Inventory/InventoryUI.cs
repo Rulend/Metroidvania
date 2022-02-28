@@ -42,7 +42,7 @@ public class InventoryUI : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
 	{
-		m_Inventory		= GameManager.Instance.Player1.GetInventory;
+		m_Inventory		= GameManager.Instance.rPlayer1.GetInventory;
 		m_Slots			= m_Inventory.m_InventorySlots; // I do not enjoy doing things in this manner, I would rather create them via code. TODO:: Do this via code. Example below.
 
 		m_InteractableAlertStartPos = m_InteractableAlert.transform.position;

@@ -104,8 +104,6 @@ public class Player : Character
     private void FixedUpdate()
     {
 		// Add -9.82 multiplied by a modifiable gravity-variable multiplied by time.fixedDeltaTime to make the player fall at a good speed.
-		//m_Velocity.y += m_Gravity * ( -9.82f ) * Time.fixedDeltaTime;
-		//m_MovementVelocity.y = Mathf.Clamp( m_Velocity.y, -50.0f, 20.0f );
 		m_GravityVelocity.y += m_Gravity * ( -9.82f ) * Time.fixedDeltaTime;
 		m_GravityVelocity.y = Mathf.Clamp( m_GravityVelocity.y, -50.0f, 20.0f );
 
@@ -124,10 +122,10 @@ public class Player : Character
         else if ( m_JumpWindowActive ) // this inside here could be made into a Jump()-function
 		{
 			m_JumpWindowTimeLeft -= Time.fixedDeltaTime;
-			//m_Velocity.y = 0.0f; // Set velocity to 0 so player isn't pushed down ( non rigidbody way)
+			m_GravityVelocity.y = 0.0f; // Set velocity to 0 so player isn't pushed down ( non rigidbody way)
 			//m_PositionToApply.y += ( m_MaxJumpHeight / m_JumpWindowDuration ) * Time.fixedDeltaTime; // Set position to move upwards
 			//m_MovementVelocity.y += ( m_MaxJumpHeight / m_JumpWindowDuration ) * ( m_JumpWindowTimeLeft * 1.2f ) ;
-			m_Rigidbody.AddForce( new Vector3( 0.0f, ( m_MaxJumpHeight / m_JumpWindowDuration ) * 1.5f, 0.0f ), ForceMode.VelocityChange ); // Use velocity in order to move the player upwards // This way sucks, because the jump becomes really floaty
+			m_Rigidbody.AddForce( new Vector3( 0.0f, ( m_MaxJumpHeight / m_JumpWindowDuration ), 0.0f ), ForceMode.VelocityChange ); // Use velocity in order to move the player upwards // This way sucks, because the jump becomes really floaty
 
 			if ( m_JumpWindowTimeLeft < 0.0f )
 			{
@@ -162,7 +160,7 @@ public class Player : Character
 		}
 
 		// Add velocity to the position.
-		//m_PositionToApply += ( m_Velocity * Time.fixedDeltaTime );
+		//m_PositionToApply += ( m_GravityVelocity * Time.fixedDeltaTime );
 
 		// Apply the position to the player.
 		//gameObject.transform.position = m_PositionToApply; // The way to do it if Rigidbodies were not needed. They are needed though, since for whatever reason colliders need a rigidbody in order to do collision against other colliders.
@@ -189,7 +187,8 @@ public class Player : Character
 		if ( Reset.triggered )
         {
             m_ActiveInput = true;
-            m_PositionToApply = new Vector3( 0.0f, 0.0f, 0.0f );
+			//m_PositionToApply = new Vector3( 0.0f, 0.0f, 0.0f );
+			transform.position = new Vector3( 0.0f, 0.0f, 0.0f );
 		}
 
         if ( !m_ActiveInput )
