@@ -65,10 +65,33 @@ public class Player : Character
 	[SerializeField] private BoxCollider m_LowerCollider;
 
 
+	// State machine for player
+	private enum PlayerStates
+	{
+		PLAYERSTATE_IDLE	= 0	,
+		PLAYERSTATE_RUNNING		,
+		PLAYERSTATE_JUMPING		,
+		PLAYERSTATE_FALLING		,
+		PLAYERSTATE_SLIDING		,
+	}
+
+	private PlayerStates m_State;
+
+
+	// State machine for the controls
+	private enum ControlTypes
+	{
+		CONTROLTYPE_DEFAULT = 0	,
+		CONTROLTYPE_NOATTACK	,
+		CONTROLTYPE_NOJUMP		,
+		CONTROLTYPE_CUTSCENE	,
+	}
+
+
 	// </End of Member variables>
 
-    // Start is called before the first frame update
-    void Start()
+	// Start is called before the first frame update
+	void Start()
     {
 		// Set character values inherited from Character-class
 		m_BaseMovementSpeed = 9.0f;
@@ -98,16 +121,52 @@ public class Player : Character
 
 		if ( m_CoyoteTimeLeft > 0.0f )
 		{
-			m_CoyoteTimeLeft -= Time.deltaTime;
+			//m_CoyoteTimeLeft -= Time.deltaTime;
 		}
 		else
 		{
-			m_CoyoteTimeLeft = 0.0f;
+			//m_CoyoteTimeLeft = 0.0f;
 		}
-    }
+
+
+		DecreaseTimersDT( Time.deltaTime );
+
+
+	}
 
     private void FixedUpdate()
     {
+
+		switch( m_State )
+		{
+			case PlayerStates.PLAYERSTATE_IDLE:
+
+				break;
+			case PlayerStates.PLAYERSTATE_RUNNING:
+
+				break;
+			case PlayerStates.PLAYERSTATE_SLIDING:
+
+				if ( m_SlideDistanceLeft > 0.0f ) 
+				{
+					Slide();
+					m_UpperCollider.enabled = false;
+				}
+				else
+				{
+					m_State = PlayerStates.PLAYERSTATE_IDLE;
+					m_UpperCollider.enabled = true;
+				}
+
+				break;
+
+			default:
+				break;
+		}
+
+
+
+
 		// Add -9.82 multiplied by a modifiable gravity-variable multiplied by time.fixedDeltaTime to make the player fall at a good speed.
 		m_GravityVelocity.y += m_Gravity * ( -9.82f ) * Time.fixedDeltaTime;
 		m_GravityVelocity.y = Mathf.Clamp( m_GravityVelocity.y, -50.0f, 20.0f );
@@ -161,7 +220,8 @@ public class Player : Character
 			//}
 
 			Move( m_LRInput * m_CurrentMovementSpeed );
-			Slide();
+
+			//Slide();
 		}
 
 		// Add velocity to the position.
@@ -178,6 +238,8 @@ public class Player : Character
     {
 
 		// TODO: Look up how to handle the input from a joystick based on how much it's being tilted in a direction. Tilting it fully should move the player faster than tilting it just a small bit.
+		// TODO: Setup so that the type of buttons with available pressing depends on what kind of control-state it is currently in. If NOJUMP is set, then don't allow jumping, don't even check for jumping.
+
 		InputActionMap ActionMap = ActionAsset.FindActionMap("MainGameMap");
 		ActionMap.Enable();
 
@@ -256,37 +318,33 @@ public class Player : Character
     {
         m_SlideCooldownTimeLeft = m_SlideCooldownDuration;
         m_SlideDistanceLeft		= m_SlideDistanceTotal;
+		m_State					= PlayerStates.PLAYERSTATE_SLIDING;
     }
 
 	void Slide()
 	{
-		// Dividing the distance by (duration / fixedDeltaTime) will make sure the dash is complete by the specified time.
-		// The further you want the character to go during the time frame, the faster they will go to get there.
 
-		if ( m_SlideDistanceLeft > 0.0f ) // Doing this is better than a clamp, as a clamp has 2 if-statements, this has one.
-		{
-			Debug.Log( "Sliding!" );
-			
-			// Change this formula later, the dash should have more speed during ~80% of the duration, and close to the end it should halt quickly.
-			m_SlideDistanceLeft -= m_SlideDistanceTotal / ( m_SlideDuration / Time.fixedDeltaTime );
-			
-			Vector3 DesiredSlidePosition = m_SlideDistanceLeft * m_SlideDirection;
-			DesiredSlidePosition.z = 0.0f;
+		Debug.Log( "Sliding!" );
 
-			//m_PositionToApply += DesiredSlidePosition;
-			m_Rigidbody.AddForce( DesiredSlidePosition * 50.0f, ForceMode.VelocityChange ) ;
-			transform.Rotate(new Vector3( m_SlideDirection.x * 10.0f, 0.0f, 0.0f ) );
-		}
+		// Change this formula later, the dash should have more speed during ~80% of the duration, and close to the end it should halt quickly.
+		m_SlideDistanceLeft -= m_SlideDistanceTotal / ( m_SlideDuration / Time.fixedDeltaTime );
 
-		// Tick down the cooldown by the same amount every time if it's more than 0.
-		if ( m_SlideCooldownTimeLeft > 0.0f )
-		{
-			m_SlideCooldownTimeLeft -= Time.fixedDeltaTime;
-		}
+		Vector3 DesiredSlidePosition = m_SlideDistanceLeft * m_SlideDirection;
+		DesiredSlidePosition.z = 0.0f;
+
+		//m_PositionToApply += DesiredSlidePosition;
+		m_Rigidbody.AddForce( DesiredSlidePosition * 50.0f, ForceMode.VelocityChange );
+		//transform.Rotate( new Vector3( m_SlideDirection.x * 10.0f, 0.0f, 0.0f ) );
+	}
+
+	private void DecreaseTimersDT( float pr_DeltaTime )
+	{
+		m_CoyoteTimeLeft			-= pr_DeltaTime;
+		m_SlideCooldownTimeLeft		-= pr_DeltaTime;
 	}
 
 
-    public void Move( float pr_Movement )
+	public void Move( float pr_Movement )
     {
         // Add this later
         //if ( m_Grounded || m_AirControl ) 
@@ -362,10 +420,10 @@ public class Player : Character
         }
 
         // Add offset to ray, in order to check slightly BEHIND the player for ground collision.
-        RayStartPos = transform.position + new Vector3( 0.0f, 0.5f, 0.0f ) + ( transform.forward * -0.5f );
+        RayStartPos = transform.position + new Vector3( 0.0f, 0.5f, 0.0f ) + ( ( m_LowerCollider.size.z / 2.0f - 0.01f ) * -transform.forward );
 
-        DebugRayStart	= transform.position + new Vector3( 0.0f,   0.5f, 0.0f ) + ( ( m_LowerCollider.size.z / 2.0f ) * -transform.forward ) ;
-        DebugRayEnd		= transform.position + new Vector3( 0.0f, -0.05f, 0.0f ) + ( ( m_LowerCollider.size.z / 2.0f ) * -transform.forward ) ;
+		DebugRayStart	= RayStartPos;
+        DebugRayEnd		= RayStartPos - new Vector3( 0.0f, RayMaxDistance, 0.0f );
         Debug.DrawLine( DebugRayStart, DebugRayEnd, Color.blue );
 
         GroundCheckRay = new Ray( RayStartPos, Vector3.down );
@@ -377,10 +435,10 @@ public class Player : Character
 		}
 
 		// Add offset to ray, in order to check slightly in FRONT of the player for ground collision.
-		RayStartPos = transform.position + new Vector3( 0.0f, 0.5f, 0.0f ) + ( transform.forward * 0.5f );
+		RayStartPos = transform.position + new Vector3( 0.0f, 0.5f, 0.0f ) + ( ( m_LowerCollider.size.z / 2.0f - 0.01f) * transform.forward );
 
-		DebugRayStart	= transform.position + new Vector3( 0.0f,   0.5f, 0.0f ) + ( ( m_LowerCollider.size.z / 2.0f ) * transform.forward ) ;
-		DebugRayEnd		= transform.position + new Vector3( 0.0f, -0.05f, 0.0f ) + ( ( m_LowerCollider.size.z / 2.0f ) * transform.forward );
+		DebugRayStart	= RayStartPos;
+		DebugRayEnd		= RayStartPos - new Vector3( 0.0f, RayMaxDistance, 0.0f );
 		Debug.DrawLine( DebugRayStart, DebugRayEnd, Color.yellow );
 
 		GroundCheckRay = new Ray( RayStartPos, Vector3.down );
