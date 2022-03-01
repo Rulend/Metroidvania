@@ -60,6 +60,11 @@ public class Player : Character
 	// Used for controlling stuff, move to controller script later.
 	[SerializeField] private InputActionAsset ActionAsset;
 
+	// Hurtboxes - used for detecting hits.
+	[SerializeField] private BoxCollider m_UpperCollider;
+	[SerializeField] private BoxCollider m_LowerCollider;
+
+
 	// </End of Member variables>
 
     // Start is called before the first frame update
@@ -185,8 +190,8 @@ public class Player : Character
 
 		// Temporary reset function. Once a loading screen has been implemented, play the loading screen and respawn player at last checkpoint.
 		if ( Reset.triggered )
-        {
-            m_ActiveInput = true;
+		{
+			m_ActiveInput = true;
 			//m_PositionToApply = new Vector3( 0.0f, 0.0f, 0.0f );
 			transform.position = new Vector3( 0.0f, 0.0f, 0.0f );
 		}
@@ -267,12 +272,14 @@ public class Player : Character
 			
 			Vector3 DesiredSlidePosition = m_SlideDistanceLeft * m_SlideDirection;
 			DesiredSlidePosition.z = 0.0f;
-			
-			m_PositionToApply += DesiredSlidePosition;
+
+			//m_PositionToApply += DesiredSlidePosition;
+			m_Rigidbody.AddForce( DesiredSlidePosition * 50.0f, ForceMode.VelocityChange ) ;
+			transform.Rotate(new Vector3( m_SlideDirection.x * 10.0f, 0.0f, 0.0f ) );
 		}
 
 		// Tick down the cooldown by the same amount every time if it's more than 0.
-		if (m_SlideCooldownTimeLeft > 0.0f)
+		if ( m_SlideCooldownTimeLeft > 0.0f )
 		{
 			m_SlideCooldownTimeLeft -= Time.fixedDeltaTime;
 		}
@@ -313,21 +320,20 @@ public class Player : Character
         m_FacingRight = !m_FacingRight;
 
         // My own version of rotating, instead of changing the scale as above.
-        float currentYRotation = gameObject.transform.localRotation.y;
+        float CurrentYRotation = gameObject.transform.localRotation.y;
 
-        Quaternion desiredRotation = new Quaternion(gameObject.transform.localRotation.x, -currentYRotation, gameObject.transform.localRotation.z, gameObject.transform.localRotation.w);
+        Quaternion DesiredRotation = new Quaternion( gameObject.transform.localRotation.x, -CurrentYRotation, gameObject.transform.localRotation.z, gameObject.transform.localRotation.w );
 
-        gameObject.transform.localRotation = desiredRotation;
+        gameObject.transform.localRotation = DesiredRotation;
     }
 
 
 
     bool CheckForGround()
     {
-        if ( m_JumpWindowActive )
-		{
+		if ( m_JumpWindowActive )
 			return false;
-		}
+
 
 //		Vector3 RayStartPos = m_PositionToApply + new Vector3( 0.0f, 0.5f, 0.0f ); // Not using rigidbody
 		Vector3 RayStartPos = transform.position + new Vector3( 0.0f, 0.5f, 0.0f ); // Using rigidbody
@@ -358,8 +364,8 @@ public class Player : Character
         // Add offset to ray, in order to check slightly BEHIND the player for ground collision.
         RayStartPos = transform.position + new Vector3( 0.0f, 0.5f, 0.0f ) + ( transform.forward * -0.5f );
 
-        DebugRayStart	= transform.position + new Vector3( 0.0f, 0.5f, 0.0f ) + ( transform.forward * -0.5f );
-        DebugRayEnd		= transform.position + new Vector3( 0.0f, -0.05f, 0.0f ) + ( transform.forward * -0.5f );
+        DebugRayStart	= transform.position + new Vector3( 0.0f,   0.5f, 0.0f ) + ( ( m_LowerCollider.size.z / 2.0f ) * -transform.forward ) ;
+        DebugRayEnd		= transform.position + new Vector3( 0.0f, -0.05f, 0.0f ) + ( ( m_LowerCollider.size.z / 2.0f ) * -transform.forward ) ;
         Debug.DrawLine( DebugRayStart, DebugRayEnd, Color.blue );
 
         GroundCheckRay = new Ray( RayStartPos, Vector3.down );
@@ -373,8 +379,8 @@ public class Player : Character
 		// Add offset to ray, in order to check slightly in FRONT of the player for ground collision.
 		RayStartPos = transform.position + new Vector3( 0.0f, 0.5f, 0.0f ) + ( transform.forward * 0.5f );
 
-		DebugRayStart = transform.position + new Vector3( 0.0f, 0.5f, 0.0f ) + ( transform.forward * 0.5f );
-		DebugRayEnd = transform.position + new Vector3( 0.0f, -0.05f, 0.0f ) + ( transform.forward * 0.5f );
+		DebugRayStart	= transform.position + new Vector3( 0.0f,   0.5f, 0.0f ) + ( ( m_LowerCollider.size.z / 2.0f ) * transform.forward ) ;
+		DebugRayEnd		= transform.position + new Vector3( 0.0f, -0.05f, 0.0f ) + ( ( m_LowerCollider.size.z / 2.0f ) * transform.forward );
 		Debug.DrawLine( DebugRayStart, DebugRayEnd, Color.yellow );
 
 		GroundCheckRay = new Ray( RayStartPos, Vector3.down );

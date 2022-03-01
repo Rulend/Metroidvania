@@ -3,7 +3,7 @@ using UnityEngine;
 public class Teleporter : Interactable
 {
 	//Teleporter[] m_rTeleporters; // gonna use this later when I've made so the player can choose which points to teleport to. Gonna do that after implementing save points.
-	[SerializeField] private Teleporter m_TargetLocation;
+	[SerializeField] private Transform m_TargetLocation;
 
     // Start is called before the first frame update
     void Awake()
