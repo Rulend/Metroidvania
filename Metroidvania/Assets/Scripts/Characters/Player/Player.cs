@@ -16,6 +16,10 @@ public class Player : Character
 	private bool m_Grounded;			// Whether or not the player is grounded.
 	private bool m_FacingRight = true;  // For determining which way the player is currently facing.
 
+	// Used for measuring fall damage
+	private float m_DistanceFallen;
+
+
 	// Player's stats
 	// Derived from Character
 
@@ -93,10 +97,12 @@ public class Player : Character
 	// Start is called before the first frame update
 	void Start()
     {
-		// Set character values inherited from Character-class
+		// Set character values inherited from Character-class. Read these from save file later, once a save system has been set up.
 		m_BaseMovementSpeed = 9.0f;
 		//m_CurrentMovementSpeed = m_BaseMovementSpeed /* * speedMultiplier */ ;
 		m_CurrentMovementSpeed = 9.0f;
+		m_MaxHealth = 10.0f;
+		m_CurrentHealth = m_MaxHealth;
 
 
 		// Setup other references and stuff
@@ -118,83 +124,27 @@ public class Player : Character
 		// Takes input from the player
 		DecideInput();
 
-
-		if ( m_CoyoteTimeLeft > 0.0f )
-		{
-			//m_CoyoteTimeLeft -= Time.deltaTime;
-		}
-		else
-		{
-			//m_CoyoteTimeLeft = 0.0f;
-		}
-
-
 		DecreaseTimersDT( Time.deltaTime );
-
-
 	}
 
     private void FixedUpdate()
     {
 
-		switch( m_State )
-		{
-			case PlayerStates.PLAYERSTATE_IDLE:
-
-				break;
-			case PlayerStates.PLAYERSTATE_RUNNING:
-
-				break;
-			case PlayerStates.PLAYERSTATE_SLIDING:
-
-				if ( m_SlideDistanceLeft > 0.0f ) 
-				{
-					Slide();
-					m_UpperCollider.enabled = false;
-				}
-				else
-				{
-					m_State = PlayerStates.PLAYERSTATE_IDLE;
-					m_UpperCollider.enabled = true;
-				}
-
-				break;
-
-			default:
-				break;
-		}
-
-
-
-
 		// Add -9.82 multiplied by a modifiable gravity-variable multiplied by time.fixedDeltaTime to make the player fall at a good speed.
 		m_GravityVelocity.y += m_Gravity * ( -9.82f ) * Time.fixedDeltaTime;
 		m_GravityVelocity.y = Mathf.Clamp( m_GravityVelocity.y, -50.0f, 20.0f );
 
-        // Set to false if player is jumping, set to true if collision is found underneath the player
-        m_Grounded = CheckForGround();
+		// Set to false if player is jumping, set to true if collision is found underneath the player
+		m_Grounded = CheckForGround();
 
-        if ( m_Grounded )
-        {
-			//m_Velocity.y = 0.0f;
-			m_GravityVelocity.y	= 0.0f;
-            //m_PositionToApply.y = m_GroundCollisionPosition.y; // Not Rigidbody way
-			//gameObject.transform.position = new Vector3( transform.position.x, m_GroundCollisionPosition.y, transform.position.z ); // Rigidbody way
-			m_JumpWindowTimeLeft	= m_JumpWindowDuration;
-            m_CoyoteTimeLeft		= m_CoyoteDuration;
-        }
-        else if ( m_JumpWindowActive ) // this inside here could be made into a Jump()-function
+		if ( m_Grounded )
 		{
-			m_JumpWindowTimeLeft -= Time.fixedDeltaTime;
-			m_GravityVelocity.y = 0.0f; // Set velocity to 0 so player isn't pushed down ( non rigidbody way)
-			//m_PositionToApply.y += ( m_MaxJumpHeight / m_JumpWindowDuration ) * Time.fixedDeltaTime; // Set position to move upwards
-			//m_MovementVelocity.y += ( m_MaxJumpHeight / m_JumpWindowDuration ) * ( m_JumpWindowTimeLeft * 1.2f ) ;
-			m_Rigidbody.AddForce( new Vector3( 0.0f, ( m_MaxJumpHeight / m_JumpWindowDuration ), 0.0f ), ForceMode.VelocityChange ); // Use velocity in order to move the player upwards // This way sucks, because the jump becomes really floaty
-
-			if ( m_JumpWindowTimeLeft < 0.0f )
-			{
-			    m_JumpWindowActive = false;
-			}
+			//m_Velocity.y = 0.0f;
+			m_GravityVelocity.y = 0.0f;
+			//m_PositionToApply.y = m_GroundCollisionPosition.y; // Not Rigidbody way
+			//gameObject.transform.position = new Vector3( transform.position.x, m_GroundCollisionPosition.y, transform.position.z ); // Rigidbody way
+			m_JumpWindowTimeLeft = m_JumpWindowDuration;
+			m_CoyoteTimeLeft = m_CoyoteDuration;
 		}
 
 		//If not being knocked back by something, allow movement.
@@ -220,9 +170,77 @@ public class Player : Character
 			//}
 
 			Move( m_LRInput * m_CurrentMovementSpeed );
-
-			//Slide();
 		}
+
+
+
+		// Temporarily like this until I make it better
+		switch ( m_State )
+		{
+			case PlayerStates.PLAYERSTATE_IDLE:
+				// Play idle animation
+
+				break;
+			case PlayerStates.PLAYERSTATE_RUNNING:
+
+				break;
+			case PlayerStates.PLAYERSTATE_JUMPING:
+				m_JumpWindowTimeLeft -= Time.deltaTime;
+
+				m_GravityVelocity.y = 0.0f; // Set velocity to 0 so player isn't pushed down
+				m_Rigidbody.AddForce( new Vector3( 0.0f, ( m_MaxJumpHeight / m_JumpWindowDuration ), 0.0f ), ForceMode.VelocityChange ); // Use velocity in order to move the player upwards // This way sucks, because the jump becomes really floaty
+
+
+				if ( m_JumpWindowTimeLeft <= 0.0f )
+				{
+					m_State = PlayerStates.PLAYERSTATE_FALLING;
+				}
+
+				break;
+			case PlayerStates.PLAYERSTATE_FALLING:
+
+				m_DistanceFallen += 0.1f;
+
+				// TODO: Remove this, it ain't a good way to use a state machine.
+				if ( m_Grounded )
+				{
+					m_State = PlayerStates.PLAYERSTATE_IDLE;
+
+					if ( m_DistanceFallen > 2.0f )
+					{
+						TakeDamage( m_DistanceFallen );
+						Debug.Log( string.Format("Took {0} damage from falling. \n", m_DistanceFallen) );
+					}
+					Debug.Log( string.Format( "Current health: {0}. \n", m_CurrentHealth ) );
+
+					m_DistanceFallen = 0.0f;
+				}
+
+				break;
+			case PlayerStates.PLAYERSTATE_SLIDING:
+
+				if ( m_SlideDistanceLeft > 0.0f ) 
+				{
+					Slide();
+					m_UpperCollider.enabled = false;
+				}
+				else
+				{
+					m_State = PlayerStates.PLAYERSTATE_IDLE;
+					m_UpperCollider.enabled = true;
+				}
+
+				break;
+
+			default:
+				break;
+		}
+
+		if ( m_GravityVelocity.y < 0.0f )
+			m_State = PlayerStates.PLAYERSTATE_FALLING;
+
+		//Debug.Log( "Current Player state: " + m_State.ToString() );
+
 
 		// Add velocity to the position.
 		//m_PositionToApply += ( m_GravityVelocity * Time.fixedDeltaTime );
@@ -283,8 +301,9 @@ public class Player : Character
 			}
 			else if ( m_CoyoteTimeLeft > 0.0f )
 			{
-				m_JumpWindowActive = true;
-				m_CoyoteTimeLeft = 0.0f;
+				//m_JumpWindowActive = true;
+				m_State				= PlayerStates.PLAYERSTATE_JUMPING;
+				m_CoyoteTimeLeft	= 0.0f;
 			}
 		}
 
@@ -295,7 +314,7 @@ public class Player : Character
 			m_CurrentlyFocusedInteractable.Interact();
 		}
 
-		if (MenuToggle.triggered  )
+		if ( MenuToggle.triggered  )
 		{
 			m_InventoryUI.SetActive( !m_InventoryUI.activeSelf );
 		}
@@ -308,9 +327,11 @@ public class Player : Character
 		{
 			Debug.Log( "Move-action released!!(-w- ')!" );
 			m_LRInput = 0;
+			m_UDInput = 0;
 		}
 
-		if ( Jump.WasReleasedThisFrame() ) { m_JumpWindowActive = false; }
+		//if ( Jump.WasReleasedThisFrame() ) { m_JumpWindowActive = false; }
+		if ( Jump.WasReleasedThisFrame() && m_State == PlayerStates.PLAYERSTATE_JUMPING ) { m_State = PlayerStates.PLAYERSTATE_FALLING; }
 	}
 
 
@@ -334,12 +355,24 @@ public class Player : Character
 
 		//m_PositionToApply += DesiredSlidePosition;
 		m_Rigidbody.AddForce( DesiredSlidePosition * 50.0f, ForceMode.VelocityChange );
-		//transform.Rotate( new Vector3( m_SlideDirection.x * 10.0f, 0.0f, 0.0f ) );
 	}
 
+	void Jump()
+	{
+
+	}
+
+	void Land()
+	{
+		// TODO on Thursday 4th of March 2022: move movement-related stuff over to the player controller. Make a velocity component.
+	}
+
+
+	// Timers that always need to be decreased, regardless of state
 	private void DecreaseTimersDT( float pr_DeltaTime )
 	{
-		m_CoyoteTimeLeft			-= pr_DeltaTime;
+//		m_CoyoteTimeLeft			-= pr_DeltaTime;	// Only needs to be decreased inside STATE_FALLING.
+//		m_JumpWindowTimeLeft		-= pr_DeltaTime;	// Only needs to be decreased inside STATE_JUMPING.
 		m_SlideCooldownTimeLeft		-= pr_DeltaTime;
 	}
 
@@ -389,7 +422,8 @@ public class Player : Character
 
     bool CheckForGround()
     {
-		if ( m_JumpWindowActive )
+		//if ( m_JumpWindowActive )
+		if ( m_State == PlayerStates.PLAYERSTATE_JUMPING )
 			return false;
 
 
