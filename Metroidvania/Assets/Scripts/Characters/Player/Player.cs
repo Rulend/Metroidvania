@@ -7,7 +7,6 @@ public class Player : Character
 	[SerializeField] private LayerMask m_WhatIsGround;                          // A mask determining what is ground to the character
 
 	public Vector3 m_PositionToApply;
-	public Vector3 m_GroundCollisionPosition;
 
 //	private Vector3 m_Velocity = new Vector3( 0.0f, 0.0f, 0.0f );
 	private Vector3 m_MovementVelocity = new Vector3( 0.0f, 0.0f, 0.0f );
@@ -18,7 +17,6 @@ public class Player : Character
 
 	// Used for measuring fall damage
 	private float m_DistanceFallen;
-
 
 	// Player's stats
 	// Derived from Character
@@ -34,6 +32,9 @@ public class Player : Character
 	private bool	m_ActiveInput = true;
 	private float	m_LRInput = 0.0f;
 	private float	m_UDInput = 0.0f;
+
+	private Vector3 m_MovementDirection;
+	private Vector3 m_GroundNormal;
 
 	// The player's jump
 	[SerializeField] private float m_MaxJumpHeight		= 3.3f;
@@ -79,9 +80,6 @@ public class Player : Character
 		PLAYERSTATE_SLIDING		,
 	}
 
-	private PlayerStates m_State;
-
-
 	// State machine for the controls
 	private enum ControlTypes
 	{
@@ -92,21 +90,22 @@ public class Player : Character
 	}
 
 
+	private PlayerStates m_State;
 	// </End of Member variables>
 
 	// Start is called before the first frame update
 	void Start()
     {
 		// Set character values inherited from Character-class. Read these from save file later, once a save system has been set up.
-		m_BaseMovementSpeed = 9.0f;
+		m_BaseMovementSpeed = 450.0f;
 		//m_CurrentMovementSpeed = m_BaseMovementSpeed /* * speedMultiplier */ ;
-		m_CurrentMovementSpeed = 9.0f;
+		m_CurrentMovementSpeed = 450.0f;
 		m_MaxHealth = 10.0f;
 		m_CurrentHealth = m_MaxHealth;
 
 
 		// Setup other references and stuff
-		m_Rigidbody		= gameObject.GetComponent<Rigidbody>(); // Might be able to delete this if not neccessary
+		m_Rigidbody				= gameObject.GetComponent<Rigidbody>(); // Might be able to delete this if not neccessary
 	}
 
 	void Awake()
@@ -141,36 +140,20 @@ public class Player : Character
 		{
 			//m_Velocity.y = 0.0f;
 			m_GravityVelocity.y = 0.0f;
-			//m_PositionToApply.y = m_GroundCollisionPosition.y; // Not Rigidbody way
-			//gameObject.transform.position = new Vector3( transform.position.x, m_GroundCollisionPosition.y, transform.position.z ); // Rigidbody way
 			m_JumpWindowTimeLeft = m_JumpWindowDuration;
 			m_CoyoteTimeLeft = m_CoyoteDuration;
 		}
 
 		//If not being knocked back by something, allow movement.
-
 		if ( m_KnockBackVelocity.x == 0.0f )
 		{
-			Vector3 MovementDirection = new Vector3( 0.0f, 0.0f, 0.0f );
 
-			//Vector3 RayStartPos = transform.position + new Vector3( 0.0f, 0.5f, 0.0f ); // Using rigidbody
-			//float RayMaxDistance = 0.55f;
-
-			//Vector3 DebugRayStart = transform.position + new Vector3( 0.0f, 0.5f, 0.0f );
-			//Vector3 DebugRayEnd = transform.position + new Vector3( 0.0f, -0.05f, 0.0f ); // Just for drawing purposes, max length of raycast has to be changed in if-statement
-			//Debug.DrawLine( DebugRayStart, DebugRayEnd, Color.red );ada
-
-			//RaycastHit RaycastHit;
-			//Ray GroundCheckRay = new Ray( RayStartPos, Vector3.down );
-
-			//// If ground is detected directly underneath the player:
-			//if ( Physics.Raycast( GroundCheckRay, out RaycastHit, RayMaxDistance, m_WhatIsGround ) )
-			//{
-			//	MovementDirection = Vector3.Cross( new Vector3( m_LRInput, 0.0f, 0.0f ).normalized, RaycastHit.normal );
-			//}
-
-			Move( m_LRInput * m_CurrentMovementSpeed );
+			m_MovementDirection = Vector3.Cross( (new Vector3(0.0f, 0.0f, -m_LRInput) ), m_GroundNormal );
+			Move( m_MovementDirection * m_CurrentMovementSpeed ); // If no input is provided, the function will still run, but the player won't move.
 		}
+
+
+		PlayerStates InputState = PlayerStates.PLAYERSTATE_IDLE;
 
 
 
@@ -281,7 +264,12 @@ public class Player : Character
 
 		// The movement we want to apply is the input (taken here) multiplied by our chosen speed (done later).
 
-		// Button downs
+		//////////////////////////////////////////////////////////////////////////////////
+		//																				//
+		// Button downs - what happens when a button is pressed.						//
+		// The actions themselves are defined inside PlayerGameControls.inputactions	//
+		//																				//
+		//////////////////////////////////////////////////////////////////////////////////
 		if ( Movement.triggered )
 		{
 			Debug.Log( "Move-action triggered...(-w- ')??" );
@@ -321,13 +309,18 @@ public class Player : Character
 
 
 
-        // Button ups
+		//////////////////////////////////////////////////////////////////////////////////
+		//																				//
+		// Button ups - what happens when a button is released.							//
+		// The actions themselves are defined inside PlayerGameControls.inputactions	//
+		//																				//
+		//////////////////////////////////////////////////////////////////////////////////
 
 		if ( Movement.WasReleasedThisFrame() )
 		{
 			Debug.Log( "Move-action released!!(-w- ')!" );
-			m_LRInput = 0;
-			m_UDInput = 0;
+			m_LRInput = 0.0f;
+			m_UDInput = 0.0f;
 		}
 
 		//if ( Jump.WasReleasedThisFrame() ) { m_JumpWindowActive = false; }
@@ -344,7 +337,6 @@ public class Player : Character
 
 	void Slide()
 	{
-
 		Debug.Log( "Sliding!" );
 
 		// Change this formula later, the dash should have more speed during ~80% of the duration, and close to the end it should halt quickly.
@@ -377,7 +369,7 @@ public class Player : Character
 	}
 
 
-	public void Move( float pr_Movement )
+	public void Move( Vector3 pr_Movement )
     {
         // Add this later
         //if ( m_Grounded || m_AirControl ) 
@@ -387,20 +379,18 @@ public class Player : Character
 
         // Turning the character the correct way is the highest priority
 
-        if ( pr_Movement < 0.0f && m_FacingRight )
+        if ( m_LRInput < 0.0f && m_FacingRight )
         {
             Flip();
         }
-        else if ( pr_Movement > 0.0f && !m_FacingRight )
+        else if ( m_LRInput > 0.0f && !m_FacingRight )
         {
             Flip();
         }
 
-
-
-        // Set position to apply to player's movement
-//		m_PositionToApply.x += pr_Movement * Time.fixedDeltaTime;	// Not Rigidbody way
-		m_MovementVelocity.x = pr_Movement * Time.fixedDeltaTime * 50.0f;	// Rigidbody way
+		// Set position to apply to player's movement
+		//		m_PositionToApply.x += pr_Movement * Time.fixedDeltaTime;	// Not Rigidbody way
+		m_MovementVelocity = pr_Movement * Time.fixedDeltaTime;	// Rigidbody way
     }
 
 
@@ -422,7 +412,9 @@ public class Player : Character
 
     bool CheckForGround()
     {
-		//if ( m_JumpWindowActive )
+		m_GroundNormal = Vector3.up;
+
+
 		if ( m_State == PlayerStates.PLAYERSTATE_JUMPING )
 			return false;
 
@@ -438,33 +430,35 @@ public class Player : Character
         RaycastHit	RaycastHit;
         Ray			GroundCheckRay = new Ray( RayStartPos, Vector3.down );
 
-        // If ground is detected directly underneath the player:
-        if ( Physics.Raycast( GroundCheckRay, out RaycastHit, RayMaxDistance, m_WhatIsGround ) )
-        {
-         
-            // TODO WARNING ERROR HEY! Fix this later so it uses a bool in the same way JumpWindowActive works.
-            if ( m_UDInput < 0.0f && RaycastHit.transform.gameObject.tag == "FallThroughPlatform" )
-            {
-                return false;
-            }
+		// If ground is detected directly underneath the player:
+		if ( Physics.Raycast( GroundCheckRay, out RaycastHit, RayMaxDistance, m_WhatIsGround ) )
+		{
+			// TODO WARNING ERROR HEY! Fix this later so it uses a bool in the same way JumpWindowActive works.
+			//if ( m_UDInput < 0.0f && RaycastHit.transform.gameObject.tag == "FallThroughPlatform" )
+			//{
+			//    return false;
+			//}
+			m_GroundNormal		= RaycastHit.normal;
+			m_SlideDirection	= Vector3.Cross( transform.right.normalized, RaycastHit.normal );
+			//m_MovementDirection = Vector3.Cross( transform.right.normalized, RaycastHit.normal );
 
-            m_GroundCollisionPosition = RaycastHit.point;
-            m_SlideDirection = Vector3.Cross( transform.right.normalized, RaycastHit.normal );
-            return true;
-        }
+			return true;
+		}
 
-        // Add offset to ray, in order to check slightly BEHIND the player for ground collision.
-        RayStartPos = transform.position + new Vector3( 0.0f, 0.5f, 0.0f ) + ( ( m_LowerCollider.size.z / 2.0f - 0.01f ) * -transform.forward );
+		// Add offset to ray, in order to check slightly BEHIND the player for ground collision.
+		RayStartPos = transform.position + new Vector3( 0.0f, 0.5f, 0.0f ) + ( ( m_LowerCollider.size.z / 2.0f - 0.01f ) * -transform.forward );
 
 		DebugRayStart	= RayStartPos;
-        DebugRayEnd		= RayStartPos - new Vector3( 0.0f, RayMaxDistance, 0.0f );
-        Debug.DrawLine( DebugRayStart, DebugRayEnd, Color.blue );
+		DebugRayEnd		= RayStartPos - new Vector3( 0.0f, RayMaxDistance, 0.0f );
+		Debug.DrawLine( DebugRayStart, DebugRayEnd, Color.blue );
 
-        GroundCheckRay = new Ray( RayStartPos, Vector3.down );
+		GroundCheckRay = new Ray( RayStartPos, Vector3.down );
 
 		if ( Physics.Raycast( GroundCheckRay, out RaycastHit, RayMaxDistance, m_WhatIsGround ) ) // if no ground directly underneath, check behind
 		{
-			m_GroundCollisionPosition = RaycastHit.point;
+			m_GroundNormal = RaycastHit.normal;
+			m_SlideDirection	= Vector3.Cross( transform.right.normalized, RaycastHit.normal );
+			//m_MovementDirection = Vector3.Cross( transform.right.normalized, RaycastHit.normal );
 			return true;
 		}
 
@@ -479,7 +473,9 @@ public class Player : Character
 
 		if ( Physics.Raycast( GroundCheckRay, out RaycastHit, RayMaxDistance, m_WhatIsGround ) ) // if no ground directly underneath, check in front
 		{
-			m_GroundCollisionPosition = RaycastHit.point;
+			m_GroundNormal = RaycastHit.normal;
+			m_SlideDirection	= Vector3.Cross( transform.right.normalized, RaycastHit.normal );
+			//m_MovementDirection = Vector3.Cross( transform.right.normalized, RaycastHit.normal );
 			return true;
 		}
 
