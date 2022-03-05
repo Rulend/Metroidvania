@@ -63,7 +63,13 @@ public class Player : Character
 	public GameObject InventoryUI { get { return m_InventoryUI; } }
 
 	// Used for controlling stuff, move to controller script later.
-	[SerializeField] private InputActionAsset ActionAsset;
+	[SerializeField] private InputActionAsset	m_InputActionAsset;
+
+	private InputActionMap	m_ActionMap; // The current actionmap. See to the right how to ser up an array //new InputActionMap[ (int)ControlTypes.CONTROLTYPE_SIZE ];	// The different kinds of actionmaps used.
+	private InputAction[]	m_InputActions; // The different actions for the action map.
+
+	// Used for controlling the character's animations
+	[SerializeField] private Animator m_Animator;
 
 	// Hurtboxes - used for detecting hits.
 	[SerializeField] private BoxCollider m_UpperCollider;
@@ -81,12 +87,31 @@ public class Player : Character
 	}
 
 	// State machine for the controls
-	private enum ControlTypes
+	private enum ControlTypes : int // Used to decide which InputActionMap to use. 
 	{
 		CONTROLTYPE_DEFAULT = 0	,
 		CONTROLTYPE_NOATTACK	,
 		CONTROLTYPE_NOJUMP		,
 		CONTROLTYPE_CUTSCENE	,
+
+
+		CONTROLTYPE_SIZE,
+	}
+
+	enum GameplayActions :int
+	{
+		GAMEPLAYACTIONS_MOVE	= 0	,
+		GAMEPLAYACTIONS_JUMP		,
+		GAMEPLAYACTIONS_INTERACT	,
+		//GAMEPLAYACTIONS_SLIDE		, // Slide is registered as a jump performed while pressing the down button. Therefore, its not here.
+		GAMEPLAYACTIONS_ATTACK		,
+		GAMEPLAYACTIONS_MENUTOGGLE	,
+
+		// Debug-actions
+		GAMEPLAYACTIONS_RESET		,
+
+		//! Not a debug action. Used to measure the size of the Actions-array. 
+		GAMEPLAYACTIONS_SIZE
 	}
 
 
@@ -106,6 +131,24 @@ public class Player : Character
 
 		// Setup other references and stuff
 		m_Rigidbody				= gameObject.GetComponent<Rigidbody>(); // Might be able to delete this if not neccessary
+
+
+		// Move the below to the player controller.
+
+		// Setup the action map
+		//m_ActionMaps[ (int)ControlTypes.CONTROLTYPE_DEFAULT ] = GameplayActionMap;
+		m_ActionMap = m_InputActionAsset.FindActionMap( "MainGameMap" );
+		m_ActionMap.Enable();
+
+		// Setup the actions
+		m_InputActions = new InputAction[ (int)GameplayActions.GAMEPLAYACTIONS_SIZE ];
+
+		m_InputActions[ (int)GameplayActions.GAMEPLAYACTIONS_MOVE ]			= m_ActionMap.FindAction( "Move" );
+		m_InputActions[ (int)GameplayActions.GAMEPLAYACTIONS_JUMP ]			= m_ActionMap.FindAction( "Jump" );
+		m_InputActions[ (int)GameplayActions.GAMEPLAYACTIONS_INTERACT ]		= m_ActionMap.FindAction( "Interact" );
+		m_InputActions[ (int)GameplayActions.GAMEPLAYACTIONS_MENUTOGGLE ]	= m_ActionMap.FindAction( "MenuToggle" );
+		m_InputActions[ (int)GameplayActions.GAMEPLAYACTIONS_RESET ]		= m_ActionMap.FindAction( "Reset" );
+
 	}
 
 	void Awake()
@@ -153,7 +196,7 @@ public class Player : Character
 		}
 
 
-		PlayerStates InputState = PlayerStates.PLAYERSTATE_IDLE;
+		//PlayerStates InputState = PlayerStates.PLAYERSTATE_IDLE; Do input here
 
 
 
@@ -222,6 +265,8 @@ public class Player : Character
 		if ( m_GravityVelocity.y < 0.0f )
 			m_State = PlayerStates.PLAYERSTATE_FALLING;
 
+		m_Animator.SetFloat( "Movement", Mathf.Abs( m_LRInput ) );	// TODO: Switch the string out for ID later.
+
 		//Debug.Log( "Current Player state: " + m_State.ToString() );
 
 
@@ -241,14 +286,12 @@ public class Player : Character
 		// TODO: Look up how to handle the input from a joystick based on how much it's being tilted in a direction. Tilting it fully should move the player faster than tilting it just a small bit.
 		// TODO: Setup so that the type of buttons with available pressing depends on what kind of control-state it is currently in. If NOJUMP is set, then don't allow jumping, don't even check for jumping.
 
-		InputActionMap ActionMap = ActionAsset.FindActionMap("MainGameMap");
-		ActionMap.Enable();
+		InputAction Movement		= m_InputActions[ (int)GameplayActions.GAMEPLAYACTIONS_MOVE ];
+		InputAction Jump			= m_InputActions[ (int)GameplayActions.GAMEPLAYACTIONS_JUMP ];
+		InputAction Interact		= m_InputActions[ (int)GameplayActions.GAMEPLAYACTIONS_INTERACT ];
+		InputAction MenuToggle		= m_InputActions[ (int)GameplayActions.GAMEPLAYACTIONS_MENUTOGGLE ];
+		InputAction Reset			= m_InputActions[ (int)GameplayActions.GAMEPLAYACTIONS_RESET];
 
-		InputAction Movement			= ActionMap.FindAction( "Move" );
-		InputAction Jump				= ActionMap.FindAction( "Jump" );
-		InputAction Interact			= ActionMap.FindAction( "Interact" );
-		InputAction Reset				= ActionMap.FindAction( "Reset" );
-		InputAction MenuToggle			= ActionMap.FindAction( "MenuToggle" );
 
 
 		// Temporary reset function. Once a loading screen has been implemented, play the loading screen and respawn player at last checkpoint.

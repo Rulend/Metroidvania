@@ -1,0 +1,15 @@
+When importing an FBX, the model is probably looking all white. This is because Unity doesn't extract neither the textures nor materials automatically from the FBX, even though they are in the file.
+To fix the all-white textures, do the following:
+
+1. Create a new folder for the textures in the same folder as your model-object.
+2. Click on the imported FBX-object, then in the inspector, click on the Materials tab.
+3. Click "Extract Textures..." and choose the texture-folder you created.
+4. If a window comes up saying that there is a problem with the normals, press "Fix Now" and it should resolve itself.
+
+Now if you look at the model inside the scene, they should have textures. However, if downloaded from Mixamo, and in other cases, they might look weird. To make the model look like it should, do the following:
+
+1. Create a new folder for the materials in the same folder as your model-object.
+2. Click on the imported FBX-object, then in the inspector, click on the Materials tab.
+3. Click "Extract Materials..." and choose the material-folder you created.
+4. On your instance of the model in the scene, select the child object which has the SkinnedMeshRenderer-component.
+5. Select the Material component underneath the SkinnedMeshRenderer-component and change the shader being used. A good one is Legacy/Diffuse.
