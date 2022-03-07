@@ -178,6 +178,7 @@ public class Player : Character
 
 		// Set to false if player is jumping, set to true if collision is found underneath the player
 		m_Grounded = CheckForGround();
+		m_Animator.SetBool( "IsGrounded", m_Grounded );
 
 		if ( m_Grounded )
 		{
@@ -212,6 +213,7 @@ public class Player : Character
 				break;
 			case PlayerStates.PLAYERSTATE_JUMPING:
 				m_JumpWindowTimeLeft -= Time.deltaTime;
+				m_Animator.SetBool( "IsJumping", true );
 
 				m_GravityVelocity.y = 0.0f; // Set velocity to 0 so player isn't pushed down
 				m_Rigidbody.AddForce( new Vector3( 0.0f, ( m_MaxJumpHeight / m_JumpWindowDuration ), 0.0f ), ForceMode.VelocityChange ); // Use velocity in order to move the player upwards // This way sucks, because the jump becomes really floaty
@@ -226,16 +228,20 @@ public class Player : Character
 			case PlayerStates.PLAYERSTATE_FALLING:
 
 				m_DistanceFallen += 0.1f;
+				m_Animator.SetBool( "IsJumping", false ); // Has to be set here instead of above, because this state can also be entered by releasing the space key
+				m_Animator.SetBool( "IsFalling", true );
 
 				// TODO: Remove this, it ain't a good way to use a state machine.
 				if ( m_Grounded )
 				{
 					m_State = PlayerStates.PLAYERSTATE_IDLE;
+					m_Animator.SetBool( "IsFalling", false );
+
 
 					if ( m_DistanceFallen > 2.0f )
 					{
 						TakeDamage( m_DistanceFallen );
-						Debug.Log( string.Format("Took {0} damage from falling. \n", m_DistanceFallen) );
+						Debug.Log( $"Took { m_DistanceFallen } damage from falling. \n" );
 					}
 					Debug.Log( string.Format( "Current health: {0}. \n", m_CurrentHealth ) );
 
@@ -265,7 +271,7 @@ public class Player : Character
 		if ( m_GravityVelocity.y < 0.0f )
 			m_State = PlayerStates.PLAYERSTATE_FALLING;
 
-		m_Animator.SetFloat( "Movement", Mathf.Abs( m_LRInput ) );	// TODO: Switch the string out for ID later.
+		m_Animator.SetFloat( "Movement", Mathf.Abs( m_LRInput ), 0.05f, Time.deltaTime );	// TODO: Switch the string out for ID later.
 
 		//Debug.Log( "Current Player state: " + m_State.ToString() );
 
@@ -317,7 +323,7 @@ public class Player : Character
 		{
 			Debug.Log( "Move-action triggered...(-w- ')??" );
 
-			m_LRInput = Movement.ReadValue<Vector2>().x;
+			//m_LRInput = Movement.ReadValue<Vector2>().x;
 			m_UDInput = Movement.ReadValue<Vector2>().y;
 		}
 
@@ -362,9 +368,13 @@ public class Player : Character
 		if ( Movement.WasReleasedThisFrame() )
 		{
 			Debug.Log( "Move-action released!!(-w- ')!" );
-			m_LRInput = 0.0f;
+			//m_LRInput = 0.0f;
 			m_UDInput = 0.0f;
 		}
+
+		m_LRInput = Movement.ReadValue<Vector2>().x;
+		
+		//print( $" LRinput = {m_LRInput}" );
 
 		//if ( Jump.WasReleasedThisFrame() ) { m_JumpWindowActive = false; }
 		if ( Jump.WasReleasedThisFrame() && m_State == PlayerStates.PLAYERSTATE_JUMPING ) { m_State = PlayerStates.PLAYERSTATE_FALLING; }
