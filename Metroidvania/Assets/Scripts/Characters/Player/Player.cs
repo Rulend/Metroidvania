@@ -344,6 +344,11 @@ public class Player : Character
 			}
 		}
 
+		if ( Keyboard.current.vKey.wasPressedThisFrame )
+		{
+			m_Animator.Play( "Falling" );
+		}
+
 
 		// Interact
 		if ( Interact.triggered && m_CurrentlyFocusedInteractable ) 
