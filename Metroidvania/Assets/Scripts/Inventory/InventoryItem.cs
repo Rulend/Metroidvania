@@ -7,9 +7,9 @@ public class InventoryItem : ScriptableObject // If it doesn't inherit from scri
 	public Sprite		m_Icon			= null;						// The icon for the item that will show up in the Inventory.
 	public bool			m_DefaultItem	= false;                    // Whether or not the item is a default item. Default items cannot be added to the inventory, and will be equipped when everything else is unequipped.
 	//public int			m_ItemValue		= 0;	// The rarity or "value" of the item. Can be used to prompt a "Are you sure you want to use that"-check.
-	public ITEMTYPE		m_ItemType		= ITEMTYPE.ITEMTYPE_MISC;	// The type of the item. Used instead of casting to see which inventory window to show it in.
+	public ITEMTYPE		m_ItemType		= ITEMTYPE.ITEMTYPE_MISC;	// The type of the item. Used to sort items in inventory, and also to decide which item slot submenu to use when left clicking the item.
 
-	public enum ITEMTYPE : int
+	public enum ITEMTYPE
 	{
 		ITEMTYPE_MISC			= 0,
 		ITEMTYPE_CONSUMABLE,
@@ -19,10 +19,8 @@ public class InventoryItem : ScriptableObject // If it doesn't inherit from scri
 
 	public virtual void Use()
 	{
-		// Use the item, do it differently for every item.
+		// Use the item, but do something different depending on what type it is. That's why this function is virtual
 		Debug.Log( "Using " + m_ItemName );
-
-
 	}
 
 }

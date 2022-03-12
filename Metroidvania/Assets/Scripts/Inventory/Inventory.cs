@@ -7,6 +7,7 @@ public class Inventory : MonoBehaviour
 	static private int m_AmountOfSlots = 16;
 
 	private int m_CurrentAmountOfItems = 0; // Set this to read from a save file rather than set it o 0.
+
 	public int AmountOfSlots { get { return m_AmountOfSlots; } }
 
 
@@ -41,13 +42,24 @@ public class Inventory : MonoBehaviour
 		return false;
 	}
 
-	public bool RemoveItem( InventoryItem pr_ItemToRemove )
+	////////////////////////////////////////////////
+	/// Function information - RemoveItem
+	/// 
+	/// Removes an item from the player's inventory.
+	/// 
+	/// parameters:
+	/// pr_ItemToRemove		: the item which should be removed from the inventory.
+	/// pr_SpawnItemPickup	: whether or not an item pickup should be spawned on the ground after removing the item. Used when dropping an item.
+	/// 
+	////////////////////////////////////////////////
+
+	public bool RemoveItem( InventoryItem pr_ItemToRemove, bool pr_SpawnItemPickup = true )
 	{
 		foreach ( InventorySlot rCurrentSlot in m_InventorySlots )
 		{
 			if ( rCurrentSlot.Item == pr_ItemToRemove )
 			{
-				rCurrentSlot.RemoveItemFromSlot();
+				rCurrentSlot.RemoveItemFromSlot( pr_SpawnItemPickup );
 
 				return true;
 			}

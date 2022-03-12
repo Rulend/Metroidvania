@@ -3,8 +3,8 @@ using UnityEngine.UI;
 
 public class InventorySlot : MonoBehaviour
 {
-	private InventoryItem					m_Item;			// The item stored in the slot.
-	[SerializeField] private GameObject		m_ItemDrop;		// Used when removing an item from the inventory.
+	private InventoryItem					m_Item;         // The item stored in the slot.
+	[SerializeField] private GameObject		m_ItemPickupPrefab; // Used for instantiating items on the ground when dropping them
 
 	public InventoryItem					Item => m_Item;
 
@@ -37,15 +37,18 @@ public class InventorySlot : MonoBehaviour
 	}
 
 	// Remove item from slot, set image to null, and disable the image component.
-	public void RemoveItemFromSlot()
+	public void RemoveItemFromSlot( bool pr_SpawnItemPickup )
 	{
-		m_ItemDrop.GetComponent<ItemPickup>().m_ItemToGive = m_Item;
-		Instantiate( m_ItemDrop, GameManager.Instance.rPlayer1.transform.position, Quaternion.identity );
+		if ( pr_SpawnItemPickup )
+		{
+			m_ItemPickupPrefab.GetComponent<ItemPickup>().m_ItemToGive = m_Item;
+			Instantiate( m_ItemPickupPrefab, GameManager.Instance.rPlayer1.transform.position, Quaternion.identity );
+		}
 
 		m_Item = null; // TODO: Maybe use destroy in order to destroy it? Or add it to an unload queue.
 
-		m_Icon.sprite = null;
-		m_Icon.enabled = false;
+		m_Icon.sprite	 = null;
+		m_Icon.enabled	 = false;
 		HideItemSlotOptions();
 	}
 
@@ -144,7 +147,7 @@ public class InventorySlot : MonoBehaviour
 	// Removes the item from your inventory. TODO:: Removing an item from your inventory should either destroy it or leave it on the ground. Decide which one to go with, or make a toggle to switch between them.
 	public void ButtonRemoveItem()
 	{
-		RemoveItemFromSlot();
+		RemoveItemFromSlot( true ); // Remove item from inventory, and since the Discard button was pressed, drop an item pickup on the ground.
 	}
 
 

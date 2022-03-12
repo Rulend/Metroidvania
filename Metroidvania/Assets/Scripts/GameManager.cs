@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
 	private static	GameManager m_Instance;
 	public	static	GameManager Instance => m_Instance;
 
-	private TeleporterManager m_rTeleporterManager;
+	//private TeleporterManager m_rTeleporterManager;
 
 
 	[SerializeField] private Player g_rPlayer1;
@@ -52,7 +52,7 @@ public class GameManager : MonoBehaviour
 
 
 
-		m_rTeleporterManager = (TeleporterManager)TeleporterManager.Instance;
+		//m_rTeleporterManager = (TeleporterManager)TeleporterManager.Instance;
 
 
 	}
