@@ -7,7 +7,8 @@ public class EquipmentManager : MonoBehaviour
 	private static EquipmentManager		m_Instance;
 	public static EquipmentManager		Instance => m_Instance; // Public getter used to access singleton from outside
 
-	Equipment[] m_CurrentEquipment;
+	public GameObject m_EquipmentSlotsParent;   // only used once, should not be a member
+	public InventorySlot[] m_EquipmentSlots;    // An array of references to all of the inventory slots inside the "InventoryPanel"-object in the scene.
 
 
 	private void Awake()
@@ -25,7 +26,7 @@ public class EquipmentManager : MonoBehaviour
 
 	private void Start()
 	{
-		m_CurrentEquipment = new Equipment[ (int)EquipmentSlot.EQUIPMENTSLOT_SIZE ];
+		m_EquipmentSlots = m_EquipmentSlotsParent.GetComponentsInChildren<InventorySlot>();
 	}
 
 	////////////////////////////////////////////////
@@ -37,17 +38,34 @@ public class EquipmentManager : MonoBehaviour
 	/// pr_NewEquipment	: the equipment that should be equipped.
 	/// 
 	////////////////////////////////////////////////
-	public void Equip( Equipment pr_NewEquipment )
+	public bool Equip( Equipment pr_NewEquipment )
 	{
-		EquipmentSlot	SlotsToCheck		= pr_NewEquipment.EquipmentSlots;
-		Equipment		PreviousEquip	= m_CurrentEquipment[ (int)SlotsToCheck ];
+		EquipmentSlot	SlotsToCheck	= pr_NewEquipment.EquipmentSlots;
+		Equipment		PreviousEquip	= (Equipment)m_EquipmentSlots[ (int)SlotsToCheck ].Item;
 
 		if ( PreviousEquip && !PreviousEquip.m_DefaultItem ) // If there was already an item equipped, and it was not a default item, put it in inventory
 		{
 			GameManager.Instance.rPlayer1.GetInventory.AddItem( PreviousEquip );
+			Debug.Log( $"Adding {PreviousEquip.name} to inventory." );
 		}
 
-		m_CurrentEquipment[ (int)pr_NewEquipment.EquipmentSlots ] = pr_NewEquipment;
+		// TODO:: Add level or stat requirements here or somewhere else to check whether the character can actually equip the item.
+
+		// If the item we're trying to equip is not already equipped, equip it.
+		if ( PreviousEquip != pr_NewEquipment )
+		{
+			Debug.Log( $"Equipping new item {pr_NewEquipment.name}." );
+			m_EquipmentSlots[ (int)pr_NewEquipment.EquipmentSlots ].AddItemToSlot( pr_NewEquipment );
+			return true;
+		}
+		else	// If the item is already equipped, which means we right clicked it when it's equipped, unequip it.
+		{
+			m_EquipmentSlots[ (int)pr_NewEquipment.EquipmentSlots ].RemoveItemFromSlot( false );
+			return false;
+		}
+
+		// security
+		return false;
 	}
 
 }

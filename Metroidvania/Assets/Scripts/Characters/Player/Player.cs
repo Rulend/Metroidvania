@@ -122,9 +122,9 @@ public class Player : Character
 	void Start()
     {
 		// Set character values inherited from Character-class. Read these from save file later, once a save system has been set up.
-		m_BaseMovementSpeed = 450.0f;
+		m_BaseMovementSpeed = 350.0f;
 		//m_CurrentMovementSpeed = m_BaseMovementSpeed /* * speedMultiplier */ ;
-		m_CurrentMovementSpeed = 450.0f;
+		m_CurrentMovementSpeed = m_BaseMovementSpeed;
 		m_MaxHealth = 10.0f;
 		m_CurrentHealth = m_MaxHealth;
 

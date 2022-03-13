@@ -2,12 +2,13 @@ using UnityEngine;
 
 public enum EquipmentSlot
 {
-	EQUIPMENTSLOT_HEAD = 0	,
-	EQUIPMENTSLOT_CHEST		,
-	EQUIPMENTSLOT_LHAND		,
-	EQUIPMENTSLOT_RHAND		,
-	EQUIPMENTSLOT_LEGS		,
-	EQUIPMENTSLOT_FEET		,
+	EQUIPMENTSLOT_HEAD = 0	,	// Armor for head.
+	EQUIPMENTSLOT_CHEST		,	// Armor for chest.
+	EQUIPMENTSLOT_GAUNTLETS	,	// Armor for hands.	
+	EQUIPMENTSLOT_LHAND		,	// Weapon for left hand.
+	EQUIPMENTSLOT_RHAND		,	// Weapon for right hand.
+	EQUIPMENTSLOT_LEGS		,	// Armor for legs.
+	EQUIPMENTSLOT_FEET		,	// Armor for feet.
 
 	EQUIPMENTSLOT_SIZE		// Always have this at the bottom to measure the amount of equipment slots.
 }
@@ -30,10 +31,12 @@ public class Equipment : InventoryItem
 	{
 		base.Use();
 
-		// Equip item.
-		EquipmentManager.Instance.Equip( this );
-		// Remove item from inventory.
-		GameManager.Instance.rPlayer1.GetInventory.RemoveItem( this, false );
+		// Try to equip item and check whether or not it was possible.
+		if ( EquipmentManager.Instance.Equip( this ) )
+		{
+			// Remove item from inventory since we equipped it.
+			GameManager.Instance.rPlayer1.GetInventory.RemoveItem( this, false );
+		}
 
 	}
 

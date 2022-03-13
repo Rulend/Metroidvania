@@ -32,8 +32,6 @@ public class InventorySlot : MonoBehaviour
 
 		m_Icon.sprite = m_Item.m_Icon;
 		m_Icon.enabled = true;
-
-
 	}
 
 	// Remove item from slot, set image to null, and disable the image component.
