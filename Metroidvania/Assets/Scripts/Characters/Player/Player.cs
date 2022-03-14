@@ -17,6 +17,7 @@ public class Player : Character
 
 	// Used for measuring fall damage
 	private float m_DistanceFallen;
+	[SerializeField] private float m_FallDamageThreshold = 10.0f;
 
 	// Player's stats
 	// Derived from Character
@@ -227,25 +228,23 @@ public class Player : Character
 				break;
 			case PlayerStates.PLAYERSTATE_FALLING:
 
-				m_DistanceFallen += 0.1f;
+				m_DistanceFallen += -0.01f * m_GravityVelocity.y;	// Might revisit this amount later, for now it works.
 				m_Animator.SetBool( "IsJumping", false ); // Has to be set here instead of above, because this state can also be entered by releasing the space key
 				m_Animator.SetBool( "IsFalling", true );
 
 				// TODO: Remove this, it ain't a good way to use a state machine.
 				if ( m_Grounded )
 				{
-					m_State = PlayerStates.PLAYERSTATE_IDLE;
-					m_Animator.SetBool( "IsFalling", false );
-
-
-					if ( m_DistanceFallen > 2.0f )
+					if ( m_DistanceFallen > m_FallDamageThreshold )
 					{
-						TakeDamage( m_DistanceFallen );
-						Debug.Log( $"Took { m_DistanceFallen } damage from falling. \n" );
+						TakeDamage( (m_DistanceFallen - m_FallDamageThreshold) );	// Take damage equal to distance fallen - the threshold
+						Debug.Log( $"Fell { m_DistanceFallen } and took { m_DistanceFallen - m_FallDamageThreshold } damage from falling. \n" );
 					}
 					Debug.Log( string.Format( "Current health: {0}. \n", m_CurrentHealth ) );
 
 					m_DistanceFallen = 0.0f;
+					m_Animator.SetBool( "IsFalling", false );
+					m_State = PlayerStates.PLAYERSTATE_IDLE;
 				}
 
 				break;

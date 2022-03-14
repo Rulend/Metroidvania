@@ -4,9 +4,9 @@ using UnityEngine;
 public class Inventory : MonoBehaviour
 {
 
-	static private int m_AmountOfSlots = 16;
+	static private int m_AmountOfSlots = 16;	// Doesn't do anything, the size of the array is based on the number of slots in the scene.
 
-	private int m_CurrentAmountOfItems = 0; // Set this to read from a save file rather than set it o 0.
+	private int m_CurrentAmountOfItems = 0; // Set this to read from a save file rather than to 0.
 
 	public int AmountOfSlots { get { return m_AmountOfSlots; } }
 
@@ -38,6 +38,7 @@ public class Inventory : MonoBehaviour
 
 		}
 
+		// TODO:: Show the player a prompt that thells them their inventory is full.
 		Debug.Log( "Couldn't add item to inventory, it's full. \n" );
 		return false;
 	}

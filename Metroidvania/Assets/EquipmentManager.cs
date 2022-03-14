@@ -41,18 +41,18 @@ public class EquipmentManager : MonoBehaviour
 	public bool Equip( Equipment pr_NewEquipment )
 	{
 		EquipmentSlot	SlotsToCheck	= pr_NewEquipment.EquipmentSlots;
-		Equipment		PreviousEquip	= (Equipment)m_EquipmentSlots[ (int)SlotsToCheck ].Item;
+		Equipment		CurrentEquip	= (Equipment)m_EquipmentSlots[ (int)SlotsToCheck ].Item;
 
-		if ( PreviousEquip && !PreviousEquip.m_DefaultItem ) // If there was already an item equipped, and it was not a default item, put it in inventory
+		if ( CurrentEquip && !CurrentEquip.m_DefaultItem ) // If there was already an item equipped, and it was not a default item, put it in inventory
 		{
-			GameManager.Instance.rPlayer1.GetInventory.AddItem( PreviousEquip );
-			Debug.Log( $"Adding {PreviousEquip.name} to inventory." );
+			GameManager.Instance.rPlayer1.GetInventory.AddItem( CurrentEquip );
+			Debug.Log( $"Adding {CurrentEquip.name} to inventory." );
 		}
 
 		// TODO:: Add level or stat requirements here or somewhere else to check whether the character can actually equip the item.
 
 		// If the item we're trying to equip is not already equipped, equip it.
-		if ( PreviousEquip != pr_NewEquipment )
+		if ( CurrentEquip != pr_NewEquipment )
 		{
 			Debug.Log( $"Equipping new item {pr_NewEquipment.name}." );
 			m_EquipmentSlots[ (int)pr_NewEquipment.EquipmentSlots ].AddItemToSlot( pr_NewEquipment );
@@ -60,12 +60,17 @@ public class EquipmentManager : MonoBehaviour
 		}
 		else	// If the item is already equipped, which means we right clicked it when it's equipped, unequip it.
 		{
-			m_EquipmentSlots[ (int)pr_NewEquipment.EquipmentSlots ].RemoveItemFromSlot( false );
+			Unequip( CurrentEquip );
 			return false;
 		}
 
 		// security
 		return false;
+	}
+
+	public void Unequip( Equipment pr_EquipmentToUnequip )
+	{
+		m_EquipmentSlots[ (int)pr_EquipmentToUnequip.EquipmentSlots ].RemoveItemFromSlot( false );
 	}
 
 }

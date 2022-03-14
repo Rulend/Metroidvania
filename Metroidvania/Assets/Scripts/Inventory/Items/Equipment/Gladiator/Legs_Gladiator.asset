@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd88c247f9726347abf08656fab2744, type: 3}
   m_Name: Legs_Gladiator
   m_EditorClassIdentifier: 
-  m_ItemName: Gladiator Plate-legs
+  m_ItemName: Leggings of The Gladiator
   m_Icon: {fileID: 21300000, guid: 027c77d9cbcf0ee43aef6bdfc8d7dc63, type: 3}
   m_DefaultItem: 0
   m_ItemType: 2
