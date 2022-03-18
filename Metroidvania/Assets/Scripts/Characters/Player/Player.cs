@@ -6,8 +6,6 @@ public class Player : Character
 	// < Member variables>
 	[SerializeField] private LayerMask m_WhatIsGround;                          // A mask determining what is ground to the character
 
-	public Vector3 m_PositionToApply;
-
 //	private Vector3 m_Velocity = new Vector3( 0.0f, 0.0f, 0.0f );
 	private Vector3 m_MovementVelocity = new Vector3( 0.0f, 0.0f, 0.0f );
 	[SerializeField] private float m_Gravity = 6.0f;
@@ -39,11 +37,10 @@ public class Player : Character
 
 	// The player's jump
 	[SerializeField] private float m_MaxJumpHeight		= 3.3f;
-	private bool	m_JumpWindowActive					= false;
 	[SerializeField] private float m_JumpWindowDuration = 0.214f; // Static as this value only needs to be set once
-	private float	m_JumpWindowTimeLeft				= 0.214f;
-	private float	m_CoyoteDuration					= 0.2f;
-	private float	m_CoyoteTimeLeft					= 0.2f;
+	private float		m_JumpWindowTimeLeft			= 0.214f;
+	private const float	m_CoyoteDuration				= 0.2f;
+	private float		m_CoyoteTimeLeft				= 0.2f;
 
 	// The player's slide move.
 	private float	m_SlideCooldownDuration				= 0.75f;
@@ -165,14 +162,13 @@ public class Player : Character
 	void Update()
     {
 		// Takes input from the player
-		DecideInput();
+		TakeInput();
 
 		DecreaseTimersDT( Time.deltaTime );
 	}
 
     private void FixedUpdate()
     {
-
 		// Add -9.82 multiplied by a modifiable gravity-variable multiplied by time.fixedDeltaTime to make the player fall at a good speed.
 		m_GravityVelocity.y += m_Gravity * ( -9.82f ) * Time.fixedDeltaTime;
 		m_GravityVelocity.y = Mathf.Clamp( m_GravityVelocity.y, -50.0f, 20.0f );
@@ -184,22 +180,20 @@ public class Player : Character
 		if ( m_Grounded )
 		{
 			//m_Velocity.y = 0.0f;
-			m_GravityVelocity.y = 0.0f;
-			m_JumpWindowTimeLeft = m_JumpWindowDuration;
-			m_CoyoteTimeLeft = m_CoyoteDuration;
+			m_GravityVelocity.y		= 0.0f;
+			m_JumpWindowTimeLeft	= m_JumpWindowDuration;
+			m_CoyoteTimeLeft		= m_CoyoteDuration;
 		}
 
 		//If not being knocked back by something, allow movement.
 		if ( m_KnockBackVelocity.x == 0.0f )
 		{
-
 			m_MovementDirection = Vector3.Cross( (new Vector3(0.0f, 0.0f, -m_LRInput) ), m_GroundNormal );
 			Move( m_MovementDirection * m_CurrentMovementSpeed ); // If no input is provided, the function will still run, but the player won't move.
 		}
 
 
 		//PlayerStates InputState = PlayerStates.PLAYERSTATE_IDLE; Do input here
-
 
 
 		// Temporarily like this until I make it better
@@ -274,18 +268,11 @@ public class Player : Character
 
 		//Debug.Log( "Current Player state: " + m_State.ToString() );
 
-
-		// Add velocity to the position.
-		//m_PositionToApply += ( m_GravityVelocity * Time.fixedDeltaTime );
-
-		// Apply the position to the player.
-		//gameObject.transform.position = m_PositionToApply; // The way to do it if Rigidbodies were not needed. They are needed though, since for whatever reason colliders need a rigidbody in order to do collision against other colliders.
-
 		// Below is the rigidbody way
 		m_Rigidbody.velocity = ( m_MovementVelocity + m_GravityVelocity );
     }
 
-    void DecideInput()
+    void TakeInput()
     {
 
 		// TODO: Look up how to handle the input from a joystick based on how much it's being tilted in a direction. Tilting it fully should move the player faster than tilting it just a small bit.
@@ -303,7 +290,6 @@ public class Player : Character
 		if ( Reset.triggered )
 		{
 			m_ActiveInput = true;
-			//m_PositionToApply = new Vector3( 0.0f, 0.0f, 0.0f );
 			transform.position = new Vector3( 0.0f, 0.0f, 0.0f );
 		}
 
@@ -337,7 +323,6 @@ public class Player : Character
 			}
 			else if ( m_CoyoteTimeLeft > 0.0f )
 			{
-				//m_JumpWindowActive = true;
 				m_State				= PlayerStates.PLAYERSTATE_JUMPING;
 				m_CoyoteTimeLeft	= 0.0f;
 			}
@@ -380,7 +365,6 @@ public class Player : Character
 		
 		//print( $" LRinput = {m_LRInput}" );
 
-		//if ( Jump.WasReleasedThisFrame() ) { m_JumpWindowActive = false; }
 		if ( Jump.WasReleasedThisFrame() && m_State == PlayerStates.PLAYERSTATE_JUMPING ) { m_State = PlayerStates.PLAYERSTATE_FALLING; }
 	}
 
@@ -402,18 +386,7 @@ public class Player : Character
 		Vector3 DesiredSlidePosition = m_SlideDistanceLeft * m_SlideDirection;
 		DesiredSlidePosition.z = 0.0f;
 
-		//m_PositionToApply += DesiredSlidePosition;
 		m_Rigidbody.AddForce( DesiredSlidePosition * 50.0f, ForceMode.VelocityChange );
-	}
-
-	void Jump()
-	{
-
-	}
-
-	void Land()
-	{
-		// TODO on Thursday 4th of March 2022: move movement-related stuff over to the player controller. Make a velocity component.
 	}
 
 
@@ -446,7 +419,6 @@ public class Player : Character
         }
 
 		// Set position to apply to player's movement
-		//		m_PositionToApply.x += pr_Movement * Time.fixedDeltaTime;	// Not Rigidbody way
 		m_MovementVelocity = pr_Movement * Time.fixedDeltaTime;	// Rigidbody way
     }
 
@@ -471,12 +443,9 @@ public class Player : Character
     {
 		m_GroundNormal = Vector3.up;
 
-
 		if ( m_State == PlayerStates.PLAYERSTATE_JUMPING )
 			return false;
 
-
-//		Vector3 RayStartPos = m_PositionToApply + new Vector3( 0.0f, 0.5f, 0.0f ); // Not using rigidbody
 		Vector3 RayStartPos = transform.position + new Vector3( 0.0f, 0.5f, 0.0f ); // Using rigidbody
         float RayMaxDistance = 0.55f;
 

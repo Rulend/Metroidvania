@@ -19,25 +19,22 @@ public class Equipment : InventoryItem
 {
 	public EquipmentSlot EquipmentSlots => m_Equipmentslots;
 
+	[SerializeField] private EquipmentSlot			m_Equipmentslots;	// The equipment slots that this weapon can be placed in.
+	[SerializeField] public SkinnedMeshRenderer		m_Mesh;	// The equipment's mesh - how it looks in the world.
+	
 
-	[SerializeField] private EquipmentSlot		m_Equipmentslots;	// The equipment slots that this weapon can be placed in.
 
-	[SerializeField] private int					m_ArmorModifier;
-	[SerializeField] private int					m_DamageModifier;
-	[SerializeField] private int					m_RequiredStats;
+	[SerializeField] private int				m_ArmorModifier;
+	[SerializeField] private int				m_DamageModifier;
+	[SerializeField] private int				m_RequiredStats;
 
 
 	public override void Use()
 	{
 		base.Use();
 
-		// Try to equip item and check whether or not it was possible.
-		if ( EquipmentManager.Instance.Equip( this ) )
-		{
-			// Remove item from inventory since we equipped it.
-			GameManager.Instance.rPlayer1.GetInventory.RemoveItem( this, false );
-		}
-
+		// Tries to equip this item. Removes it from inventory if it succeeds, also adds previous items back to inventory. Adds this item back to inventory if it was already equipped.
+		EquipmentManager.Instance.Equip( this );
 	}
 
 

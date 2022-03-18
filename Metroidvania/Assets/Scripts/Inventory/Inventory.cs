@@ -20,6 +20,19 @@ public class Inventory : MonoBehaviour
 		m_InventorySlots = m_InventorySlotsParent.GetComponentsInChildren<InventorySlot>();
 	}
 
+	////////////////////////////////////////////////
+	/// Function information - AddItem
+	/// 
+	/// Adds an item to the inventory.
+	/// 
+	/// return value:	returns false if pr_ItemToAdd
+	///					is a default item or if there is not enough
+	///					space in inventory, otherwise returns true.
+	/// 
+	/// parameters:
+	/// pr_ItemToAdd	: the item that should be added to inventory.
+	/// 
+	////////////////////////////////////////////////
 	public bool AddItem( InventoryItem pr_ItemToAdd )
 	{
 		// Is it stackable? Is there space in that stack? Is the inventory full? TODO:: Check these stuff.
@@ -38,8 +51,8 @@ public class Inventory : MonoBehaviour
 
 		}
 
-		// TODO:: Show the player a prompt that thells them their inventory is full.
-		Debug.Log( "Couldn't add item to inventory, it's full. \n" );
+		// TODO:: Show the player a prompt that tells them why they couldn't add the item.
+		Debug.Log( "Couldn't add item to inventory. \n" );
 		return false;
 	}
 
