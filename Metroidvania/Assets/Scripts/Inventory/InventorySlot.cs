@@ -1,14 +1,14 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class InventorySlot : MonoBehaviour
+public class InventorySlot : MonoBehaviour	// TODO:: Rename from InventorySlot to ItemSlot
 {
-	private InventoryItem					m_Item;         // The item stored in the slot.
-	[SerializeField] private GameObject		m_ItemPickupPrefab; // Used for instantiating items on the ground when dropping them
+	private InventoryItem					m_Item;					// The item stored in the slot.
+	[SerializeField] private GameObject		m_ItemPickupPrefab;		// A prefab used for instantiating the item on the ground when discarding it
 
 	public InventoryItem					Item => m_Item;
 
-	[ SerializeField ] private Image		m_Icon;     // The icon of the item.
+	[ SerializeField ] private Image		m_Icon;	// The icon of the item when in a slot.
 
 
 	InventoryUI								m_rInventoryUI;	// A reference to the InventoryUI
@@ -25,7 +25,17 @@ public class InventorySlot : MonoBehaviour
 
 
 
-	// Add item to slot, set image to that item's icon, then enable the image component.
+	////////////////////////////////////////////////
+	/// Function information - AddItemToSlot
+	/// 
+	/// Adds an item to a an itemslot.
+	/// 
+	/// return value: void
+	/// 
+	/// parameters:
+	/// InventoryItem pr_ItemToAdd	: the item to be added in the slot.
+	/// 
+	////////////////////////////////////////////////
 	public void AddItemToSlot( InventoryItem pr_ItemToAdd )
 	{
 		m_Item = pr_ItemToAdd;
@@ -34,7 +44,18 @@ public class InventorySlot : MonoBehaviour
 		m_Icon.enabled = true;
 	}
 
-	// Remove item from slot, set image to null, and disable the image component.
+
+	////////////////////////////////////////////////
+	/// Function information - RemoveItemFromSlot
+	/// 
+	/// Removes the item from the slot, sets the slot icon to null, and disables the icon.
+	/// 
+	/// return value: void
+	/// 
+	/// parameters:
+	/// bool pr_SpawnItemPickup	: whether or not to spawn the item on the ground when dropping it.
+	/// 
+	////////////////////////////////////////////////
 	public void RemoveItemFromSlot( bool pr_SpawnItemPickup )
 	{
 		if ( pr_SpawnItemPickup )
@@ -51,7 +72,16 @@ public class InventorySlot : MonoBehaviour
 	}
 
 
-	// Brings up the submenu for an item.
+	////////////////////////////////////////////////
+	/// Function information - ButtonShowItemSlotOptions
+	/// 
+	/// Shows a submenu for the item when left clicking on it - a different submenu for different item-types.
+	/// 
+	/// return value: void
+	/// 
+	/// parameters:
+	/// N/A
+	////////////////////////////////////////////////
 	public void ButtonShowItemSlotOptions()
 	{
 		if ( m_Item )	// Check item type to decide which menu to bring up.
@@ -98,6 +128,16 @@ public class InventorySlot : MonoBehaviour
 		}
 	}
 
+	////////////////////////////////////////////////
+	/// Function information - HideItemSlotOptions
+	/// 
+	/// Hides the current ItemSlotsSubmenu.
+	/// 
+	/// return value: void
+	/// 
+	/// parameters:
+	/// N/A
+	////////////////////////////////////////////////
 	public void HideItemSlotOptions()
 	{
 		if ( m_rInventoryUI.SlotMenuCurrent.activeSelf )
@@ -106,7 +146,6 @@ public class InventorySlot : MonoBehaviour
 			m_rInventoryUI.m_CurrentSlotBorder.SetActive( false );
 
 			Debug.Log( "Hiding the current inventory slot options... (-w- )" );
-
 		}
 	}
 

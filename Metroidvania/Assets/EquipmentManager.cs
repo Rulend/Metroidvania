@@ -9,7 +9,9 @@ public class EquipmentManager : MonoBehaviour
 
 	public GameObject					m_EquipmentSlotsParent;		// only used once, should not be a member TODO:: Remove
 	public InventorySlot[]				m_EquipmentSlots;			// An array of references to all of the inventory slots inside the "EquipmentPanel"-object in the scene.
-	public SkinnedMeshRenderer[]		m_EquipmentMeshes;			
+	public SkinnedMeshRenderer[]		m_EquipmentMeshes;
+
+	[SerializeField]private Equipment[]					m_DefaultEquipment;
 
 
 	private void Awake()
@@ -23,11 +25,29 @@ public class EquipmentManager : MonoBehaviour
 		{
 			m_Instance = this;
 		}
+
+		// Create default equipment
+		//m_DefaultEquipment = new Equipment[]
+		//{
+
+		// dragged inside from inspector (cheating)
+		//};
 	}
 
 	private void Start()
 	{
 		m_EquipmentSlots = m_EquipmentSlotsParent.GetComponentsInChildren<InventorySlot>();
+
+		// solution
+		for ( int EquipSlotIndex = 0; EquipSlotIndex < (int)EquipmentSlot.EQUIPMENTSLOT_SIZE; ++EquipSlotIndex )
+		{
+			InventorySlot CurrentEquipSlot = m_EquipmentSlots[ EquipSlotIndex ];
+
+			if ( !CurrentEquipSlot.Item )
+			{
+				Equip( m_DefaultEquipment[ EquipSlotIndex ] ); // todo: figure out why this is not equipping it
+			}
+		}
 	}
 
 	////////////////////////////////////////////////
@@ -39,19 +59,17 @@ public class EquipmentManager : MonoBehaviour
 	/// 
 	/// parameters:
 	/// pr_NewEquipment	: the equipment that should be equipped.
-	/// 
 	////////////////////////////////////////////////
 	public void Equip( Equipment pr_NewEquipment )
 	{
 		EquipmentSlot	SlotsToCheck		= pr_NewEquipment.EquipmentSlots;
 		Equipment		CurrentEquipment	= (Equipment)m_EquipmentSlots[ (int)SlotsToCheck ].Item;
-		Inventory		PlayerInventory = GameManager.Instance.rPlayer1.GetInventory;
+		Inventory		PlayerInventory		= GameManager.Instance.rPlayer1.GetInventory;
 
 		// TODO:: Add level or stat requirements here or somewhere else to check whether the character can actually equip the item.
 
-
-		// If the item we're trying to equip is not already equipped, try to equip it.
-		if ( CurrentEquipment != pr_NewEquipment )
+		// If the item we're trying to equip is not the same as the equipped item, try to equip it.
+		if ( pr_NewEquipment != CurrentEquipment )
 		{
 			Debug.Log( $"Equipping new item {pr_NewEquipment.name}." );
 			m_EquipmentSlots[ (int)pr_NewEquipment.EquipmentSlots ].AddItemToSlot( pr_NewEquipment );
@@ -64,7 +82,7 @@ public class EquipmentManager : MonoBehaviour
 			Unequip( CurrentEquipment );
 		}
 
-		// Add previous equipment to inventory if there was any
+		// If there was a previously equipped item, add it to inventory
 		if ( CurrentEquipment )
 		{
 			PlayerInventory.AddItem( CurrentEquipment );
@@ -72,9 +90,21 @@ public class EquipmentManager : MonoBehaviour
 	}
 
 
-
+	////////////////////////////////////////////////
+	/// Function information - Unequip
+	/// 
+	/// Unequips an item in the item's specified slot and equips default equipment in its place.
+	/// 
+	/// return value: void
+	/// 
+	/// parameters:
+	/// pr_EquipmentToUnequip	: the equipment that should be unequipped.
+	////////////////////////////////////////////////
 	public void Unequip( Equipment pr_EquipmentToUnequip )
 	{
-		m_EquipmentSlots[ (int)pr_EquipmentToUnequip.EquipmentSlots ].RemoveItemFromSlot( false );
+		int EquipmentSlot = (int)pr_EquipmentToUnequip.EquipmentSlots;
+
+		m_EquipmentSlots[ EquipmentSlot ].RemoveItemFromSlot( false );
+		m_EquipmentSlots[ EquipmentSlot ].AddItemToSlot( m_DefaultEquipment[ EquipmentSlot ] );
 	}
 }
