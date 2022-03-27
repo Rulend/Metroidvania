@@ -17,16 +17,16 @@ public enum EquipmentSlot
 [CreateAssetMenu(fileName = "New Equipment", menuName = "Inventory/Equipment" )]
 public class Equipment : InventoryItem
 {
-	public EquipmentSlot EquipmentSlots => m_Equipmentslots;
+	[SerializeField] public EquipmentSlot EquipmentSlots => m_Equipmentslots;
 
-	[SerializeField] private EquipmentSlot			m_Equipmentslots;	// The equipment slots that this weapon can be placed in.
+	[SerializeField] public EquipmentSlot			m_Equipmentslots;	// The equipment slots that this weapon can be placed in.
 	[SerializeField] public SkinnedMeshRenderer		m_Mesh;	// The equipment's mesh - how it looks in the world.
 	
 
 
-	[SerializeField] private int				m_ArmorModifier;
-	[SerializeField] private int				m_DamageModifier;
-	[SerializeField] private int				m_RequiredStats;
+	[SerializeField] public int				m_ArmorModifier;
+	[SerializeField] public int				m_DamageModifier;
+	[SerializeField] public int				m_RequiredStats;
 
 
 	public override void Use()

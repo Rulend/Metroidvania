@@ -7,7 +7,7 @@ public class Interactable : MonoBehaviour
 {
 	public		float			m_InteractionRadius = 1.5f;
 	private		GameObject		m_rInteractableAlert;		// A reference to the Alert that shows up on the screen when the player comes close. Found inside the UI-canvas.
-	protected	string			m_InteractableAlertText = "Press E to \n ";	// The text that will be when the player is within InteractionRadius. Add to this in derived classes.
+	protected	string			m_InteractableAlertText = "Press E to \n ";	// The text that will be when the player is within InteractionRadius. Add to (+=) this in derived classes. DO NOT OVERWRITE. 
 
 
 	protected	Player			m_rPlayer;			// A reference to the player.
@@ -47,9 +47,9 @@ public class Interactable : MonoBehaviour
 				m_rPlayer.SetCurrentInteractable( this );
 				m_rInteractableAlert.GetComponentInChildren<Text>().text = m_InteractableAlertText;
 
-				// Set position of the interactable text based on whether the player recently picked up an item or not.
+				// Set position of the interactable text based on whether the player recently picked up an item or not. This is so it can still be seen even if ItemPickedUpNotice is active.
 				if ( m_rPlayer.InventoryUI.GetComponent<InventoryUI>().m_ItemPickedUpNotice.activeSelf )
-					m_rInteractableAlert.transform.position = m_rPlayer.InventoryUI.GetComponent<InventoryUI>().InteractableAlertStartPos - new Vector3( 0.0f, 200.0f, 0.0f );
+					m_rInteractableAlert.transform.position = m_rPlayer.InventoryUI.GetComponent<InventoryUI>().InteractableAlertStartPos - new Vector3( 0.0f, 200.0f, 0.0f ); // TODO:: Change this from a hard coded value to be the y-size of the itempickupnotice yextbox
 				else
 					m_rInteractableAlert.transform.position = m_rPlayer.InventoryUI.GetComponent<InventoryUI>().InteractableAlertStartPos;
 

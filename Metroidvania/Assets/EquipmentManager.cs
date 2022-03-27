@@ -1,17 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EquipmentManager : MonoBehaviour
 {
-	private static EquipmentManager		m_Instance;
-	public static EquipmentManager		Instance => m_Instance; // Public getter used to access singleton from outside
+	public static EquipmentManager			Instance => m_Instance; // Public getter used to access singleton from outside
 
-	public GameObject					m_EquipmentSlotsParent;		// only used once, should not be a member TODO:: Remove
-	public InventorySlot[]				m_EquipmentSlots;			// An array of references to all of the inventory slots inside the "EquipmentPanel"-object in the scene.
-	public SkinnedMeshRenderer[]		m_EquipmentMeshes;
 
-	[SerializeField]private Equipment[]					m_DefaultEquipment;
+	private static EquipmentManager			m_Instance;
+	public GameObject						m_EquipmentSlotsParent;		// only used once, should not be a member TODO:: Remove
+	public InventorySlot[]					m_EquipmentSlots;		// An array of references to all of the inventory slots inside the "EquipmentPanel"-object in the scene. Used to store current equipment.
+	public SkinnedMeshRenderer[]			m_EquipmentMeshes;		// An array of the current equipment's meshes
+
+	[SerializeField]private Equipment[]		m_DefaultEquipment;	// SerializeFielded because I don't know how to create them from script.
 
 
 	private void Awake()
@@ -45,9 +44,35 @@ public class EquipmentManager : MonoBehaviour
 
 			if ( !CurrentEquipSlot.Item )
 			{
-				Equip( m_DefaultEquipment[ EquipSlotIndex ] ); // todo: figure out why this is not equipping it
+				//Equip( m_DefaultEquipment[ EquipSlotIndex ] ); // todo: figure out why this is not equipping it
 			}
 		}
+
+
+		string[] JsonEquipment = new string[ m_EquipmentSlots.Length ];
+
+		for ( int EquipIndex = 0; EquipIndex < m_EquipmentSlots.Length; ++EquipIndex )
+		{
+			string EquipString			= JsonUtility.ToJson( m_DefaultEquipment[ EquipIndex ] ); // Create Json object of equipment
+			JsonEquipment[ EquipIndex ] = EquipString;
+
+			Debug.Log( "Whole equipment sent in: " );
+			Debug.Log( EquipString );
+		}
+
+
+
+		for ( int EquipIndex = 0; EquipIndex < m_EquipmentSlots.Length; ++EquipIndex )
+		{
+			Equipment	DefaultEquip		= (Equipment)(SerializableItem)JsonUtility.FromJson<SerializableItem>( JsonEquipment[ EquipIndex ]); // Create equipment from Json-object
+			string		EquipString			= JsonUtility.ToJson( DefaultEquip );
+
+			Debug.Log( "Whole equipment converted back: " );
+			Debug.Log( EquipString );
+
+			Equip( DefaultEquip );
+		}
+
 	}
 
 	////////////////////////////////////////////////
@@ -71,7 +96,7 @@ public class EquipmentManager : MonoBehaviour
 		// If the item we're trying to equip is not the same as the equipped item, try to equip it.
 		if ( pr_NewEquipment != CurrentEquipment )
 		{
-			Debug.Log( $"Equipping new item {pr_NewEquipment.name}." );
+			Debug.Log( $"Equipping new item {pr_NewEquipment.m_ItemName}." );
 			m_EquipmentSlots[ (int)pr_NewEquipment.EquipmentSlots ].AddItemToSlot( pr_NewEquipment );
 
 			// Remove newly equipped item from inventory

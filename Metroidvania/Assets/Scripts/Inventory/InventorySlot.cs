@@ -72,10 +72,43 @@ public class InventorySlot : MonoBehaviour	// TODO:: Rename from InventorySlot t
 	}
 
 
+	// Functions to do regarding submenus and other UI-related stuff:
+
+
+	////////////////////////////////////////////////
+	/// Function information - DisplayItemInfo
+	/// 
+	/// Displays information about an item while hovering over it with the mouse.
+	/// 
+	/// return value: void
+	/// 
+	/// parameters:
+	/// N/A
+	////////////////////////////////////////////////
+	public void DisplayItemInfo()
+	{
+		if ( !m_Item || m_Item.m_DefaultItem )
+			return;
+
+		//m_rInventoryUI.ItemInfoDisplay;
+		m_rInventoryUI.ItemInfoDisplay.transform.GetChild( 0 ).gameObject.transform.GetChild( 0 ).GetComponent<Image>().sprite	= m_Item.m_Icon; // TODO:: Save this monstrocisy of a way to do this.
+		m_rInventoryUI.ItemInfoDisplay.transform.GetChild( 1 ).transform.GetChild( 0 ).transform.GetChild(0).GetComponent<Text>().text					= m_Item.m_ItemName;
+		m_rInventoryUI.ItemInfoDisplay.transform.GetChild( 1 ).transform.GetChild(1).transform.GetChild( 0 ).GetComponent<Text>().text					= "This is a very long string, detailing a lot of information about various things. Most of these items will just display their stats, pure and simple, but others might display some kind of story or other info. It depends on how creative I'm feeling with this, and how long I'm willing to spend on it.";
+		m_rInventoryUI.ItemInfoDisplay.SetActive( true );
+	}
+
+	public void HideItemInfo()
+	{
+		m_rInventoryUI.ItemInfoDisplay.SetActive( false );
+	}
+
+
+
 	////////////////////////////////////////////////
 	/// Function information - ButtonShowItemSlotOptions
 	/// 
-	/// Shows a submenu for the item when left clicking on it - a different submenu for different item-types.
+	/// Shows a submenu for when left clicking on an item slot that contains an item. 
+	///	Brings up a different submenu for different item-types.
 	/// 
 	/// return value: void
 	/// 
@@ -87,6 +120,10 @@ public class InventorySlot : MonoBehaviour	// TODO:: Rename from InventorySlot t
 		if ( m_Item )	// Check item type to decide which menu to bring up.
 		{
 			HideItemSlotOptions();
+
+			if ( m_Item.m_DefaultItem ) // Don't show any menu if left clicking a default item, since those can only be in the equipment slots if there's nothing else there.
+				return;
+
 
 			// Bring up a different menu based on what kind of item it is.	// TODO: Another way to do this, is to assign a different submenu to a slot
 			// based on what kind of item is in it. The submenu could be assignd when adding/removing an item from that slot. For now though, this works.
@@ -114,7 +151,7 @@ public class InventorySlot : MonoBehaviour	// TODO:: Rename from InventorySlot t
 			}
 
 			m_rInventoryUI.m_CurrentSlot = this;
-			m_rInventoryUI.m_CurrentSlotBorder.transform.position = gameObject.transform.position;
+			m_rInventoryUI.m_CurrentSlotBorder.transform.position = transform.position;
 			m_rInventoryUI.m_CurrentSlotBorder.SetActive( true );
 
 			PositionSlotMenuCurrent();
@@ -193,8 +230,12 @@ public class InventorySlot : MonoBehaviour	// TODO:: Rename from InventorySlot t
 	{
 		if ( m_Item )
 		{
-			m_Item.Use();
 			HideItemSlotOptions();
+
+			if ( m_Item.m_DefaultItem )
+				return;
+
+			m_Item.Use();
 		}
 	}
 }

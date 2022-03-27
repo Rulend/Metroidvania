@@ -11,7 +11,9 @@ public class InventoryUI : MonoBehaviour
 
 
 	//private InventorySlot[][]					m_InventorySlots;		// An array of references to all of the inventory slots inside the "InventoryPanel"-object in the scene.
-	private InventorySlot[]						m_Slots;		// An array of references to all of the inventory slots inside the "InventoryPanel"-object in the scene.
+	private InventorySlot[]						m_Slots;        // An array of references to all of the inventory slots inside the "InventoryPanel"-object in the scene.
+
+	[ SerializeField ] private GameObject		m_ItemInfoDisplay;				// A gameobject used to display information about an item while hovering over it in the inventory.
 
 	[ SerializeField ] private GameObject		m_SlotMenuCurrent;		//	The current slot-menu.
 	[ SerializeField ] private GameObject		m_SlotMenuMisc;			//	The Slot-Menu for ITEMTYPE_MISC items. 
@@ -27,6 +29,10 @@ public class InventoryUI : MonoBehaviour
 	private Vector3								m_InteractableAlertStartPos;
 
 	public Vector3 InteractableAlertStartPos =>		m_InteractableAlertStartPos;
+
+	// TODO:: Clean this document up. So messy
+
+	public GameObject ItemInfoDisplay => m_ItemInfoDisplay;
 
 	public GameObject SlotMenuCurrent	
 	{
@@ -138,7 +144,7 @@ public class InventoryUI : MonoBehaviour
 
 	public void ShowItemPickedUpNotice( InventoryItem pr_PickedUpItem )
 	{
-		m_ItemPickedUpNotice.transform.GetChild( 0 ).gameObject.transform.GetChild(0).GetComponent<Image>().sprite		= pr_PickedUpItem.m_Icon;
+		m_ItemPickedUpNotice.transform.GetChild( 0 ).gameObject.transform.GetChild(0).GetComponent<Image>().sprite		= pr_PickedUpItem.m_Icon; // TODO:: Save this monstrocisy of a way to do this.
 		m_ItemPickedUpNotice.GetComponentInChildren<Text>().text														= pr_PickedUpItem.m_ItemName;
 		m_ItemPickedUpNotice.GetComponent<HideUIAfterDuration>().ResetAliveTimeLeft();
 		m_ItemPickedUpNotice.SetActive( true );

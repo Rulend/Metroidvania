@@ -3,13 +3,15 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-public class BetterButton : MonoBehaviour, IPointerClickHandler
+public class BetterButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
 
 	public UnityEvent m_LeftMouseButton;
 	public UnityEvent m_RightMouseButton;
 	public UnityEvent m_MiddleMouseButton;
 
+	public UnityEvent m_PointerEntered;
+	public UnityEvent m_PointerExited;
 
 	public void OnPointerClick( PointerEventData pr_EventData )
 	{
@@ -26,6 +28,20 @@ public class BetterButton : MonoBehaviour, IPointerClickHandler
 			m_MiddleMouseButton.Invoke();
 		}
 	}
+
+
+	public void OnPointerEnter( PointerEventData pr_EventData )
+	{
+		m_PointerEntered.Invoke();
+
+	}
+
+	public void OnPointerExit( PointerEventData pr_EventData )
+	{
+		m_PointerExited.Invoke();
+	}
+
+
 
 	public void OnPointer()
 	{
