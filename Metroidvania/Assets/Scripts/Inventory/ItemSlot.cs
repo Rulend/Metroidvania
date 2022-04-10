@@ -1,23 +1,38 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class InventorySlot : MonoBehaviour	// TODO:: Rename from InventorySlot to ItemSlot
+public class ItemSlot : MonoBehaviour	// TODO:: Rename from InventorySlot to ItemSlot
 {
+	public InventoryItem					Item => m_Item;
 	private InventoryItem					m_Item;					// The item stored in the slot.
+
+	private Image							m_Icon;					// The icon of the item when in a slot.
+
 	[SerializeField] private GameObject		m_ItemPickupPrefab;		// A prefab used for instantiating the item on the ground when discarding it
 
-	public InventoryItem					Item => m_Item;
-
-	[ SerializeField ] private Image		m_Icon;	// The icon of the item when in a slot.
-
-
-	InventoryUI								m_rInventoryUI;	// A reference to the InventoryUI
+	private InventoryUI						m_rInventoryUI;				// A reference to the InventoryUI
+	private Image							m_rItemHoverIcon;			// A reference to the item-icon part of the item slot hover panel
+	private Text							m_rItemHoverName;			// A reference to the name part of the item slot hover panel
+	private Text							m_rItemHoverDescription;	// A reference to the description part of the item slot hover panel
 
 	void Start()
 	{
+		string ItemPickupPrefabFilePath = "Prefabs/ItemPickup";
+		m_ItemPickupPrefab = (GameObject)Resources.Load( ItemPickupPrefabFilePath );
+		if ( m_ItemPickupPrefab == null )
+			Debug.LogError( $"Failed to load ItemPickupPrefab at filepath {ItemPickupPrefabFilePath}" );
+
+		m_Icon = transform.GetChild( 0 ).GetComponent<Image>();
+
 		// TODO: Instead of doing player 1, do it the correct way (which includes being able to handle multiple players and not showing each others inventory).
-		if ( !m_rInventoryUI )
-			m_rInventoryUI = GameManager.Instance.rPlayer1.InventoryUI.GetComponent<InventoryUI>();
+
+		m_rInventoryUI			= GameManager.Instance.rPlayer1.InventoryUI.GetComponent<InventoryUI>();
+
+		m_rItemHoverIcon		= m_rInventoryUI.ItemInfoDisplay.transform.GetChild( 0 ).transform.GetChild( 0 ).GetComponent<Image>();
+
+		m_rItemHoverName		= m_rInventoryUI.ItemInfoDisplay.transform.GetChild( 1 ).transform.GetChild( 0 ).transform.GetChild( 0 ).GetComponent<Text>();
+
+		m_rItemHoverDescription = m_rInventoryUI.ItemInfoDisplay.transform.GetChild( 1 ).transform.GetChild( 1 ).transform.GetChild( 0 ).GetComponent<Text>();
 
 		// TODO: Add so that the slot menu options buttons get assigned their functions automatically if it's not filled in.
 	}
@@ -40,8 +55,8 @@ public class InventorySlot : MonoBehaviour	// TODO:: Rename from InventorySlot t
 	{
 		m_Item = pr_ItemToAdd;
 
-		m_Icon.sprite = m_Item.m_Icon;
-		m_Icon.enabled = true;
+		m_Icon.sprite	= m_Item.m_Icon;
+		m_Icon.enabled	= true;
 	}
 
 
@@ -64,10 +79,9 @@ public class InventorySlot : MonoBehaviour	// TODO:: Rename from InventorySlot t
 			Instantiate( m_ItemPickupPrefab, GameManager.Instance.rPlayer1.transform.position, Quaternion.identity );
 		}
 
-		m_Item = null; // TODO: Maybe use destroy in order to destroy it? Or add it to an unload queue.
-
-		m_Icon.sprite	 = null;
-		m_Icon.enabled	 = false;
+		m_Item				= null; // TODO: Maybe use destroy in order to destroy it? Or add it to an unload queue.
+		m_Icon.sprite		= null;
+		m_Icon.enabled		= false;
 		HideItemSlotOptions();
 	}
 
@@ -87,13 +101,26 @@ public class InventorySlot : MonoBehaviour	// TODO:: Rename from InventorySlot t
 	////////////////////////////////////////////////
 	public void DisplayItemInfo()
 	{
-		if ( !m_Item || m_Item.m_DefaultItem )
+		if ( !m_Item /*|| m_Item.m_DefaultItem*/ )
 			return;
 
-		//m_rInventoryUI.ItemInfoDisplay;
-		m_rInventoryUI.ItemInfoDisplay.transform.GetChild( 0 ).gameObject.transform.GetChild( 0 ).GetComponent<Image>().sprite	= m_Item.m_Icon; // TODO:: Save this monstrocisy of a way to do this.
-		m_rInventoryUI.ItemInfoDisplay.transform.GetChild( 1 ).transform.GetChild( 0 ).transform.GetChild(0).GetComponent<Text>().text					= m_Item.m_ItemName;
-		m_rInventoryUI.ItemInfoDisplay.transform.GetChild( 1 ).transform.GetChild(1).transform.GetChild( 0 ).GetComponent<Text>().text					= "This is a very long string, detailing a lot of information about various things. Most of these items will just display their stats, pure and simple, but others might display some kind of story or other info. It depends on how creative I'm feeling with this, and how long I'm willing to spend on it.";
+		m_rItemHoverIcon.sprite			= m_Item.m_Icon; // TODO:: Save this monstrocisy of a way to do this.
+		m_rItemHoverName.text			= m_Item.m_ItemName;
+
+		if ( m_Item.m_ItemType == InventoryItem.ITEMTYPE.ITEMTYPE_EQUIPMENT )
+		{
+			Equipment EquipmentItem = (Equipment)m_Item;
+
+			m_rItemHoverDescription.text = 
+				$" Damage: {EquipmentItem.m_DamageModifier} \n " +
+				$" Armor: {EquipmentItem.m_ArmorModifier} ";
+		}
+		else
+		{
+			m_rItemHoverDescription.text	= m_Item.m_ItemDescription;
+		}
+
+		//PositionUIPanelNextToSlot( m_rInventoryUI.ItemInfoDisplay );
 		m_rInventoryUI.ItemInfoDisplay.SetActive( true );
 	}
 
@@ -154,7 +181,7 @@ public class InventorySlot : MonoBehaviour	// TODO:: Rename from InventorySlot t
 			m_rInventoryUI.m_CurrentSlotBorder.transform.position = transform.position;
 			m_rInventoryUI.m_CurrentSlotBorder.SetActive( true );
 
-			PositionSlotMenuCurrent();
+			PositionUIPanelNextToSlot( m_rInventoryUI.SlotMenuCurrent );
 
 			m_rInventoryUI.SlotMenuCurrent.SetActive( true );
 
@@ -187,31 +214,31 @@ public class InventorySlot : MonoBehaviour	// TODO:: Rename from InventorySlot t
 	}
 
 
-	private void PositionSlotMenuCurrent()
-	{
-		RectTransform SlotMenuCurrentRectTransform = m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>();
+	private void PositionUIPanelNextToSlot( GameObject pr_PanelToPosition )
+	{	
+		RectTransform PanelRectTransform = pr_PanelToPosition.GetComponent<RectTransform>();
 
-		float SlotMenuWidth		= SlotMenuCurrentRectTransform.rect.width	* SlotMenuCurrentRectTransform.localScale.x;
-		float SlotMenuHeight	= SlotMenuCurrentRectTransform.rect.height	* SlotMenuCurrentRectTransform.localScale.y;
+		float PanelWidth	= PanelRectTransform.rect.width		* PanelRectTransform.localScale.x;
+		float Panelheight	= PanelRectTransform.rect.height	* PanelRectTransform.localScale.y;
 
-		float NewSlotMenuXPos	= gameObject.transform.position.x + ( SlotMenuWidth / 2.0f ) + ( gameObject.GetComponent<RectTransform>().rect.width / 2.0f ) + 5.0f;
-		float NewSlotMenuYPos	= gameObject.transform.position.y - ( SlotMenuHeight * 0.75f );
+		float NewPanelPosX = gameObject.transform.position.x + ( PanelWidth / 2.0f ) + ( gameObject.GetComponent<RectTransform>().rect.width / 2.0f ) + 5.0f;
+		float NewPanelPosY = gameObject.transform.position.y - ( Panelheight * 0.75f );
 
-		if ( NewSlotMenuXPos + ( SlotMenuWidth * 0.25f ) > Screen.width )
+		if ( NewPanelPosX + ( PanelWidth * 0.25f ) > Screen.width ) // If the panel would be put outside the screen by more than 25%
 		{
-			NewSlotMenuXPos = gameObject.transform.position.x - ( SlotMenuWidth / 2.0f ) - ( gameObject.GetComponent<RectTransform>().rect.width / 2.0f ) - 5.0f;
-			Debug.Log( "Had to move xposition of slotmenu options, it would have been outside the screen on the right." );
+			NewPanelPosX = gameObject.transform.position.x - ( PanelWidth / 2.0f ) - ( gameObject.GetComponent<RectTransform>().rect.width / 2.0f ) - 5.0f;
+			Debug.Log( $"Had to move xposition of {pr_PanelToPosition.name}, it would have been outside the screen on the right." );
 		}
 
-		if ( NewSlotMenuYPos + m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.height > Screen.height )
+		if ( NewPanelPosY + m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.height > Screen.height )
 		{
-			NewSlotMenuYPos += 100.0f; // TODO: Don't let this be static.
-			Debug.Log( "Had to move yposition of slotmenu options, it would have been below the screen." );
+			NewPanelPosY += 100.0f; // TODO: Don't let this be static.
+			Debug.Log( $"Had to move yposition of {pr_PanelToPosition.name}, it would have been below the screen." );
 		}
 
-		Vector3 NewSlotMenuPos = new Vector3( NewSlotMenuXPos, NewSlotMenuYPos, 0.0f );
+		Vector3 NewSlotMenuPos = new Vector3( NewPanelPosX, NewPanelPosY, 0.0f );
 
-		m_rInventoryUI.SlotMenuCurrent.transform.position = NewSlotMenuPos;
+		pr_PanelToPosition.transform.position = NewSlotMenuPos;
 	}
 
 

@@ -16,6 +16,7 @@ MonoBehaviour:
   m_Icon: {fileID: 21300000, guid: 31447dcc4dc742e40b8a213e56904610, type: 3}
   m_DefaultItem: 1
   m_ItemType: 2
+  m_ItemDescription: N/A
   m_Equipmentslots: 6
   m_Mesh: {fileID: 0}
   m_ArmorModifier: 0

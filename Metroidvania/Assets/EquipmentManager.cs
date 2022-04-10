@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.IO;
 
 public class EquipmentManager : MonoBehaviour
 {
@@ -7,7 +8,7 @@ public class EquipmentManager : MonoBehaviour
 
 	private static EquipmentManager			m_Instance;
 	public GameObject						m_EquipmentSlotsParent;		// only used once, should not be a member TODO:: Remove
-	public InventorySlot[]					m_EquipmentSlots;		// An array of references to all of the inventory slots inside the "EquipmentPanel"-object in the scene. Used to store current equipment.
+	public ItemSlot[]						m_EquipmentSlots;		// An array of references to all of the inventory slots inside the "EquipmentPanel"-object in the scene. Used to store current equipment.
 	public SkinnedMeshRenderer[]			m_EquipmentMeshes;		// An array of the current equipment's meshes
 
 	[SerializeField]private Equipment[]		m_DefaultEquipment;	// SerializeFielded because I don't know how to create them from script.
@@ -35,44 +36,30 @@ public class EquipmentManager : MonoBehaviour
 
 	private void Start()
 	{
-		m_EquipmentSlots = m_EquipmentSlotsParent.GetComponentsInChildren<InventorySlot>();
+		m_EquipmentSlots = m_EquipmentSlotsParent.GetComponentsInChildren<ItemSlot>();
 
-		// solution
-		for ( int EquipSlotIndex = 0; EquipSlotIndex < (int)EquipmentSlot.EQUIPMENTSLOT_SIZE; ++EquipSlotIndex )
+		// How to write to JSON
+		//SerializableEquipmentArray TestArray = new SerializableEquipmentArray( m_DefaultEquipment.Length );
+
+		//for ( int i = 0; i < m_DefaultEquipment.Length; ++i )
+		//{
+		//	TestArray.ItemArray[ i ] = (SerializableEquipment)m_DefaultEquipment[ i ];
+		//}
+
+		//string JsonString = JsonUtility.ToJson( TestArray );
+
+		//File.WriteAllText( Application.dataPath + "/Resources/DefaultItems.json", JsonString );
+
+		// How to read from JSON
+		string DefaultItemsFilePath = Application.dataPath + "/Resources/DefaultItems.json";
+
+		SerializableEquipmentArray ArrayFromJson = JsonUtility.FromJson<SerializableEquipmentArray>( File.ReadAllText( DefaultItemsFilePath ) ); // Create equipment from Json-object
+
+		foreach ( SerializableEquipment CurrentSerializedItem in ArrayFromJson.ItemArray )
 		{
-			InventorySlot CurrentEquipSlot = m_EquipmentSlots[ EquipSlotIndex ];
-
-			if ( !CurrentEquipSlot.Item )
-			{
-				//Equip( m_DefaultEquipment[ EquipSlotIndex ] ); // todo: figure out why this is not equipping it
-			}
+			Equipment CurrentEquip = (Equipment)CurrentSerializedItem;
+			Equip( CurrentEquip );
 		}
-
-
-		string[] JsonEquipment = new string[ m_EquipmentSlots.Length ];
-
-		for ( int EquipIndex = 0; EquipIndex < m_EquipmentSlots.Length; ++EquipIndex )
-		{
-			string EquipString			= JsonUtility.ToJson( m_DefaultEquipment[ EquipIndex ] ); // Create Json object of equipment
-			JsonEquipment[ EquipIndex ] = EquipString;
-
-			Debug.Log( "Whole equipment sent in: " );
-			Debug.Log( EquipString );
-		}
-
-
-
-		for ( int EquipIndex = 0; EquipIndex < m_EquipmentSlots.Length; ++EquipIndex )
-		{
-			Equipment	DefaultEquip		= (Equipment)(SerializableItem)JsonUtility.FromJson<SerializableItem>( JsonEquipment[ EquipIndex ]); // Create equipment from Json-object
-			string		EquipString			= JsonUtility.ToJson( DefaultEquip );
-
-			Debug.Log( "Whole equipment converted back: " );
-			Debug.Log( EquipString );
-
-			Equip( DefaultEquip );
-		}
-
 	}
 
 	////////////////////////////////////////////////

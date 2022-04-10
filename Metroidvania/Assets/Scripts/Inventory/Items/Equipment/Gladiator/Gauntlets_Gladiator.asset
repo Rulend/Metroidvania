@@ -16,7 +16,9 @@ MonoBehaviour:
   m_Icon: {fileID: 21300000, guid: da9d7f75135245946ba06d9cf8361d3b, type: 3}
   m_DefaultItem: 0
   m_ItemType: 2
+  m_ItemDescription: Gauntlets drenched in the smell of blood.
   m_Equipmentslots: 2
-  m_ArmorModifier: 0
+  m_Mesh: {fileID: 0}
+  m_ArmorModifier: 2
   m_DamageModifier: 0
   m_RequiredStats: 0

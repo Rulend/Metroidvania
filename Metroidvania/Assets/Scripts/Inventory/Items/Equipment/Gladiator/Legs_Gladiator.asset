@@ -16,7 +16,9 @@ MonoBehaviour:
   m_Icon: {fileID: 21300000, guid: 027c77d9cbcf0ee43aef6bdfc8d7dc63, type: 3}
   m_DefaultItem: 0
   m_ItemType: 2
+  m_ItemDescription: Leggings worn by a proud warrior.
   m_Equipmentslots: 5
-  m_ArmorModifier: 0
+  m_Mesh: {fileID: 0}
+  m_ArmorModifier: 6
   m_DamageModifier: 0
   m_RequiredStats: 0

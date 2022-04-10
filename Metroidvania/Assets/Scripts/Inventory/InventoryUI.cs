@@ -11,7 +11,7 @@ public class InventoryUI : MonoBehaviour
 
 
 	//private InventorySlot[][]					m_InventorySlots;		// An array of references to all of the inventory slots inside the "InventoryPanel"-object in the scene.
-	private InventorySlot[]						m_Slots;        // An array of references to all of the inventory slots inside the "InventoryPanel"-object in the scene.
+	private ItemSlot[]						m_Slots;        // An array of references to all of the inventory slots inside the "InventoryPanel"-object in the scene.
 
 	[ SerializeField ] private GameObject		m_ItemInfoDisplay;				// A gameobject used to display information about an item while hovering over it in the inventory.
 
@@ -21,7 +21,7 @@ public class InventoryUI : MonoBehaviour
 	[ SerializeField ] private GameObject		m_SlotMenuEquippable;	//	The Slot-Menu for ITEMTYPE_EQUIPPABLE items. 
 	[ SerializeField ] private GameObject		m_SlotMenuQuest;        //	The Slot-Menu for ITEMTYPE_QUEST items. 
 
-	public InventorySlot						m_CurrentSlot;	// The slot was lastly left-clicked.
+	public ItemSlot						m_CurrentSlot;	// The slot was lastly left-clicked.
 	public GameObject							m_CurrentSlotBorder;	// The slot was lastly left-clicked.
 	public GameObject							m_InteractableAlert;    // A panel that shows up when close to an interactable. Will show different text based on what kind it is. 
 	public GameObject							m_ItemPickedUpNotice;   // After picking up an item, this panel will be shown in order to let the player see what they've picked up.

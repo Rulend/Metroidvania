@@ -12,12 +12,12 @@ public class Inventory : MonoBehaviour
 
 
 	public GameObject		m_InventorySlotsParent;	// only used once, should not be a member
-	public InventorySlot[]	m_InventorySlots;       // An array of references to all of the inventory slots inside the "InventoryPanel"-object in the scene.
+	public ItemSlot[]		m_InventorySlots;       // An array of references to all of the inventory slots inside the "InventoryPanel"-object in the scene.
 
 
 	private void Start()
 	{
-		m_InventorySlots = m_InventorySlotsParent.GetComponentsInChildren<InventorySlot>();
+		m_InventorySlots = m_InventorySlotsParent.GetComponentsInChildren<ItemSlot>();
 	}
 
 	////////////////////////////////////////////////
@@ -39,7 +39,7 @@ public class Inventory : MonoBehaviour
 
 		if ( !pr_ItemToAdd.m_DefaultItem )
 		{
-			foreach ( InventorySlot rCurrentSlot in m_InventorySlots )
+			foreach ( ItemSlot rCurrentSlot in m_InventorySlots )
 			{
 				if ( !rCurrentSlot.Item )
 				{
@@ -69,7 +69,7 @@ public class Inventory : MonoBehaviour
 
 	public bool RemoveItem( InventoryItem pr_ItemToRemove, bool pr_SpawnItemPickup = true )
 	{
-		foreach ( InventorySlot rCurrentSlot in m_InventorySlots )
+		foreach ( ItemSlot rCurrentSlot in m_InventorySlots )
 		{
 			if ( rCurrentSlot.Item == pr_ItemToRemove )
 			{

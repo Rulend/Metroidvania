@@ -16,7 +16,9 @@ MonoBehaviour:
   m_Icon: {fileID: 21300000, guid: 7a46031c38113104198373e68b64fdb8, type: 3}
   m_DefaultItem: 0
   m_ItemType: 2
+  m_ItemDescription: Feetwear of a warrior.
   m_Equipmentslots: 6
-  m_ArmorModifier: 0
+  m_Mesh: {fileID: 0}
+  m_ArmorModifier: 2
   m_DamageModifier: 0
   m_RequiredStats: 0
