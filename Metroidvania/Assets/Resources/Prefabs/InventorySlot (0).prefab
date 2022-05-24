@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8508131529754230771}
   - component: {fileID: 8508131529754230764}
   - component: {fileID: 878714840268896421}
-  - component: {fileID: 1238836902}
+  - component: {fileID: 1022408663336703696}
   m_Layer: 5
   m_Name: InventorySlot (0)
   m_TagString: Untagged
@@ -136,8 +136,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ItemPickupPrefab: {fileID: 0}
-  m_Icon: {fileID: 0}
---- !u!114 &1238836902
+--- !u!114 &1022408663336703696
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -146,84 +145,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 8508131529754230766}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a3903f4d28f244746aa10d3a9d8d49c0, type: 3}
+  m_Script: {fileID: 11500000, guid: bf80034cc7769fc4ba86389fddc972f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_LeftMouseButton:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 878714840268896421}
-        m_TargetAssemblyTypeName: InventorySlot, Assembly-CSharp
-        m_MethodName: ButtonShowItemSlotOptions
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  m_RightMouseButton:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 878714840268896421}
-        m_TargetAssemblyTypeName: InventorySlot, Assembly-CSharp
-        m_MethodName: ButtonUseItem
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  m_MiddleMouseButton:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 878714840268896421}
-        m_TargetAssemblyTypeName: InventorySlot, Assembly-CSharp
-        m_MethodName: HideItemSlotOptions
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  m_PointerEntered:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 878714840268896421}
-        m_TargetAssemblyTypeName: InventorySlot, Assembly-CSharp
-        m_MethodName: DisplayItemInfo
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  m_PointerExited:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 878714840268896421}
-        m_TargetAssemblyTypeName: InventorySlot, Assembly-CSharp
-        m_MethodName: HideItemInfo
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!1 &8508131530336278973
 GameObject:
   m_ObjectHideFlags: 0

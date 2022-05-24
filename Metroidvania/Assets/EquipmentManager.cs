@@ -48,10 +48,10 @@ public class EquipmentManager : MonoBehaviour
 
 		//string JsonString = JsonUtility.ToJson( TestArray );
 
-		//File.WriteAllText( Application.dataPath + "/Resources/DefaultItems.json", JsonString );
+		//File.WriteAllText( Application.dataPath + "/Resources/Items(Json)/DefaultItems.json", JsonString );
 
 		// How to read from JSON
-		string DefaultItemsFilePath = Application.dataPath + "/Resources/DefaultItems.json";
+		string DefaultItemsFilePath = Application.dataPath + "/Resources/Items(Json)/DefaultItems.json";
 
 		SerializableEquipmentArray ArrayFromJson = JsonUtility.FromJson<SerializableEquipmentArray>( File.ReadAllText( DefaultItemsFilePath ) ); // Create equipment from Json-object
 
