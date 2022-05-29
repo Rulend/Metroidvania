@@ -101,15 +101,17 @@ public class ItemSlot : MonoBehaviour	// TODO:: Rename from InventorySlot to Ite
 	////////////////////////////////////////////////
 	public void DisplayItemInfo()
 	{
-		if ( !m_Item /*|| m_Item.m_DefaultItem*/ )
+		if ( !m_Item || m_Item.m_DefaultItem )
 			return;
 
-		m_rItemHoverIcon.sprite			= m_Item.m_Icon; // TODO:: Save this monstrocisy of a way to do this.
-		m_rItemHoverName.text			= m_Item.m_ItemName;
+		m_rItemHoverIcon.sprite		= m_Item.m_Icon; // TODO:: Save this monstrocisy of a way to do this.
+		m_rItemHoverName.text		= m_Item.m_ItemName;
 
 		if ( m_Item.m_ItemType == InventoryItem.ITEMTYPE.ITEMTYPE_EQUIPMENT )
 		{
 			Equipment EquipmentItem = (Equipment)m_Item;
+
+			// TODO:: Display this in a more interesting way, add an icon or something. Also add some kind of info about the item itself to be displayed here. Also make the display box move (maybe).
 
 			m_rItemHoverDescription.text = 
 				$" Damage: {EquipmentItem.m_DamageModifier} \n " +

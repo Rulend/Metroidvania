@@ -74,30 +74,26 @@ public class EquipmentManager : MonoBehaviour
 	////////////////////////////////////////////////
 	public void Equip( Equipment pr_NewEquipment )
 	{
-		EquipmentSlot	SlotsToCheck		= pr_NewEquipment.EquipmentSlots;
-		Equipment		CurrentEquipment	= (Equipment)m_EquipmentSlots[ (int)SlotsToCheck ].Item;
-		Inventory		PlayerInventory		= GameManager.Instance.rPlayer1.GetInventory;
+		if ( pr_NewEquipment == null )
+			return;
+
+		int				NewEquipmentSlots	= (int)pr_NewEquipment.EquipmentSlots;
+		Equipment		CurrentEquipment	= (Equipment)m_EquipmentSlots[ NewEquipmentSlots ].Item;
 
 		// TODO:: Add level or stat requirements here or somewhere else to check whether the character can actually equip the item.
 
 		// If the item we're trying to equip is not the same as the equipped item, try to equip it.
 		if ( pr_NewEquipment != CurrentEquipment )
 		{
-			Debug.Log( $"Equipping new item {pr_NewEquipment.m_ItemName}." );
-			m_EquipmentSlots[ (int)pr_NewEquipment.EquipmentSlots ].AddItemToSlot( pr_NewEquipment );
+			GameManager.Instance.rPlayer1.GetInventory.RemoveItem( pr_NewEquipment, false ); // Remove the item that's about to be equipped from the inventory
 
-			// Remove newly equipped item from inventory
-			PlayerInventory.RemoveItem( pr_NewEquipment, false );
+			Unequip( CurrentEquipment ); // Unequip old item
+
+			m_EquipmentSlots[ NewEquipmentSlots ].AddItemToSlot( pr_NewEquipment ); // Equip new item
 		}
-		else	// If the item is already equipped, which means we right clicked it when it's equipped, unequip it.
+		else	// If equip was called while item was already equipped, unequip it
 		{
 			Unequip( CurrentEquipment );
-		}
-
-		// If there was a previously equipped item, add it to inventory
-		if ( CurrentEquipment )
-		{
-			PlayerInventory.AddItem( CurrentEquipment );
 		}
 	}
 
@@ -114,9 +110,40 @@ public class EquipmentManager : MonoBehaviour
 	////////////////////////////////////////////////
 	public void Unequip( Equipment pr_EquipmentToUnequip )
 	{
+		if ( pr_EquipmentToUnequip == null )
+			return;
+
 		int EquipmentSlot = (int)pr_EquipmentToUnequip.EquipmentSlots;
 
 		m_EquipmentSlots[ EquipmentSlot ].RemoveItemFromSlot( false );
 		m_EquipmentSlots[ EquipmentSlot ].AddItemToSlot( m_DefaultEquipment[ EquipmentSlot ] );
+
+		GameManager.Instance.rPlayer1.GetInventory.AddItem( pr_EquipmentToUnequip );
+	}
+
+
+
+	////////////////////////////////////////////////
+	/// Function information - IsItemEquipped
+	/// 
+	/// Checks whether or not an item is equipped
+	/// 
+	/// return value: true if equipped, false if not.
+	/// 
+	/// parameters:
+	/// pr_ItemToCheck	: the item to check
+	////////////////////////////////////////////////
+	public bool IsItemEquipped( InventoryItem pr_ItemToCheck )
+	{
+		if ( pr_ItemToCheck as Equipment == null )
+			return false;
+
+		foreach ( ItemSlot CurrentEquipSlot in m_EquipmentSlots )
+		{
+			if ( CurrentEquipSlot.Item == pr_ItemToCheck )
+				return true;
+		}
+
+		return false;
 	}
 }
