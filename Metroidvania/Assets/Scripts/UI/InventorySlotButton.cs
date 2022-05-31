@@ -1,6 +1,7 @@
 using UnityEngine.EventSystems;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 public class InventorySlotButton : BetterButton, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
 {
@@ -36,15 +37,19 @@ public class InventorySlotButton : BetterButton, IBeginDragHandler, IDragHandler
 	// Todo:: implement these.
 	public void OnBeginDrag( PointerEventData pr_EventData )
 	{
-		//if ( m_ItemSlot.Item != null )
-		//	GameManager.Instance.rPlayer1.InventoryUI.GetComponent<InventoryUI>().DraggedItem.GetComponent<Image>().sprite = m_ItemSlot.Item.m_Icon;
+		if ( m_ItemSlot.Item == null )
+			return;
+
+		UI_Manager.Instance.rInventoryUI.DraggedItem.GetComponent<Image>().sprite = m_ItemSlot.Item.m_Icon;
 	}
 
 
 	public void OnDrag( PointerEventData pr_EventData )
 	{
-		//if ( m_ItemSlot.Item != null )
-		//	GameManager.Instance.rPlayer1.InventoryUI.GetComponent<InventoryUI>().DraggedItem.transform.position = Camera.main.ScreenToWorldPoint( Input.mousePosition );
+		if ( m_ItemSlot.Item == null )
+			return;
+
+		//UI_Manager.Instance.rInventoryUI.DraggedItem.transform.position = Camera.main.ScreenToWorldPoint( new Vector3( Mouse.current.position.x.ReadValue() / Screen.width, Mouse.current.position.y.ReadValue()/Screen.height, 0.0f ) );
 	}
 
 
@@ -56,6 +61,7 @@ public class InventorySlotButton : BetterButton, IBeginDragHandler, IDragHandler
 	}
 
 
+	// Triggers when you drop an item into a slot.
 	public void OnDrop( PointerEventData pr_EventData )
 	{
 		InventoryItem DraggedItem = pr_EventData.pointerDrag.GetComponent<ItemSlot>().Item; // The item that was dragged to this slot
@@ -69,7 +75,7 @@ public class InventorySlotButton : BetterButton, IBeginDragHandler, IDragHandler
 
 		if ( m_ItemSlot.Item != null ) // If this slot is not empty
 		{
-			if ( rEquipManager.IsItemEquipped( m_ItemSlot.Item ) ) // This will always return true for the equipment slots, since they count the default items as equipped items.
+			if ( rEquipManager.IsItemEquipped( m_ItemSlot.Item ) ) // This will always return true for the equipment slots, as default items also count as equipped items.
 			{
 				if ( DraggedItem as Equipment != null )
 					rEquipManager.Equip( (Equipment)DraggedItem );
@@ -83,7 +89,7 @@ public class InventorySlotButton : BetterButton, IBeginDragHandler, IDragHandler
 					else
 						rEquipManager.Unequip( (Equipment)DraggedItem );
 				}
-				else
+				else // Switch places on items since neither of them was equipped
 				{
 					InventoryItem TempItemHolder = m_ItemSlot.Item;
 					m_ItemSlot.AddItemToSlot( pr_EventData.pointerDrag.GetComponent<ItemSlot>().Item );

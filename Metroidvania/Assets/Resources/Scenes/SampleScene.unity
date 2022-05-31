@@ -4039,6 +4039,7 @@ GameObject:
   - component: {fileID: 924315404}
   - component: {fileID: 924315403}
   - component: {fileID: 924315405}
+  - component: {fileID: 924315406}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -4096,6 +4097,19 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 03300ce36f5aa984e9f81c1f967f3da7, type: 2}
   - {fileID: 11400000, guid: 114e6f6ddeac86d4abc75ffb5caaffdd, type: 2}
   - {fileID: 11400000, guid: a9c8905560fdd8f4a9e8f890ac414133, type: 2}
+--- !u!114 &924315406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 924315402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc06a192fb84ebf40a00815bd5c2beaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_rInventoryUI: {fileID: 1285339919}
 --- !u!1 &930055015
 GameObject:
   m_ObjectHideFlags: 0
@@ -11233,7 +11247,6 @@ MonoBehaviour:
   m_SlideDistanceTotal: 0.5
   m_CurrentlyFocusedInteractable: {fileID: 0}
   m_Inventory: {fileID: 0}
-  m_InventoryUI: {fileID: 1285339916}
   m_InputActionAsset: {fileID: -944628639613478452, guid: f06a9e5c1abfbc949bda96224b90033f, type: 3}
   m_Animator: {fileID: 5517997049011878463}
   m_UpperCollider: {fileID: 5517997049011878461}

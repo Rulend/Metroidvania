@@ -26,7 +26,7 @@ public class ItemSlot : MonoBehaviour	// TODO:: Rename from InventorySlot to Ite
 
 		// TODO: Instead of doing player 1, do it the correct way (which includes being able to handle multiple players and not showing each others inventory).
 
-		m_rInventoryUI			= GameManager.Instance.rPlayer1.InventoryUI.GetComponent<InventoryUI>();
+		m_rInventoryUI			= UI_Manager.Instance.rInventoryUI;
 
 		m_rItemHoverIcon		= m_rInventoryUI.ItemInfoDisplay.transform.GetChild( 0 ).transform.GetChild( 0 ).GetComponent<Image>();
 

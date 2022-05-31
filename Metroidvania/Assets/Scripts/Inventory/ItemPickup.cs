@@ -33,7 +33,7 @@ public class ItemPickup : Interactable
 
 		if ( m_rPlayer.GetInventory.AddItem( m_ItemToGive ) ) // If its possible to pickup the item...
 		{
-			m_rPlayer.InventoryUI.GetComponent<InventoryUI>().ShowItemPickedUpNotice( m_ItemToGive );
+			UI_Manager.Instance.rInventoryUI.ShowItemPickedUpNotice( m_ItemToGive ); // Instead of calling a function here, invoking an event would be better, since that would allow us to easily move the interactable alert too
 
 			Destroy( gameObject );
 		}

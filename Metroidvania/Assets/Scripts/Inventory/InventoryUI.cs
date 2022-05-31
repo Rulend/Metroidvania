@@ -47,6 +47,9 @@ public class InventoryUI : MonoBehaviour
 	public GameObject SlotMenuQuest			{ get { return m_SlotMenuQuest;			} }
 
 
+	//public delegate void InteractableAlertHandler();
+	//public event InteractableAlertHandler InteractableAlert;
+
 	// Start is called before the first frame update
 	void Start()
 	{

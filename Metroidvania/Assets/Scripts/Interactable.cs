@@ -18,7 +18,7 @@ public class Interactable : MonoBehaviour
 	void Start()
     {
 		m_rPlayer				= GameManager.Instance.rPlayer1;
-		m_rInteractableAlert	= m_rPlayer.InventoryUI.GetComponent<InventoryUI>().m_InteractableAlert;
+		m_rInteractableAlert	= UI_Manager.Instance.rInventoryUI.m_InteractableAlert;
 	}
 
 
@@ -47,11 +47,13 @@ public class Interactable : MonoBehaviour
 				m_rPlayer.SetCurrentInteractable( this );
 				m_rInteractableAlert.GetComponentInChildren<Text>().text = m_InteractableAlertText;
 
+				InventoryUI rInventoryUI = UI_Manager.Instance.rInventoryUI;
+
 				// Set position of the interactable text based on whether the player recently picked up an item or not. This is so it can still be seen even if ItemPickedUpNotice is active.
-				if ( m_rPlayer.InventoryUI.GetComponent<InventoryUI>().m_ItemPickedUpNotice.activeSelf )
-					m_rInteractableAlert.transform.position = m_rPlayer.InventoryUI.GetComponent<InventoryUI>().InteractableAlertStartPos - new Vector3( 0.0f, 200.0f, 0.0f ); // TODO:: Change this from a hard coded value to be the y-size of the itempickupnotice yextbox
+				if ( rInventoryUI.m_ItemPickedUpNotice.activeSelf )
+					m_rInteractableAlert.transform.position = rInventoryUI.InteractableAlertStartPos - new Vector3( 0.0f, 200.0f, 0.0f ); // TODO:: Change this from a hard coded value to be the y-size of the itempickupnotice yextbox
 				else
-					m_rInteractableAlert.transform.position = m_rPlayer.InventoryUI.GetComponent<InventoryUI>().InteractableAlertStartPos;
+					m_rInteractableAlert.transform.position = rInventoryUI.InteractableAlertStartPos;
 
 				m_rInteractableAlert.SetActive( true );
 			}
@@ -61,7 +63,7 @@ public class Interactable : MonoBehaviour
 		else if ( m_rPlayer.GetCurrentInteractable() == this )
 		{
 			m_rPlayer.SetCurrentInteractable( null );
-			m_rPlayer.InventoryUI.GetComponent<InventoryUI>().m_InteractableAlert.SetActive( false );
+			UI_Manager.Instance.rInventoryUI.m_InteractableAlert.SetActive( false ); // Todo:: fix this monstrosity of a mess
 		}
 	}
 }

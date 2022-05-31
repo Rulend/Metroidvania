@@ -56,9 +56,8 @@ public class Player : Character
 	[SerializeField] private Inventory m_Inventory;
 	public Inventory GetInventory => m_Inventory;
 
-	[SerializeField] private GameObject m_InventoryUI;
 
-	public GameObject InventoryUI { get { return m_InventoryUI; } }
+	private GameObject m_rInventoryUI;
 
 	// Used for controlling stuff, move to controller script later.
 	[SerializeField] private InputActionAsset	m_InputActionAsset;
@@ -147,6 +146,9 @@ public class Player : Character
 		m_InputActions[ (int)GameplayActions.GAMEPLAYACTIONS_MENUTOGGLE ]	= m_ActionMap.FindAction( "MenuToggle" );
 		m_InputActions[ (int)GameplayActions.GAMEPLAYACTIONS_RESET ]		= m_ActionMap.FindAction( "Reset" );
 
+
+		// Get inventory UI
+		m_rInventoryUI = UI_Manager.Instance.rInventoryUI.gameObject;
 	}
 
 	void Awake()
@@ -155,7 +157,6 @@ public class Player : Character
 		{
 			m_Inventory = gameObject.GetComponent<Inventory>();
 		}
-
 	}
 
 	// Update is called once per frame
@@ -342,7 +343,7 @@ public class Player : Character
 
 		if ( MenuToggle.triggered  )
 		{
-			m_InventoryUI.SetActive( !m_InventoryUI.activeSelf );
+			m_rInventoryUI.SetActive( !m_rInventoryUI.activeSelf );
 		}
 
 
