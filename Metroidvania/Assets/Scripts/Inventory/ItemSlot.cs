@@ -160,27 +160,23 @@ public class ItemSlot : MonoBehaviour	// TODO:: Rename from InventorySlot to Ite
 			{
 				case InventoryItem.ITEMTYPE.ITEMTYPE_MISC:
 					m_rInventoryUI.SlotMenuCurrent = m_rInventoryUI.SlotMenuMisc;
-					Debug.Log( "Left-clicking an item of type MISC. " );
 					break;
 				case InventoryItem.ITEMTYPE.ITEMTYPE_CONSUMABLE:
 					m_rInventoryUI.SlotMenuCurrent = m_rInventoryUI.SlotMenuConsumable;
-					Debug.Log( "Left-clicking an item of type CONSUMABLE. " );
 					break;
 				case InventoryItem.ITEMTYPE.ITEMTYPE_EQUIPMENT:
 					m_rInventoryUI.SlotMenuCurrent = m_rInventoryUI.SlotMenuEquippable;
-					Debug.Log( "Left-clicking an item of type EQUIPMENT. " );
 					break;
 				case InventoryItem.ITEMTYPE.ITEMTYPE_QUEST:
 					m_rInventoryUI.SlotMenuCurrent = m_rInventoryUI.SlotMenuQuest;
-					Debug.Log( "Left-clicking an item of type QUEST. " );
 					break;
 				default:
 					Debug.Log( "Unspecified what kind of menu should appear when left-clicking an item of type " + m_Item.m_ItemType.ToString() );
 					break;
 			}
 
-			m_rInventoryUI.m_CurrentSlot = this;
-			m_rInventoryUI.m_CurrentSlotBorder.transform.position = transform.position;
+			m_rInventoryUI.m_CurrentSlot							= this;
+			m_rInventoryUI.m_CurrentSlotBorder.transform.position	= transform.position;
 			m_rInventoryUI.m_CurrentSlotBorder.SetActive( true );
 
 			PositionUIPanelNextToSlot( m_rInventoryUI.SlotMenuCurrent );
@@ -189,9 +185,7 @@ public class ItemSlot : MonoBehaviour	// TODO:: Rename from InventorySlot to Ite
 
 		}
 		else
-		{
 			HideItemSlotOptions();
-		}
 	}
 
 	////////////////////////////////////////////////

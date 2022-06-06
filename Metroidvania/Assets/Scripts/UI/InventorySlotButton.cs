@@ -100,12 +100,16 @@ public class InventorySlotButton : BetterButton, IBeginDragHandler, IDragHandler
 		else
 		{
 			if ( rEquipManager.IsItemEquipped( DraggedItem ) )
-				rEquipManager.Unequip( (Equipment)DraggedItem );
+			{
+				rEquipManager.Unequip( (Equipment)DraggedItem ); // Remove item from being equipped
+				GameManager.Instance.rPlayer1.GetInventory.RemoveItem( DraggedItem ); // Remove item from inventory, since unequipping it puts it in the first open slot
+			}
 			else
 			{
-				m_ItemSlot.AddItemToSlot( DraggedItem );
 				pr_EventData.pointerDrag.GetComponent<ItemSlot>().RemoveItemFromSlot( false );
 			}
+
+			m_ItemSlot.AddItemToSlot( DraggedItem ); // Put item in dragged to slot // TODO:: Test if this causes any issues.
 		}
 	}
 }

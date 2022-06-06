@@ -113,6 +113,8 @@ public class EquipmentManager : MonoBehaviour
 		if ( pr_EquipmentToUnequip == null )
 			return;
 
+		// TODO:: Add check to see if inventory is full before unequipping an item
+
 		int EquipmentSlot = (int)pr_EquipmentToUnequip.EquipmentSlots;
 
 		m_EquipmentSlots[ EquipmentSlot ].RemoveItemFromSlot( false );

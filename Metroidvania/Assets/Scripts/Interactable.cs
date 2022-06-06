@@ -10,8 +10,8 @@ public class Interactable : MonoBehaviour
 	protected	string			m_InteractableAlertText = "Press E to \n ";	// The text that will be when the player is within InteractionRadius. Add to (+=) this in derived classes. DO NOT OVERWRITE. 
 
 
-	protected	Player			m_rPlayer;			// A reference to the player.
-	private		float			m_DistanceToPlayer;	// Distance to the player.
+	protected	Player				m_rPlayer;				// A reference to the player.
+	private		float				m_DistanceToPlayer;		// Distance to the player.
 
 
 	// Start is called after creation, if the gameobject or component is not disabled
@@ -26,7 +26,7 @@ public class Interactable : MonoBehaviour
 	public virtual void Interact()
 	{
 		Debug.Log( string.Format( "Interacting with {0}. \n", gameObject.name ) );
-		m_rPlayer.SetCurrentInteractable( null );
+		m_rPlayer.m_CurrentlyFocusedInteractable = null;
 		m_rInteractableAlert.SetActive( false );
 	}
 
@@ -42,9 +42,9 @@ public class Interactable : MonoBehaviour
 		if ( m_DistanceToPlayer <= m_InteractionRadius )
 		{
 			// If player is not currently focusing another interactable, or if this interactable is closer, set this as current and display the Interact text.
-			if ( !m_rPlayer.GetCurrentInteractable() || m_DistanceToPlayer < m_rPlayer.GetCurrentInteractable().m_DistanceToPlayer )
+			if ( !m_rPlayer.m_CurrentlyFocusedInteractable || m_DistanceToPlayer < m_rPlayer.m_CurrentlyFocusedInteractable.m_DistanceToPlayer )
 			{
-				m_rPlayer.SetCurrentInteractable( this );
+				m_rPlayer.m_CurrentlyFocusedInteractable = this;
 				m_rInteractableAlert.GetComponentInChildren<Text>().text = m_InteractableAlertText;
 
 				InventoryUI rInventoryUI = UI_Manager.Instance.rInventoryUI;
@@ -60,9 +60,9 @@ public class Interactable : MonoBehaviour
 
 		}
 		// If this is the current interactable, but not within range, set current to null. TODO: Fix this later, will yield a small performance gain
-		else if ( m_rPlayer.GetCurrentInteractable() == this )
+		else if ( m_rPlayer.m_CurrentlyFocusedInteractable == this )
 		{
-			m_rPlayer.SetCurrentInteractable( null );
+			m_rPlayer.m_CurrentlyFocusedInteractable = null;
 			UI_Manager.Instance.rInventoryUI.m_InteractableAlert.SetActive( false ); // Todo:: fix this monstrosity of a mess
 		}
 	}

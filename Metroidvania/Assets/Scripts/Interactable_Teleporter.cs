@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Teleporter : Interactable
+public class Interactable_Teleporter : Interactable
 {
 	//Teleporter[] m_rTeleporters; // gonna use this later when I've made so the player can choose which points to teleport to. Gonna do that after implementing save points.
 	[SerializeField] private Transform m_TargetLocation;
