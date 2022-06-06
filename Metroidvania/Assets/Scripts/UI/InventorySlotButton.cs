@@ -5,12 +5,24 @@ using UnityEngine.InputSystem;
 
 public class InventorySlotButton : BetterButton, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
 {
-	private ItemSlot m_ItemSlot;
+	private ItemSlot	m_ItemSlot;
+	private Image		m_ItemSlotItemImage;
+
+	private GameObject	m_DraggedItemObject;
+	private Mouse		m_Mouse;
 
 	private void Awake()
 	{
-		m_ItemSlot = GetComponent<ItemSlot>();
+		m_ItemSlot			= GetComponent<ItemSlot>();
+		m_ItemSlotItemImage = m_ItemSlot.transform.GetChild( 0 ).GetComponent<Image>();
 	}
+
+	private void Start()
+	{
+		m_DraggedItemObject = UI_Manager.Instance.rInventoryUI.DraggedItem;
+	}
+
+
 
 	public override void OnPointerClick( PointerEventData pr_EventData )
 	{
@@ -33,31 +45,31 @@ public class InventorySlotButton : BetterButton, IBeginDragHandler, IDragHandler
 	}
 
 
-
-	// Todo:: implement these.
 	public void OnBeginDrag( PointerEventData pr_EventData )
 	{
 		if ( m_ItemSlot.Item == null )
 			return;
 
-		UI_Manager.Instance.rInventoryUI.DraggedItem.GetComponent<Image>().sprite = m_ItemSlot.Item.m_Icon;
+		m_ItemSlotItemImage.color -= new Color( 0.0f, 0.0f, 0.0f, 0.6f );
+		m_DraggedItemObject.GetComponent<Image>().enabled = true;
+		m_DraggedItemObject.GetComponent<Image>().sprite = m_ItemSlot.Item.m_Icon;
+		m_Mouse = Mouse.current;
 	}
 
 
 	public void OnDrag( PointerEventData pr_EventData )
 	{
-		if ( m_ItemSlot.Item == null )
-			return;
-
-		//UI_Manager.Instance.rInventoryUI.DraggedItem.transform.position = Camera.main.ScreenToWorldPoint( new Vector3( Mouse.current.position.x.ReadValue() / Screen.width, Mouse.current.position.y.ReadValue()/Screen.height, 0.0f ) );
+		//We don't need this functionality, we have a separate gameobjet that takes care of that.
+		m_DraggedItemObject.transform.position = m_Mouse.position.ReadValue();
 	}
 
 
 	public void OnEndDrag( PointerEventData pr_EventData )
 	{
-
-		//Inventory_Item_Mover.Instance.MoveItems( GetComponent<ItemSlot>() );
-		//Debug.Log( $"Ended drag, object that handled that was: {pr_EventData.pointerDrag.name}" );
+		m_ItemSlotItemImage.color += new Color( 0.0f, 0.0f, 0.0f, 0.6f );
+		m_DraggedItemObject.GetComponent<Image>().enabled = false;
+		m_DraggedItemObject.GetComponent<Image>().sprite = null;
+		m_Mouse = null;
 	}
 
 
@@ -65,6 +77,8 @@ public class InventorySlotButton : BetterButton, IBeginDragHandler, IDragHandler
 	public void OnDrop( PointerEventData pr_EventData )
 	{
 		InventoryItem DraggedItem = pr_EventData.pointerDrag.GetComponent<ItemSlot>().Item; // The item that was dragged to this slot
+		//UI_Manager.Instance.rInventoryUI.DraggedItem.GetComponent<Image>().enabled = false;
+		//UI_Manager.Instance.rInventoryUI.DraggedItem.GetComponent<Image>().sprite = null;
 
 		if ( DraggedItem == null )
 			return;
