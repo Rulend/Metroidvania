@@ -50,9 +50,14 @@ public class InventorySlotButton : BetterButton, IBeginDragHandler, IDragHandler
 		if ( m_ItemSlot.Item == null )
 			return;
 
-		m_ItemSlotItemImage.color -= new Color( 0.0f, 0.0f, 0.0f, 0.6f );
-		m_DraggedItemObject.GetComponent<Image>().enabled = true;
-		m_DraggedItemObject.GetComponent<Image>().sprite = m_ItemSlot.Item.m_Icon;
+		if ( !m_ItemSlot.Item.m_DefaultItem )
+		{
+
+			m_ItemSlotItemImage.color -= new Color( 0.0f, 0.0f, 0.0f, 0.6f );
+			m_DraggedItemObject.GetComponent<Image>().enabled = true;
+			m_DraggedItemObject.GetComponent<Image>().sprite = m_ItemSlot.Item.m_Icon;
+		}
+
 		m_Mouse = Mouse.current;
 	}
 
@@ -73,12 +78,10 @@ public class InventorySlotButton : BetterButton, IBeginDragHandler, IDragHandler
 	}
 
 
-	// Triggers when you drop an item into a slot.
+	// Triggers when an item is dropped into THIS slot. The item inside pr_EventData is the dragged item.
 	public void OnDrop( PointerEventData pr_EventData )
 	{
 		InventoryItem DraggedItem = pr_EventData.pointerDrag.GetComponent<ItemSlot>().Item; // The item that was dragged to this slot
-		//UI_Manager.Instance.rInventoryUI.DraggedItem.GetComponent<Image>().enabled = false;
-		//UI_Manager.Instance.rInventoryUI.DraggedItem.GetComponent<Image>().sprite = null;
 
 		if ( DraggedItem == null )
 			return;

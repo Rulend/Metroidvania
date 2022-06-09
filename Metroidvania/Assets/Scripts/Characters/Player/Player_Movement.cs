@@ -30,8 +30,8 @@ public class Player_Movement : Character_Movement
 	private Player m_rPlayer;
 
 	// Hurtboxes - used for detecting hits.
-	[SerializeField] private BoxCollider m_UpperCollider;
-	[SerializeField] private BoxCollider m_LowerCollider;
+	[SerializeField] private BoxCollider m_FullBodyCollider;
+	[SerializeField] private BoxCollider m_SlideCollider;
 
 
 	// State machine for player
@@ -133,12 +133,12 @@ public class Player_Movement : Character_Movement
 				if ( m_SlideDistanceLeft > 0.0f ) 
 				{
 					Slide();
-					m_UpperCollider.enabled = false;
+					m_FullBodyCollider.enabled = false;
 				}
 				else
 				{
 					SetState( EPlayerState.PLAYERSTATE_IDLE );
-					m_UpperCollider.enabled = true;
+					m_FullBodyCollider.enabled = true;
 				}
 
 				break;
@@ -180,6 +180,10 @@ public class Player_Movement : Character_Movement
 				break;
 			case EPlayerState.PLAYERSTATE_SLIDING:
 				m_rAnimator.SetBool( "Sliding", false );
+
+				m_SlideCollider.enabled		= false;
+				m_FullBodyCollider.enabled	= true;
+
 				break;
 		}
 
@@ -215,9 +219,11 @@ public class Player_Movement : Character_Movement
 		if ( m_SlideCooldownTimeLeft > 0.0f )
 			return;
 
-		m_SlideCooldownTimeLeft = m_SlideCooldownDuration;
-        m_SlideDistanceLeft		= m_SlideDistanceTotal;
-		m_CurrentState					= EPlayerState.PLAYERSTATE_SLIDING;
+		m_SlideCooldownTimeLeft		= m_SlideCooldownDuration;
+        m_SlideDistanceLeft			= m_SlideDistanceTotal;
+		m_CurrentState				= EPlayerState.PLAYERSTATE_SLIDING;
+		m_FullBodyCollider.enabled	= false;
+		m_SlideCollider.enabled		= true;
     }
 
 	private void Slide()
@@ -330,7 +336,7 @@ public class Player_Movement : Character_Movement
 		}
 
 		// Add offset to ray, in order to check slightly BEHIND the player for ground collision.
-		RayStartPos = transform.position + new Vector3( 0.0f, 0.5f, 0.0f ) + ( ( m_LowerCollider.size.z / 2.0f - 0.01f ) * -transform.forward );
+		RayStartPos = transform.position + new Vector3( 0.0f, 0.5f, 0.0f ) + ( ( m_SlideCollider.size.z / 2.0f - 0.01f ) * -transform.forward );
 
 #if UNITY_EDITOR
 		DebugRayStart	= RayStartPos;
@@ -348,7 +354,7 @@ public class Player_Movement : Character_Movement
 		}
 
 		// Add offset to ray, in order to check slightly in FRONT of the player for ground collision.
-		RayStartPos = transform.position + new Vector3( 0.0f, 0.5f, 0.0f ) + ( ( m_LowerCollider.size.z / 2.0f - 0.01f) * transform.forward );
+		RayStartPos = transform.position + new Vector3( 0.0f, 0.5f, 0.0f ) + ( ( m_SlideCollider.size.z / 2.0f - 0.01f) * transform.forward );
 
 #if UNITY_EDITOR
 		DebugRayStart	= RayStartPos;
