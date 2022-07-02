@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -45,6 +46,11 @@ public class InventoryUI : MonoBehaviour
 	public GameObject SlotMenuConsumable	{ get { return m_SlotMenuConsumable;	} }
 	public GameObject SlotMenuEquippable	{ get { return m_SlotMenuEquippable;	} }
 	public GameObject SlotMenuQuest			{ get { return m_SlotMenuQuest;			} }
+
+
+
+	public delegate void	UpdateEquippabableListHandler( List<Equipment> _NewItems );
+	public event			UpdateEquippabableListHandler UpdateEquippableListEvent;
 
 
 	//public delegate void InteractableAlertHandler();
@@ -153,6 +159,16 @@ public class InventoryUI : MonoBehaviour
 		m_ItemPickedUpNotice.GetComponentInChildren<Text>().text														= pr_PickedUpItem.m_ItemName;
 		m_ItemPickedUpNotice.GetComponent<HideUIAfterDuration>().ResetAliveTimeLeft();
 		m_ItemPickedUpNotice.SetActive( true );
+	}
+
+
+
+	public void UpdateEquippableList( List<Equipment> _NewList )
+	{
+		// Here we have to get the different inventories
+
+
+		UpdateEquippableListEvent.Invoke( _NewList );
 	}
 
 

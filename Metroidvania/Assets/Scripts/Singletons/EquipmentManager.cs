@@ -39,16 +39,16 @@ public class EquipmentManager : MonoBehaviour
 		m_EquipmentSlots = m_EquipmentSlotsParent.GetComponentsInChildren<ItemSlot>();
 
 		// How to write to JSON
-		//SerializableEquipmentArray TestArray = new SerializableEquipmentArray( m_DefaultEquipment.Length );
+		SerializableEquipmentArray TestArray = new SerializableEquipmentArray( m_DefaultEquipment.Length );
 
-		//for ( int i = 0; i < m_DefaultEquipment.Length; ++i )
-		//{
-		//	TestArray.ItemArray[ i ] = (SerializableEquipment)m_DefaultEquipment[ i ];
-		//}
+		for ( int i = 0; i < m_DefaultEquipment.Length; ++i )
+		{
+			TestArray.ItemArray[ i ] = (SerializableEquipment)m_DefaultEquipment[ i ];
+		}
 
-		//string JsonString = JsonUtility.ToJson( TestArray );
+		string JsonString = JsonUtility.ToJson( TestArray );
 
-		//File.WriteAllText( Application.dataPath + "/Resources/Items(Json)/DefaultItems.json", JsonString );
+		File.WriteAllText( Application.dataPath + "/Resources/Items(Json)/DefaultItems.json", JsonString );
 
 		// How to read from JSON
 		string DefaultItemsFilePath = Application.dataPath + "/Resources/Items(Json)/DefaultItems.json";

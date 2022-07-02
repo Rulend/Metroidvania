@@ -15,9 +15,22 @@ public class Inventory : MonoBehaviour
 	public ItemSlot[]		m_InventorySlots;       // An array of references to all of the inventory slots inside the "InventoryPanel"-object in the scene.
 
 
+	public List<Equipment> m_HeadGear;
+	public List<Equipment> m_ChestGear;
+	public List<Equipment> m_HandGear;
+	public List<Equipment> m_LegGear;
+	public List<Equipment> m_FeetGear;
+
 	private void Start()
 	{
 		m_InventorySlots = m_InventorySlotsParent.GetComponentsInChildren<ItemSlot>();
+
+
+		m_HeadGear		= new List<Equipment>();
+		m_ChestGear		= new List<Equipment>();
+		m_HandGear		= new List<Equipment>();
+		m_LegGear		= new List<Equipment>();
+		m_FeetGear		= new List<Equipment>();
 	}
 
 	////////////////////////////////////////////////
@@ -36,6 +49,31 @@ public class Inventory : MonoBehaviour
 	public bool AddItem( InventoryItem pr_ItemToAdd )
 	{
 		// Is it stackable? Is there space in that stack? Is the inventory full? TODO:: Check these stuff.
+
+
+		if ( !pr_ItemToAdd.m_DefaultItem )
+		{
+			if ( pr_ItemToAdd.m_ItemType == InventoryItem.ITEMTYPE.ITEMTYPE_EQUIPMENT )
+			{
+				Equipment Item = (Equipment)pr_ItemToAdd;
+
+				// TODO:: Remove the L_Hand/R_Hand equipslots. They aren't needed in order to identify weapon type anymore, just give it a generic weapon type. Then it will be equippable by both hands.
+				switch ( Item.m_Equipmentslots )
+				{
+					case EquipmentSlot.EQUIPMENTSLOT_HEAD:			m_HeadGear.Add( Item );		break;
+					case EquipmentSlot.EQUIPMENTSLOT_CHEST:			m_ChestGear.Add( Item );	break;
+					case EquipmentSlot.EQUIPMENTSLOT_GAUNTLETS:		m_HandGear.Add( Item );		break;
+					case EquipmentSlot.EQUIPMENTSLOT_LEGS:			m_LegGear.Add( Item );		break;
+					case EquipmentSlot.EQUIPMENTSLOT_FEET:			m_FeetGear.Add( Item );		break;
+				}
+
+				return true;
+			}
+		}
+
+
+
+
 
 		if ( !pr_ItemToAdd.m_DefaultItem )
 		{
