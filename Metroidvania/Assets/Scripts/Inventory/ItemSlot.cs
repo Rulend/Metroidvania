@@ -1,14 +1,14 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ItemSlot : MonoBehaviour	// TODO:: Rename from InventorySlot to ItemSlot
+public class ItemSlot : MonoBehaviour
 {
-	public InventoryItem					Item => m_Item;
+	public InventoryItem					Item => m_Item;			// Getter for the item
 	private InventoryItem					m_Item;					// The item stored in the slot.
 
 	private Image							m_Icon;					// The icon of the item when in a slot.
 
-	[SerializeField] private GameObject		m_ItemPickupPrefab;		// A prefab used for instantiating the item on the ground when discarding it
+	private GameObject		m_ItemPickupPrefab;		// A prefab used for instantiating the item on the ground when discarding it
 
 	private InventoryUI						m_rInventoryUI;				// A reference to the InventoryUI
 	private Image							m_rItemHoverIcon;			// A reference to the item-icon part of the item slot hover panel
@@ -18,7 +18,9 @@ public class ItemSlot : MonoBehaviour	// TODO:: Rename from InventorySlot to Ite
 	void Start()
 	{
 		string ItemPickupPrefabFilePath = "Prefabs/ItemPickup";
+
 		m_ItemPickupPrefab = (GameObject)Resources.Load( ItemPickupPrefabFilePath );
+
 		if ( m_ItemPickupPrefab == null )
 			Debug.LogError( $"Failed to load ItemPickupPrefab at filepath {ItemPickupPrefabFilePath}" );
 
