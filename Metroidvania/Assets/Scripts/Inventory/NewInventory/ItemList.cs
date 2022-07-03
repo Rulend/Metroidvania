@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class ItemList : MonoBehaviour
 {
-	private List<Equipment>			m_HeldItems;
+	private List<InventoryItem>			m_HeldItems;
 	private List<List_Item>			m_ItemSlots;
 	int								m_AmountItemsWidth	= 6;
 	float							m_ItemApartDistX	= 50.0f;
@@ -16,7 +16,7 @@ public class ItemList : MonoBehaviour
 
 	private void Awake()
 	{
-		m_HeldItems = new List<Equipment>();
+		m_HeldItems = new List<InventoryItem>();
 		m_ItemSlots = new List<List_Item>();
 	}
 
@@ -25,7 +25,7 @@ public class ItemList : MonoBehaviour
 	void Start()
     {
 
-		UI_Manager.Instance.rInventoryUI.UpdateEquippableListEvent += UpdateList;
+		UI_Manager.Instance.rInventoryUI.UpdateDisplayedItemsEvent += UpdateList;
 	}
 
     // Update is called once per frame
@@ -35,10 +35,15 @@ public class ItemList : MonoBehaviour
     }
 
 	// Send in a list of either all items if its a shop, or the categorized items if it's a player's equipment.
-	// TODO:: Make it so this doesn't have to be created every time, just do a bunch of them at start and switch them on/off.
-	public void UpdateList( List<Equipment> _NewList )
+	// TODO:: Make it so this doesn't have to be created every time, just do a bunch of them at start and switch them on/off. Do this even if performance is not affected, because this way fucking sucks lol
+	public void UpdateList( List<InventoryItem> _NewList )
 	{
 		m_HeldItems = _NewList;
+
+		foreach ( List_Item currentItem in m_ItemSlots )
+		{
+			Destroy( currentItem.gameObject );
+		}
 
 		m_ItemSlots.Clear();
 

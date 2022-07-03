@@ -12,12 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd88c247f9726347abf08656fab2744, type: 3}
   m_Name: Helmet_Default
   m_EditorClassIdentifier: 
+  m_ID: 0
   m_ItemName: The Default Helmet
   m_Icon: {fileID: 21300000, guid: 30d3e8fb9411afe48a8cc0ddfc3de35c, type: 3}
   m_DefaultItem: 1
   m_ItemType: 2
   m_ItemDescription: N/A
-  m_Equipmentslots: 0
+  m_Equipmentslots: 1
   m_Mesh: {fileID: 0}
   m_ArmorModifier: 0
   m_DamageModifier: 0

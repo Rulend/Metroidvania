@@ -13,7 +13,7 @@ public class Button_EquipmentCategory : MonoBehaviour
 
 	public void ShowItemsInCategory()
 	{
-		List<Equipment> ListOfItems = new List<Equipment>();
+		List<InventoryItem> ListOfItems = new List<InventoryItem>();
 
 
 		switch ( m_EquipmentType )
@@ -25,6 +25,6 @@ public class Button_EquipmentCategory : MonoBehaviour
 			case EquipmentSlot.EQUIPMENTSLOT_FEET:			ListOfItems = GameManager.Instance.rPlayer1.GetInventory.m_FeetGear;	break;
 		}
 
-		UI_Manager.Instance.rInventoryUI.UpdateEquippableList( ListOfItems );
+		UI_Manager.Instance.rInventoryUI.UpdateDisplayedItems( ListOfItems );
 	}
 }

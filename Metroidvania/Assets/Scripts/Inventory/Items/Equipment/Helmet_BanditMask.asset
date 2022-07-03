@@ -12,11 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd88c247f9726347abf08656fab2744, type: 3}
   m_Name: Helmet_BanditMask
   m_EditorClassIdentifier: 
+  m_ID: 0
   m_ItemName: BanditMask
   m_Icon: {fileID: 21300000, guid: 893613f7ce3d1254aaf8aa0bcf6f11e3, type: 3}
   m_DefaultItem: 0
   m_ItemType: 2
-  m_Equipmentslots: 0
+  m_ItemDescription: This is an item description which has not yet been customized.
+  m_Equipmentslots: 1
+  m_Mesh: {fileID: 0}
   m_ArmorModifier: 0
   m_DamageModifier: 0
   m_RequiredStats: 0

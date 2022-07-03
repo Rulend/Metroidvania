@@ -12,12 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd88c247f9726347abf08656fab2744, type: 3}
   m_Name: Legs_Default
   m_EditorClassIdentifier: 
+  m_ID: 0
   m_ItemName: The Default Plate-legs
   m_Icon: {fileID: 21300000, guid: 941715b3d18429c48a2ef21dbde03d43, type: 3}
   m_DefaultItem: 1
   m_ItemType: 2
   m_ItemDescription: N/A
-  m_Equipmentslots: 5
+  m_Equipmentslots: 4
   m_Mesh: {fileID: 0}
   m_ArmorModifier: 0
   m_DamageModifier: 0

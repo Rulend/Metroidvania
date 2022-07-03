@@ -38,9 +38,13 @@ public class EquipmentManager : MonoBehaviour
 	{
 		m_EquipmentSlots = m_EquipmentSlotsParent.GetComponentsInChildren<ItemSlot>();
 
+
+
+
 		// How to write to JSON
 		SerializableEquipmentArray TestArray = new SerializableEquipmentArray( m_DefaultEquipment.Length );
 
+		// TODO:: Fix it so that the order of the default items is correct
 		for ( int i = 0; i < m_DefaultEquipment.Length; ++i )
 		{
 			TestArray.ItemArray[ i ] = (SerializableEquipment)m_DefaultEquipment[ i ];
@@ -74,6 +78,9 @@ public class EquipmentManager : MonoBehaviour
 	////////////////////////////////////////////////
 	public void Equip( Equipment pr_NewEquipment )
 	{
+		// TODO:: Remake this function. It doesn't work anymore becuase weapons are no longer tied to a specific hand. What this means is that: since there is no longer a LHAND/RHAND_Slot in the Equipslot-enum,
+		// this will need to be slightly rworked. TODO:: Remove the right hand / left hand shit, I don't have time for it right now.
+
 		if ( pr_NewEquipment == null )
 			return;
 

@@ -14,23 +14,39 @@ public class Inventory : MonoBehaviour
 	public GameObject		m_InventorySlotsParent;	// only used once, should not be a member
 	public ItemSlot[]		m_InventorySlots;       // An array of references to all of the inventory slots inside the "InventoryPanel"-object in the scene.
 
+	// TODO:: Replace all of these lists with indices instead, so that all of them can use the same list.
+	// In other words, a start index and a count of how many of that item type exists.
+	public List<InventoryItem> m_Consumables;
+	public List<InventoryItem> m_QuestItems;
+	public List<InventoryItem> m_MiscItems;
 
-	public List<Equipment> m_HeadGear;
-	public List<Equipment> m_ChestGear;
-	public List<Equipment> m_HandGear;
-	public List<Equipment> m_LegGear;
-	public List<Equipment> m_FeetGear;
+	//private List<InventoryItem>[] GearLists;
+	public List<InventoryItem> m_WeaponGear;
+	public List<InventoryItem> m_HeadGear;
+	public List<InventoryItem> m_ChestGear;
+	public List<InventoryItem> m_HandGear;
+	public List<InventoryItem> m_LegGear;
+	public List<InventoryItem> m_FeetGear;
 
 	private void Start()
 	{
 		m_InventorySlots = m_InventorySlotsParent.GetComponentsInChildren<ItemSlot>();
 
 
-		m_HeadGear		= new List<Equipment>();
-		m_ChestGear		= new List<Equipment>();
-		m_HandGear		= new List<Equipment>();
-		m_LegGear		= new List<Equipment>();
-		m_FeetGear		= new List<Equipment>();
+		m_WeaponGear	= new List<InventoryItem>();
+		m_HeadGear		= new List<InventoryItem>();
+		m_ChestGear		= new List<InventoryItem>();
+		m_HandGear		= new List<InventoryItem>();
+		m_LegGear		= new List<InventoryItem>();
+		m_FeetGear		= new List<InventoryItem>();
+
+		//GearLists = new List<InventoryItem>[ 6 ];
+		//GearLists[0] = m_WeaponGear;
+		//GearLists[1] = m_HeadGear;
+		//GearLists[2] = m_ChestGear;
+		//GearLists[3] = m_HandGear;
+		//GearLists[4] = m_LegGear;
+		//GearLists[5] = m_FeetGear;
 	}
 
 	////////////////////////////////////////////////
@@ -60,11 +76,11 @@ public class Inventory : MonoBehaviour
 				// TODO:: Remove the L_Hand/R_Hand equipslots. They aren't needed in order to identify weapon type anymore, just give it a generic weapon type. Then it will be equippable by both hands.
 				switch ( Item.m_Equipmentslots )
 				{
-					case EquipmentSlot.EQUIPMENTSLOT_HEAD:			m_HeadGear.Add( Item );		break;
-					case EquipmentSlot.EQUIPMENTSLOT_CHEST:			m_ChestGear.Add( Item );	break;
-					case EquipmentSlot.EQUIPMENTSLOT_GAUNTLETS:		m_HandGear.Add( Item );		break;
-					case EquipmentSlot.EQUIPMENTSLOT_LEGS:			m_LegGear.Add( Item );		break;
-					case EquipmentSlot.EQUIPMENTSLOT_FEET:			m_FeetGear.Add( Item );		break;
+					case EquipmentSlot.EQUIPMENTSLOT_HEAD:			m_HeadGear.Add( pr_ItemToAdd );		break;
+					case EquipmentSlot.EQUIPMENTSLOT_CHEST:			m_ChestGear.Add( pr_ItemToAdd );	break;
+					case EquipmentSlot.EQUIPMENTSLOT_GAUNTLETS:		m_HandGear.Add( pr_ItemToAdd );		break;
+					case EquipmentSlot.EQUIPMENTSLOT_LEGS:			m_LegGear.Add( pr_ItemToAdd );		break;
+					case EquipmentSlot.EQUIPMENTSLOT_FEET:			m_FeetGear.Add( pr_ItemToAdd );		break;
 				}
 
 				return true;
@@ -118,5 +134,25 @@ public class Inventory : MonoBehaviour
 		}
 
 		return false;
+	}
+
+
+
+	public List<InventoryItem> GetEquipmentGear( EquipmentSlot _ItemEquiSlot ) 
+	{
+		List<InventoryItem> ReturnedList = new List<InventoryItem>();
+
+		switch ( _ItemEquiSlot )
+		{
+			case EquipmentSlot.EQUIPMENTSLOT_WEAPON:		ReturnedList = m_WeaponGear;	break;
+			case EquipmentSlot.EQUIPMENTSLOT_HEAD:			ReturnedList = m_HeadGear;		break;
+			case EquipmentSlot.EQUIPMENTSLOT_CHEST:			ReturnedList = m_ChestGear;		break;
+			case EquipmentSlot.EQUIPMENTSLOT_GAUNTLETS:		ReturnedList = m_HandGear;		break;
+			case EquipmentSlot.EQUIPMENTSLOT_LEGS:			ReturnedList = m_LegGear;		break;
+			case EquipmentSlot.EQUIPMENTSLOT_FEET:			ReturnedList = m_FeetGear;		break;
+		}
+
+		return ReturnedList;
+		//return GearLists[ _EquipSlotIndex ];
 	}
 }

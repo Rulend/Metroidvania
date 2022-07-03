@@ -49,8 +49,11 @@ public class InventoryUI : MonoBehaviour
 
 
 
-	public delegate void	UpdateEquippabableListHandler( List<Equipment> _NewItems );
-	public event			UpdateEquippabableListHandler UpdateEquippableListEvent;
+	public delegate void	UpdateDisplayedItemsHandler ( List<InventoryItem> _NewItems );
+	public event			UpdateDisplayedItemsHandler UpdateDisplayedItemsEvent;
+	[Space]
+	[ SerializeField ] private GameObject m_DisplayedItemsParent;
+	[ SerializeField ] private GameObject m_CurrentEquipmentWindow;
 
 
 	//public delegate void InteractableAlertHandler();
@@ -163,13 +166,49 @@ public class InventoryUI : MonoBehaviour
 
 
 
-	public void UpdateEquippableList( List<Equipment> _NewList )
+	public void UpdateDisplayedItems( List<InventoryItem> _NewList )
 	{
 		// Here we have to get the different inventories
 
-
-		UpdateEquippableListEvent.Invoke( _NewList );
+		UpdateDisplayedItemsEvent.Invoke( _NewList );
 	}
 
+	public void ShowItemCategory()
+	{
+
+
+
+	}
+
+
+	public void ShowEquipmentCategory( Equipment_Category_Component _Category )
+	{
+		if ( _Category.m_EquipmentCategory == EquipmentSlot.EQUIPMENTSLOT_EQUIPPEDTAB )
+		{
+			m_CurrentEquipmentWindow.SetActive( true );
+			m_DisplayedItemsParent.SetActive( false );
+		}
+		else
+		{
+			m_CurrentEquipmentWindow.SetActive( false );
+			m_DisplayedItemsParent.SetActive( true );
+
+
+			ItemSlot[] Slots =  m_DisplayedItemsParent.GetComponentsInChildren<ItemSlot>();
+
+			List<InventoryItem> Equipments = GameManager.Instance.rPlayer1.GetInventory.GetEquipmentGear( _Category.m_EquipmentCategory );
+
+
+			for ( int SlotIndex = 0; SlotIndex < Slots.Length; ++SlotIndex )
+			{
+				if ( SlotIndex < Equipments.Count )
+				{
+					Slots[ SlotIndex ].AddItemToSlot( Equipments[ SlotIndex ] );
+				}
+				else
+					Slots[ SlotIndex ].RemoveItemFromSlot( false );
+			}
+		}
+	}
 
 }
