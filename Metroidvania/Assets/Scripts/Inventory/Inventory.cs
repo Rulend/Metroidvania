@@ -10,9 +10,8 @@ public class Inventory : MonoBehaviour
 
 	public int AmountOfSlots { get { return m_AmountOfSlots; } }
 
+	private GameObject m_ItemPickupPrefab;      // A prefab used for instantiating the item on the ground when discarding it
 
-	public GameObject		m_InventorySlotsParent;	// only used once, should not be a member
-	public ItemSlot[]		m_InventorySlots;       // An array of references to all of the inventory slots inside the "InventoryPanel"-object in the scene.
 
 	// TODO:: Replace all of these lists with indices instead, so that all of them can use the same list.
 	// In other words, a start index and a count of how many of that item type exists.
@@ -28,9 +27,17 @@ public class Inventory : MonoBehaviour
 	public List<InventoryItem> m_LegGear;
 	public List<InventoryItem> m_FeetGear;
 
+	public delegate void	InventoryUpdateHandler( List<InventoryItem> _Items );
+	public event			InventoryUpdateHandler InventoryUpdateEvent;
+
 	private void Start()
 	{
-		m_InventorySlots = m_InventorySlotsParent.GetComponentsInChildren<ItemSlot>();
+		string ItemPickupPrefabFilePath = "Prefabs/ItemPickup";
+
+		m_ItemPickupPrefab = (GameObject)Resources.Load( ItemPickupPrefabFilePath );
+
+		if ( m_ItemPickupPrefab == null )
+			Debug.LogError( $"Failed to load ItemPickupPrefab at filepath {ItemPickupPrefabFilePath}" );
 
 
 		m_WeaponGear	= new List<InventoryItem>();
@@ -62,47 +69,37 @@ public class Inventory : MonoBehaviour
 	/// pr_ItemToAdd	: the item that should be added to inventory.
 	/// 
 	////////////////////////////////////////////////
-	public bool AddItem( InventoryItem pr_ItemToAdd )
+	public bool AddItem( InventoryItem _ItemToAdd )
 	{
 		// Is it stackable? Is there space in that stack? Is the inventory full? TODO:: Check these stuff.
 
 
-		if ( !pr_ItemToAdd.m_DefaultItem )
+		if ( !_ItemToAdd.m_DefaultItem )
 		{
-			if ( pr_ItemToAdd.m_ItemType == InventoryItem.ITEMTYPE.ITEMTYPE_EQUIPMENT )
+			List<InventoryItem> NewItemList = new List<InventoryItem>();
+
+
+			if ( _ItemToAdd.m_ItemType == InventoryItem.ITEMTYPE.ITEMTYPE_EQUIPMENT )
 			{
-				Equipment Item = (Equipment)pr_ItemToAdd;
+				Equipment Item = (Equipment)_ItemToAdd;
 
 				// TODO:: Remove the L_Hand/R_Hand equipslots. They aren't needed in order to identify weapon type anymore, just give it a generic weapon type. Then it will be equippable by both hands.
 				switch ( Item.m_Equipmentslots )
 				{
-					case EquipmentSlot.EQUIPMENTSLOT_HEAD:			m_HeadGear.Add( pr_ItemToAdd );		break;
-					case EquipmentSlot.EQUIPMENTSLOT_CHEST:			m_ChestGear.Add( pr_ItemToAdd );	break;
-					case EquipmentSlot.EQUIPMENTSLOT_GAUNTLETS:		m_HandGear.Add( pr_ItemToAdd );		break;
-					case EquipmentSlot.EQUIPMENTSLOT_LEGS:			m_LegGear.Add( pr_ItemToAdd );		break;
-					case EquipmentSlot.EQUIPMENTSLOT_FEET:			m_FeetGear.Add( pr_ItemToAdd );		break;
-				}
-
-				return true;
-			}
-		}
-
-
-
-
-
-		if ( !pr_ItemToAdd.m_DefaultItem )
-		{
-			foreach ( ItemSlot rCurrentSlot in m_InventorySlots )
-			{
-				if ( !rCurrentSlot.Item )
-				{
-					rCurrentSlot.AddItemToSlot( pr_ItemToAdd );
-
-					return true;
+					case EquipmentSlot.EQUIPMENTSLOT_HEAD:		NewItemList = m_HeadGear;	break;
+					case EquipmentSlot.EQUIPMENTSLOT_CHEST:		NewItemList = m_ChestGear;	break;
+					case EquipmentSlot.EQUIPMENTSLOT_GAUNTLETS:	NewItemList = m_HandGear;	break;
+					case EquipmentSlot.EQUIPMENTSLOT_LEGS:		NewItemList = m_LegGear;	break;
+					case EquipmentSlot.EQUIPMENTSLOT_FEET:		NewItemList = m_FeetGear;	break;
 				}
 			}
 
+
+			NewItemList.Add( _ItemToAdd );
+
+			InventoryUpdateEvent.Invoke( NewItemList );
+
+			return true;
 		}
 
 		// TODO:: Show the player a prompt that tells them why they couldn't add the item.
@@ -121,19 +118,56 @@ public class Inventory : MonoBehaviour
 	/// 
 	////////////////////////////////////////////////
 
-	public bool RemoveItem( InventoryItem pr_ItemToRemove, bool pr_SpawnItemPickup = true )
+	public void RemoveItem( InventoryItem _ItemToRemove, bool _SpawnItemPickup = true )
 	{
-		foreach ( ItemSlot rCurrentSlot in m_InventorySlots )
-		{
-			if ( rCurrentSlot.Item == pr_ItemToRemove )
-			{
-				rCurrentSlot.RemoveItemFromSlot( pr_SpawnItemPickup );
+		List<InventoryItem> ListToUpdate = new List<InventoryItem>();
 
-				return true;
+
+
+
+		if ( _ItemToRemove.m_ItemType == InventoryItem.ITEMTYPE.ITEMTYPE_EQUIPMENT )
+		{
+			Equipment Item = (Equipment)_ItemToRemove;
+
+			// TODO:: Remove the L_Hand/R_Hand equipslots. They aren't needed in order to identify weapon type anymore, just give it a generic weapon type. Then it will be equippable by both hands.
+			switch ( Item.m_Equipmentslots )
+			{
+				case EquipmentSlot.EQUIPMENTSLOT_HEAD:		ListToUpdate =	m_HeadGear;		break;
+				case EquipmentSlot.EQUIPMENTSLOT_CHEST:		ListToUpdate =	m_ChestGear;	break;
+				case EquipmentSlot.EQUIPMENTSLOT_GAUNTLETS:	ListToUpdate =	m_HandGear;		break;
+				case EquipmentSlot.EQUIPMENTSLOT_LEGS:		ListToUpdate =	m_LegGear;		break;
+				case EquipmentSlot.EQUIPMENTSLOT_FEET:		ListToUpdate =	m_FeetGear;		break;
 			}
 		}
 
-		return false;
+
+
+		//ListToUpdate.Remove( _ItemToRemove );
+
+		int RemovedItemIndex = 0;
+
+		for ( int ItemIndex = 0; ItemIndex < ListToUpdate.Count; ++ItemIndex )
+		{
+			if ( ListToUpdate[ ItemIndex ] == _ItemToRemove )
+			{
+				ListToUpdate.RemoveAt( ItemIndex );
+				RemovedItemIndex			= ItemIndex;
+				break;
+			}
+		}
+
+		for ( int ListIndex = RemovedItemIndex; ListIndex < ListToUpdate.Count - 1; ++ListIndex )
+			ListToUpdate[ ListIndex ] = ListToUpdate[ ListIndex + 1 ];
+
+		if ( _SpawnItemPickup )
+		{
+			m_ItemPickupPrefab.GetComponent<ItemPickup>().m_ItemToGive = _ItemToRemove;
+			Instantiate( m_ItemPickupPrefab, GameManager.Instance.rPlayer1.transform.position, Quaternion.identity );
+		}
+
+		InventoryUpdateEvent.Invoke( ListToUpdate );
+
+		return;
 	}
 
 

@@ -8,8 +8,6 @@ public class ItemSlot : MonoBehaviour
 
 	private Image							m_Icon;					// The icon of the item when in a slot.
 
-	private GameObject		m_ItemPickupPrefab;		// A prefab used for instantiating the item on the ground when discarding it
-
 	private InventoryUI						m_rInventoryUI;				// A reference to the InventoryUI
 	private Image							m_rItemHoverIcon;			// A reference to the item-icon part of the item slot hover panel
 	private Text							m_rItemHoverName;			// A reference to the name part of the item slot hover panel
@@ -17,13 +15,6 @@ public class ItemSlot : MonoBehaviour
 
 	void Start()
 	{
-		string ItemPickupPrefabFilePath = "Prefabs/ItemPickup";
-
-		m_ItemPickupPrefab = (GameObject)Resources.Load( ItemPickupPrefabFilePath );
-
-		if ( m_ItemPickupPrefab == null )
-			Debug.LogError( $"Failed to load ItemPickupPrefab at filepath {ItemPickupPrefabFilePath}" );
-
 		m_Icon = transform.GetChild( 0 ).GetComponent<Image>();
 
 		// TODO: Instead of doing player 1, do it the correct way (which includes being able to handle multiple players and not showing each others inventory).
@@ -73,14 +64,8 @@ public class ItemSlot : MonoBehaviour
 	/// bool pr_SpawnItemPickup	: whether or not to spawn the item on the ground when dropping it.
 	/// 
 	////////////////////////////////////////////////
-	public void RemoveItemFromSlot( bool pr_SpawnItemPickup )
+	public void RemoveItemFromSlot()
 	{
-		if ( pr_SpawnItemPickup )
-		{
-			m_ItemPickupPrefab.GetComponent<ItemPickup>().m_ItemToGive = m_Item;
-			Instantiate( m_ItemPickupPrefab, GameManager.Instance.rPlayer1.transform.position, Quaternion.identity );
-		}
-
 		m_Item				= null; // TODO: Maybe use destroy in order to destroy it? Or add it to an unload queue.
 		m_Icon.sprite		= null;
 		m_Icon.enabled		= false;
@@ -241,13 +226,6 @@ public class ItemSlot : MonoBehaviour
 
 
 	// Button-functions to be called from the UI
-
-
-	// Removes the item from your inventory. TODO:: Removing an item from your inventory should either destroy it or leave it on the ground. Decide which one to go with, or make a toggle to switch between them.
-	public void ButtonRemoveItem()
-	{
-		RemoveItemFromSlot( true ); // Remove item from inventory, and since the Discard button was pressed, drop an item pickup on the ground.
-	}
 
 
 	// "Uses" the item. For a consumable, this will consume it. For an equipment, this will equip it, etc.

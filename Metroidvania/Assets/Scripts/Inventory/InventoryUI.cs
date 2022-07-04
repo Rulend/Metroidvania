@@ -8,11 +8,7 @@ public class InventoryUI : MonoBehaviour
 
 	//[ SerializeField ] private GameObject		m_InventoryUI;			// A reference to the "Inventory"-object inside the UI-canvas in the scene. // (Not needed since we do this inside Player.cs instead)
 
-	[ SerializeField ] private GameObject		m_InventorySlotsParent;	// A reference to the "InventoryPanel"-object inside the "Inventory"-object in the scene.
-
-
 	//private InventorySlot[][]					m_InventorySlots;		// An array of references to all of the inventory slots inside the "InventoryPanel"-object in the scene.
-	private ItemSlot[]							m_Slots;				// An array of references to all of the inventory slots inside the "InventoryPanel"-object in the scene.
 
 	[ SerializeField ] private GameObject		m_DraggedItem;		// The object which follows the mouse and displays an icon when dragging an item.
 	[ SerializeField ] private GameObject		m_ItemInfoDisplay;		// A gameobject used to display information about an item while hovering over it in the inventory.
@@ -54,6 +50,7 @@ public class InventoryUI : MonoBehaviour
 	[Space]
 	[ SerializeField ] private GameObject m_DisplayedItemsParent;
 	[ SerializeField ] private GameObject m_CurrentEquipmentWindow;
+	[ SerializeField ] private GameObject m_EquippedIcon; // Red icon used to show which item is equipped while browsing the inventory.
 
 
 	//public delegate void InteractableAlertHandler();
@@ -63,7 +60,7 @@ public class InventoryUI : MonoBehaviour
 	void Start()
 	{
 		m_Inventory		= GameManager.Instance.rPlayer1.GetInventory;
-		m_Slots			= m_Inventory.m_InventorySlots; // I do not enjoy doing things in this manner, I would rather create them via code. TODO:: Do this via code. Example below.
+		m_Inventory.InventoryUpdateEvent += UpdateDisplayedItems;
 
 		m_InteractableAlertStartPos = m_InteractableAlert.transform.position;
 
@@ -150,9 +147,10 @@ public class InventoryUI : MonoBehaviour
 		m_CurrentSlot.ButtonUseItem();
 	}
 
+	// This function has 0 references because it gets called from a UI button press.
 	public void RemoveCurrentlySelectedItem() // An ugly workaround to the problem where the item slot menus need to target a specific slot in order to trigger their functions. Since they can't access this gameobject in their button functions, this was the only way I found.
 	{
-		m_CurrentSlot.ButtonRemoveItem(); // Change this later so it brings up an "Are you sure?"-menu. Also change discard to actually put the gameobject back into the scene.
+		m_Inventory.RemoveItem( m_CurrentSlot.Item ); // Change this later so it brings up an "Are you sure?"-menu. Also change discard to actually put the gameobject back into the scene.
 	}
 
 
@@ -165,14 +163,6 @@ public class InventoryUI : MonoBehaviour
 	}
 
 
-
-	public void UpdateDisplayedItems( List<InventoryItem> _NewList )
-	{
-		// Here we have to get the different inventories
-
-		UpdateDisplayedItemsEvent.Invoke( _NewList );
-	}
-
 	public void ShowItemCategory()
 	{
 
@@ -180,7 +170,7 @@ public class InventoryUI : MonoBehaviour
 
 	}
 
-
+	// This function is called from a UI-button press. That's why it has 0 references.
 	public void ShowEquipmentCategory( Equipment_Category_Component _Category )
 	{
 		if ( _Category.m_EquipmentCategory == EquipmentSlot.EQUIPMENTSLOT_EQUIPPEDTAB )
@@ -190,25 +180,36 @@ public class InventoryUI : MonoBehaviour
 		}
 		else
 		{
-			m_CurrentEquipmentWindow.SetActive( false );
-			m_DisplayedItemsParent.SetActive( true );
-
-
-			ItemSlot[] Slots =  m_DisplayedItemsParent.GetComponentsInChildren<ItemSlot>();
-
 			List<InventoryItem> Equipments = GameManager.Instance.rPlayer1.GetInventory.GetEquipmentGear( _Category.m_EquipmentCategory );
 
-
-			for ( int SlotIndex = 0; SlotIndex < Slots.Length; ++SlotIndex )
-			{
-				if ( SlotIndex < Equipments.Count )
-				{
-					Slots[ SlotIndex ].AddItemToSlot( Equipments[ SlotIndex ] );
-				}
-				else
-					Slots[ SlotIndex ].RemoveItemFromSlot( false );
-			}
+			UpdateDisplayedItems( Equipments );
 		}
 	}
 
+
+	public void UpdateDisplayedItems( List<InventoryItem> _Items )
+	{
+		m_CurrentEquipmentWindow.SetActive( false );
+		m_DisplayedItemsParent.SetActive( true );
+
+		ItemSlot[] Slots =  m_DisplayedItemsParent.GetComponentsInChildren<ItemSlot>();
+
+		EquipmentManager rEquipmentManager = EquipmentManager.Instance;
+
+		for ( int SlotIndex = 0; SlotIndex < Slots.Length; ++SlotIndex )
+		{
+			if ( SlotIndex < _Items.Count )
+			{
+				Slots[ SlotIndex ].AddItemToSlot( _Items[ SlotIndex ] );
+
+				if ( rEquipmentManager.IsItemEquipped( _Items[ SlotIndex ] ) )
+				{
+					m_EquippedIcon.transform.SetParent( Slots[ SlotIndex ].transform );
+					m_EquippedIcon.transform.localPosition = new Vector3( 25.0f, 25.0f, 0.0f );
+				}
+			}
+			else
+				Slots[ SlotIndex ].RemoveItemFromSlot();
+		}
+	}
 }

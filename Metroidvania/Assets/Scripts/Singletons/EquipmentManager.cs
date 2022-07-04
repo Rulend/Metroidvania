@@ -92,7 +92,8 @@ public class EquipmentManager : MonoBehaviour
 		// If the item we're trying to equip is not the same as the equipped item, try to equip it.
 		if ( pr_NewEquipment != CurrentEquipment )
 		{
-			GameManager.Instance.rPlayer1.GetInventory.RemoveItem( pr_NewEquipment, false ); // Remove the item that's about to be equipped from the inventory
+			//GameManager.Instance.rPlayer1.GetInventory.RemoveItem( pr_NewEquipment, false ); // Remove the item that's about to be equipped from the inventory
+			// Update the inventory UI here, to show an Equipped Icon next to the newly equipped item
 
 			Unequip( CurrentEquipment ); // Unequip old item
 
@@ -124,10 +125,8 @@ public class EquipmentManager : MonoBehaviour
 
 		int EquipmentSlot = (int)pr_EquipmentToUnequip.EquipmentSlots;
 
-		m_EquipmentSlots[ EquipmentSlot ].RemoveItemFromSlot( false );
+		m_EquipmentSlots[ EquipmentSlot ].RemoveItemFromSlot();
 		m_EquipmentSlots[ EquipmentSlot ].AddItemToSlot( m_DefaultEquipment[ EquipmentSlot ] );
-
-		GameManager.Instance.rPlayer1.GetInventory.AddItem( pr_EquipmentToUnequip );
 	}
 
 

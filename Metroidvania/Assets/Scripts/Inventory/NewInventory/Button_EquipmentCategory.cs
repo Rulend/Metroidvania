@@ -24,7 +24,5 @@ public class Button_EquipmentCategory : MonoBehaviour
 			case EquipmentSlot.EQUIPMENTSLOT_LEGS:			ListOfItems = GameManager.Instance.rPlayer1.GetInventory.m_LegGear;		break;
 			case EquipmentSlot.EQUIPMENTSLOT_FEET:			ListOfItems = GameManager.Instance.rPlayer1.GetInventory.m_FeetGear;	break;
 		}
-
-		UI_Manager.Instance.rInventoryUI.UpdateDisplayedItems( ListOfItems );
 	}
 }
