@@ -97,8 +97,6 @@ public class Inventory : MonoBehaviour
 
 			NewItemList.Add( _ItemToAdd );
 
-			InventoryUpdateEvent.Invoke( NewItemList );
-
 			return true;
 		}
 

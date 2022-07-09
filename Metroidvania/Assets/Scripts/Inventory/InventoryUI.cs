@@ -171,16 +171,16 @@ public class InventoryUI : MonoBehaviour
 	}
 
 	// This function is called from a UI-button press. That's why it has 0 references.
-	public void ShowEquipmentCategory( Equipment_Category_Component _Category )
+	public void ShowEquipmentCategory( EquipmentSlot _Category )
 	{
-		if ( _Category.m_EquipmentCategory == EquipmentSlot.EQUIPMENTSLOT_EQUIPPEDTAB )
+		if ( _Category == EquipmentSlot.EQUIPMENTSLOT_EQUIPPEDTAB )
 		{
 			m_CurrentEquipmentWindow.SetActive( true );
 			m_DisplayedItemsParent.SetActive( false );
 		}
 		else
 		{
-			List<InventoryItem> Equipments = GameManager.Instance.rPlayer1.GetInventory.GetEquipmentGear( _Category.m_EquipmentCategory );
+			List<InventoryItem> Equipments = GameManager.Instance.rPlayer1.GetInventory.GetEquipmentGear( _Category );
 
 			UpdateDisplayedItems( Equipments );
 		}
@@ -192,6 +192,9 @@ public class InventoryUI : MonoBehaviour
 		m_CurrentEquipmentWindow.SetActive( false );
 		m_DisplayedItemsParent.SetActive( true );
 
+		m_EquippedIcon.transform.SetParent( gameObject.transform, false );		// Reset transform of the equipped icon
+		m_EquippedIcon.GetComponent<Image>().enabled	= false;					// Disable image component in case nothing is equipped in this category
+
 		ItemSlot[] Slots =  m_DisplayedItemsParent.GetComponentsInChildren<ItemSlot>();
 
 		EquipmentManager rEquipmentManager = EquipmentManager.Instance;
@@ -202,10 +205,11 @@ public class InventoryUI : MonoBehaviour
 			{
 				Slots[ SlotIndex ].AddItemToSlot( _Items[ SlotIndex ] );
 
-				if ( rEquipmentManager.IsItemEquipped( _Items[ SlotIndex ] ) )
+				if ( rEquipmentManager.IsItemEquipped( _Items[ SlotIndex ] ) ) // TODO:: Optimize this
 				{
 					m_EquippedIcon.transform.SetParent( Slots[ SlotIndex ].transform );
-					m_EquippedIcon.transform.localPosition = new Vector3( 25.0f, 25.0f, 0.0f );
+					m_EquippedIcon.transform.localPosition			= new Vector3( 25.0f, 25.0f, 0.0f );
+					m_EquippedIcon.GetComponent<Image>().enabled	= true;
 				}
 			}
 			else

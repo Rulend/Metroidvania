@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class ItemSlot : MonoBehaviour
 {
 	public InventoryItem					Item => m_Item;			// Getter for the item
-	private InventoryItem					m_Item;					// The item stored in the slot.
+	[SerializeField]private InventoryItem					m_Item;					// The item stored in the slot.
 
 	private Image							m_Icon;					// The icon of the item when in a slot.
 

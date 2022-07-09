@@ -8,11 +8,15 @@ public class EquipmentManager : MonoBehaviour
 
 	private static EquipmentManager			m_Instance;
 	public GameObject						m_EquipmentSlotsParent;		// only used once, should not be a member TODO:: Remove
+	public GameObject						m_WeaponSlotsParent;		// only used once, should not be a member TODO:: Remove
 	public ItemSlot[]						m_EquipmentSlots;		// An array of references to all of the inventory slots inside the "EquipmentPanel"-object in the scene. Used to store current equipment.
 	public SkinnedMeshRenderer[]			m_EquipmentMeshes;		// An array of the current equipment's meshes
 
-	[SerializeField]private Equipment[]		m_DefaultEquipment;	// SerializeFielded because I don't know how to create them from script.
+	[SerializeField]private Equipment[]		m_DefaultEquipment; // SerializeFielded because I don't know how to create them from script.
 
+
+	private ItemSlot	m_SelectedEquipmentSlot;
+	private int			m_NumberWeaponSlots;
 
 	private void Awake()
 	{
@@ -36,8 +40,9 @@ public class EquipmentManager : MonoBehaviour
 
 	private void Start()
 	{
-		m_EquipmentSlots = m_EquipmentSlotsParent.GetComponentsInChildren<ItemSlot>();
+		m_EquipmentSlots	= m_EquipmentSlotsParent.GetComponentsInChildren<ItemSlot>();
 
+		m_NumberWeaponSlots = m_WeaponSlotsParent.GetComponentsInChildren<ItemSlot>().Length;
 
 
 
@@ -59,11 +64,15 @@ public class EquipmentManager : MonoBehaviour
 
 		SerializableEquipmentArray ArrayFromJson = JsonUtility.FromJson<SerializableEquipmentArray>( File.ReadAllText( DefaultItemsFilePath ) ); // Create equipment from Json-object
 
-		foreach ( SerializableEquipment CurrentSerializedItem in ArrayFromJson.ItemArray )
+		for ( int EquipIndex = 0; EquipIndex < ArrayFromJson.ItemArray.Length; ++EquipIndex )
 		{
-			Equipment CurrentEquip = (Equipment)CurrentSerializedItem;
-			Equip( CurrentEquip );
+			Equipment CurrentEquip = (Equipment)ArrayFromJson.ItemArray[EquipIndex];
+
+			m_SelectedEquipmentSlot = m_EquipmentSlots[ EquipIndex ];
+			Equip( CurrentEquip, false );
 		}
+
+		UnselectEquipmentSlot();
 	}
 
 	////////////////////////////////////////////////
@@ -76,33 +85,38 @@ public class EquipmentManager : MonoBehaviour
 	/// parameters:
 	/// pr_NewEquipment	: the equipment that should be equipped.
 	////////////////////////////////////////////////
-	public void Equip( Equipment pr_NewEquipment )
+	public void Equip( Equipment _NewEquipment, bool _UpdateInventoryUI = true )
 	{
 		// TODO:: Remake this function. It doesn't work anymore becuase weapons are no longer tied to a specific hand. What this means is that: since there is no longer a LHAND/RHAND_Slot in the Equipslot-enum,
 		// this will need to be slightly rworked. TODO:: Remove the right hand / left hand shit, I don't have time for it right now.
 
-		if ( pr_NewEquipment == null )
+		if ( _NewEquipment == null )
 			return;
 
-		int				NewEquipmentSlots	= (int)pr_NewEquipment.EquipmentSlots;
-		Equipment		CurrentEquipment	= (Equipment)m_EquipmentSlots[ NewEquipmentSlots ].Item;
+		Equipment		CurrentEquipment	= (Equipment)m_SelectedEquipmentSlot.Item;
 
 		// TODO:: Add level or stat requirements here or somewhere else to check whether the character can actually equip the item.
 
 		// If the item we're trying to equip is not the same as the equipped item, try to equip it.
-		if ( pr_NewEquipment != CurrentEquipment )
+		if ( _NewEquipment != CurrentEquipment )
 		{
 			//GameManager.Instance.rPlayer1.GetInventory.RemoveItem( pr_NewEquipment, false ); // Remove the item that's about to be equipped from the inventory
 			// Update the inventory UI here, to show an Equipped Icon next to the newly equipped item
 
 			Unequip( CurrentEquipment ); // Unequip old item
 
-			m_EquipmentSlots[ NewEquipmentSlots ].AddItemToSlot( pr_NewEquipment ); // Equip new item
+
+			m_SelectedEquipmentSlot.AddItemToSlot( _NewEquipment ); // Equip new item
 		}
 		else	// If equip was called while item was already equipped, unequip it
 		{
 			Unequip( CurrentEquipment );
 		}
+
+		if ( _UpdateInventoryUI )
+			UI_Manager.Instance.rInventoryUI.UpdateDisplayedItems( GameManager.Instance.rPlayer1.GetInventory.GetEquipmentGear( _NewEquipment.EquipmentSlots ) );
+
+		// TODO:: Add stats re-calculation in here
 	}
 
 
@@ -125,8 +139,8 @@ public class EquipmentManager : MonoBehaviour
 
 		int EquipmentSlot = (int)pr_EquipmentToUnequip.EquipmentSlots;
 
-		m_EquipmentSlots[ EquipmentSlot ].RemoveItemFromSlot();
-		m_EquipmentSlots[ EquipmentSlot ].AddItemToSlot( m_DefaultEquipment[ EquipmentSlot ] );
+		m_SelectedEquipmentSlot.RemoveItemFromSlot();
+		m_SelectedEquipmentSlot.AddItemToSlot( m_DefaultEquipment[ EquipmentSlot + m_NumberWeaponSlots - 1 ] );
 	}
 
 
@@ -154,4 +168,24 @@ public class EquipmentManager : MonoBehaviour
 
 		return false;
 	}
+
+
+
+	public void SelectEquipmentSlot( ItemSlot _SlotToSelect, EquipmentSlot _SlotCategory )
+	{
+		m_SelectedEquipmentSlot = _SlotToSelect;
+
+		UI_Manager.Instance.rInventoryUI.ShowEquipmentCategory( _SlotCategory );
+		// Call UI manager to show new slot category of items
+	}
+
+	public void UnselectEquipmentSlot()
+	{
+		m_SelectedEquipmentSlot = null;
+
+		UI_Manager.Instance.rInventoryUI.ShowEquipmentCategory( EquipmentSlot.EQUIPMENTSLOT_EQUIPPEDTAB );
+
+		// Call UI managetr and show equipped tab
+	}
+
 }
