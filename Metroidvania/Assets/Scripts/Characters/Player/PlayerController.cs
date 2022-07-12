@@ -5,6 +5,15 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
 
+	public enum EPlayerControllerState
+	{
+		PCSTATE_Normal,
+		PCSTATE_Inventory,
+		PCSTATE_Cutscene,
+		PCSTATE_Dialogue,
+	}
+
+
 	// Movement variables.
 	private bool	m_ActiveInput	= true;
 	private float	m_LRInput		= 0.0f;
@@ -93,7 +102,7 @@ public class PlayerController : MonoBehaviour
 		//////////////////////////////////////////////////////////////////////////////////
 		if ( m_ActionMovement.triggered )
 		{
-			Debug.Log( "Move-action triggered...(-w- ')??" );
+			//Debug.Log( "Move-action triggered...(-w- ')??" );
 
 			//_LRInput = m_ActionMovement.ReadValue<Vector2>().x;
 			m_UDInput = m_ActionMovement.ReadValue<Vector2>().y;
@@ -118,8 +127,19 @@ public class PlayerController : MonoBehaviour
 				m_rPlayer.m_CurrentlyFocusedInteractable.Interact(); // Invoke an event called Interact, which invokes it on the closest one which should be subscribed to the event.
 		}
 
-		if ( m_ActionMenuToggle.triggered  )
-			m_rInventoryUI.SetActive( !m_rInventoryUI.activeSelf );
+		if ( m_ActionMenuToggle.triggered )
+		{
+			
+			if ( !m_rInventoryUI.activeSelf )
+			{
+				m_rInventoryUI.SetActive( true );
+			}
+			else
+			{
+				m_rInventoryUI.SetActive( false );
+			}
+
+		}
 
 
 		//////////////////////////////////////////////////////////////////////////////////
@@ -131,7 +151,7 @@ public class PlayerController : MonoBehaviour
 
 		if ( m_ActionMovement.WasReleasedThisFrame() )
 		{
-			Debug.Log( "Move-action released!!(-w- ')!" );
+			//Debug.Log( "Move-action released!!(-w- ')!" );
 			m_UDInput = 0.0f;
 		}
 

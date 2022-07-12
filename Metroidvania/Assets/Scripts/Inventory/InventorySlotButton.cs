@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 
-public class InventorySlotButton : BetterButton
+public class InventorySlotButton : BetterButton, ISelectHandler
 {
 	private ItemSlot	m_ItemSlot;
 	private Image		m_ItemSlotItemImage;
@@ -42,5 +42,13 @@ public class InventorySlotButton : BetterButton
 	public override void OnPointerExit( PointerEventData pr_EventData )
 	{
 		m_ItemSlot.HideItemInfo();
+	}
+
+
+	public void OnSelect( BaseEventData _EventData )
+	{
+		UI_Manager.Instance.rInventoryUI.SelectInventorySlot( GetComponent<ItemSlot>() );
+
+		m_ItemSlot.DisplayItemInfo();
 	}
 }

@@ -16,6 +16,7 @@ public class EquipmentManager : MonoBehaviour
 
 
 	private ItemSlot	m_SelectedEquipmentSlot;
+	public  ItemSlot	SelectedEquipmentSlot => m_SelectedEquipmentSlot;
 	private int			m_NumberWeaponSlots;
 
 	private void Awake()
@@ -73,6 +74,9 @@ public class EquipmentManager : MonoBehaviour
 		}
 
 		UnselectEquipmentSlot();
+
+		m_SelectedEquipmentSlot = m_EquipmentSlots[ 0 ];
+		UI_Manager.Instance.rInventoryUI.SelectInventorySlot( SelectedEquipmentSlot );
 	}
 
 	////////////////////////////////////////////////
@@ -108,13 +112,10 @@ public class EquipmentManager : MonoBehaviour
 
 			m_SelectedEquipmentSlot.AddItemToSlot( _NewEquipment ); // Equip new item
 		}
-		else	// If equip was called while item was already equipped, unequip it
-		{
-			Unequip( CurrentEquipment );
-		}
 
 		if ( _UpdateInventoryUI )
-			UI_Manager.Instance.rInventoryUI.UpdateDisplayedItems( GameManager.Instance.rPlayer1.GetInventory.GetEquipmentGear( _NewEquipment.EquipmentSlots ) );
+			UI_Manager.Instance.rInventoryUI.UpdateEquippedIcon();
+			//UI_Manager.Instance.rInventoryUI.UpdateDisplayedItems( GameManager.Instance.rPlayer1.GetInventory.GetEquipmentGear( _NewEquipment.EquipmentSlots ) );
 
 		// TODO:: Add stats re-calculation in here
 	}

@@ -19,7 +19,7 @@ public class InventoryUI : MonoBehaviour
 	[ SerializeField ] private GameObject		m_SlotMenuEquippable;	//	The Slot-Menu for ITEMTYPE_EQUIPPABLE items. 
 	[ SerializeField ] private GameObject		m_SlotMenuQuest;		//	The Slot-Menu for ITEMTYPE_QUEST items. 
 
-	public ItemSlot								m_CurrentSlot;			// The slot was lastly left-clicked.
+	public ItemSlot								m_SelectedInventorySlot;			// The slot was lastly left-clicked.
 	public GameObject							m_CurrentSlotBorder;	// The slot was lastly left-clicked.
 	public GameObject							m_InteractableAlert;	// A panel that shows up when close to an interactable. Will show different text based on what kind it is. 
 	public GameObject							m_ItemPickedUpNotice;	// After picking up an item, this panel will be shown in order to let the player see what they've picked up.
@@ -142,15 +142,21 @@ public class InventoryUI : MonoBehaviour
 		gameObject.SetActive( false );
 	}
 
+
+
+
 	public void UseCurrentlySelectedItem() // An ugly workaround to the problem where the item slot menus need to target a specific slot in order to trigger their functions. Since they can't access this gameobject in their button functions, this was the only way I found.
 	{
-		m_CurrentSlot.ButtonUseItem();
+		m_SelectedInventorySlot.ButtonUseItem();
 	}
+
+
+
 
 	// This function has 0 references because it gets called from a UI button press.
 	public void RemoveCurrentlySelectedItem() // An ugly workaround to the problem where the item slot menus need to target a specific slot in order to trigger their functions. Since they can't access this gameobject in their button functions, this was the only way I found.
 	{
-		m_Inventory.RemoveItem( m_CurrentSlot.Item ); // Change this later so it brings up an "Are you sure?"-menu. Also change discard to actually put the gameobject back into the scene.
+		m_Inventory.RemoveItem( m_SelectedInventorySlot.Item ); // Change this later so it brings up an "Are you sure?"-menu.
 	}
 
 
@@ -197,7 +203,10 @@ public class InventoryUI : MonoBehaviour
 
 		ItemSlot[] Slots =  m_DisplayedItemsParent.GetComponentsInChildren<ItemSlot>();
 
-		EquipmentManager rEquipmentManager = EquipmentManager.Instance;
+		 Slots[ 0 ].GetComponent<Button>().Select(); // Select the first slot
+
+
+		InventoryItem EquippedItem = EquipmentManager.Instance.SelectedEquipmentSlot.Item; // Get the item in the selected slot, so that we can put the equipped icon there, and also later scroll to there if the inventory is too big to fit
 
 		for ( int SlotIndex = 0; SlotIndex < Slots.Length; ++SlotIndex )
 		{
@@ -205,15 +214,40 @@ public class InventoryUI : MonoBehaviour
 			{
 				Slots[ SlotIndex ].AddItemToSlot( _Items[ SlotIndex ] );
 
-				if ( rEquipmentManager.IsItemEquipped( _Items[ SlotIndex ] ) ) // TODO:: Optimize this
+				if ( Slots[ SlotIndex ].Item == EquippedItem )
 				{
-					m_EquippedIcon.transform.SetParent( Slots[ SlotIndex ].transform );
-					m_EquippedIcon.transform.localPosition			= new Vector3( 25.0f, 25.0f, 0.0f );
-					m_EquippedIcon.GetComponent<Image>().enabled	= true;
+					SelectInventorySlot( Slots[ SlotIndex ] );
+					UpdateEquippedIcon();
 				}
 			}
 			else
 				Slots[ SlotIndex ].RemoveItemFromSlot();
 		}
+	}
+
+
+
+	public void SelectInventorySlot( ItemSlot _SlotToSelect )
+	{
+		_SlotToSelect.GetComponent<Button>().Select();
+		m_SelectedInventorySlot					= _SlotToSelect;
+		m_CurrentSlotBorder.transform.position	= _SlotToSelect.transform.position;
+		m_CurrentSlotBorder.SetActive( true );
+	}
+
+
+	public void ShowSelectedSlot( ItemSlot _Slot )
+	{
+		m_CurrentSlotBorder.transform.position = _Slot.transform.position;
+		m_CurrentSlotBorder.SetActive( true );
+	}
+
+
+
+	public void UpdateEquippedIcon()
+	{
+		m_EquippedIcon.transform.SetParent( m_SelectedInventorySlot.transform );
+		m_EquippedIcon.transform.localPosition = new Vector3( 25.0f, 25.0f, 0.0f );
+		m_EquippedIcon.GetComponent<Image>().enabled = true;
 	}
 }

@@ -94,8 +94,11 @@ public class Inventory : MonoBehaviour
 				}
 			}
 
+			// TODO:: Check if the item is stackable. If it is, search through the inventory to see if it already exists. If it does, increase the stack amount rather than adding it.
+			// TODO:: If the item already exists, don't do this:
+			InventoryItem InstancedItem = Object.Instantiate( _ItemToAdd ); // This needs to be done since otherwise there will only be one instance of the object. That's how it works.
 
-			NewItemList.Add( _ItemToAdd );
+			NewItemList.Add( InstancedItem );
 
 			return true;
 		}
@@ -119,8 +122,6 @@ public class Inventory : MonoBehaviour
 	public void RemoveItem( InventoryItem _ItemToRemove, bool _SpawnItemPickup = true )
 	{
 		List<InventoryItem> ListToUpdate = new List<InventoryItem>();
-
-
 
 
 		if ( _ItemToRemove.m_ItemType == InventoryItem.ITEMTYPE.ITEMTYPE_EQUIPMENT )
@@ -149,12 +150,12 @@ public class Inventory : MonoBehaviour
 			if ( ListToUpdate[ ItemIndex ] == _ItemToRemove )
 			{
 				ListToUpdate.RemoveAt( ItemIndex );
-				RemovedItemIndex			= ItemIndex;
+				RemovedItemIndex = ItemIndex;
 				break;
 			}
 		}
 
-		for ( int ListIndex = RemovedItemIndex; ListIndex < ListToUpdate.Count - 1; ++ListIndex )
+		for ( int ListIndex = RemovedItemIndex; ListIndex < ListToUpdate.Count - 1; ++ListIndex ) // Reorganize the rest of the inventory to adjust for the removed item
 			ListToUpdate[ ListIndex ] = ListToUpdate[ ListIndex + 1 ];
 
 		if ( _SpawnItemPickup )

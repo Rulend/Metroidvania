@@ -44,9 +44,9 @@ public class ItemSlot : MonoBehaviour
 	/// InventoryItem pr_ItemToAdd	: the item to be added in the slot.
 	/// 
 	////////////////////////////////////////////////
-	public void AddItemToSlot( InventoryItem pr_ItemToAdd )
+	public void AddItemToSlot( InventoryItem _ItemToAdd )
 	{
-		m_Item = pr_ItemToAdd;
+		m_Item = _ItemToAdd;
 
 		m_Icon.sprite	= m_Item.m_Icon;
 		m_Icon.enabled	= true;
@@ -89,7 +89,10 @@ public class ItemSlot : MonoBehaviour
 	public void DisplayItemInfo()
 	{
 		if ( !m_Item || m_Item.m_DefaultItem )
+		{
+			HideItemInfo();
 			return;
+		}
 
 		m_rItemHoverIcon.sprite		= m_Item.m_Icon; // TODO:: Save this monstrocisy of a way to do this.
 		m_rItemHoverName.text		= m_Item.m_ItemName;
@@ -162,7 +165,7 @@ public class ItemSlot : MonoBehaviour
 					break;
 			}
 
-			m_rInventoryUI.m_CurrentSlot							= this;
+			m_rInventoryUI.m_SelectedInventorySlot							= this;
 			m_rInventoryUI.m_CurrentSlotBorder.transform.position	= transform.position;
 			m_rInventoryUI.m_CurrentSlotBorder.SetActive( true );
 
