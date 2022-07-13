@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 
-public class InventorySlotButton : BetterButton, ISelectHandler
+public class InventorySlotButton : BetterButton, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
 	private ItemSlot	m_ItemSlot;
 	private Image		m_ItemSlotItemImage;
@@ -24,7 +24,7 @@ public class InventorySlotButton : BetterButton, ISelectHandler
 
 
 
-	public override void OnPointerClick( PointerEventData pr_EventData )
+	public void OnPointerClick( PointerEventData pr_EventData )
 	{
 		if ( pr_EventData.button == PointerEventData.InputButton.Left )
 			m_ItemSlot.ButtonShowItemSlotOptions();
@@ -34,19 +34,22 @@ public class InventorySlotButton : BetterButton, ISelectHandler
 			m_ItemSlot.HideItemSlotOptions();
 	}
 
-	public override void OnPointerEnter( PointerEventData pr_EventData )
+	public void OnPointerEnter( PointerEventData pr_EventData )
 	{
 		m_ItemSlot.DisplayItemInfo();
 	}
 
-	public override void OnPointerExit( PointerEventData pr_EventData )
+	public void OnPointerExit( PointerEventData pr_EventData )
 	{
 		m_ItemSlot.HideItemInfo();
 	}
 
 
-	public void OnSelect( BaseEventData _EventData )
+	public override void OnSelect( BaseEventData _EventData )
 	{
+		//UI_Manager.Instance.rInventoryUI.SelectInventorySlot( GetComponent<ItemSlot>() );
+		base.OnSelect( _EventData );
+
 		UI_Manager.Instance.rInventoryUI.SelectInventorySlot( GetComponent<ItemSlot>() );
 
 		m_ItemSlot.DisplayItemInfo();

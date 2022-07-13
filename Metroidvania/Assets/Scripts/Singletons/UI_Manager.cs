@@ -11,9 +11,11 @@ public class UI_Manager : MonoBehaviour
 
 
 	[SerializeField] private InventoryUI m_rInventoryUI;
+	[SerializeField] private Menu m_rMenu;
 
 	
 	public InventoryUI rInventoryUI => m_rInventoryUI;
+	public Menu rMenu => m_rMenu;
 
 
 	private void Awake()

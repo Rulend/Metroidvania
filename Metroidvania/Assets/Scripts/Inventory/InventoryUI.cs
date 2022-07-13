@@ -20,7 +20,6 @@ public class InventoryUI : MonoBehaviour
 	[ SerializeField ] private GameObject		m_SlotMenuQuest;		//	The Slot-Menu for ITEMTYPE_QUEST items. 
 
 	public ItemSlot								m_SelectedInventorySlot;			// The slot was lastly left-clicked.
-	public GameObject							m_CurrentSlotBorder;	// The slot was lastly left-clicked.
 	public GameObject							m_InteractableAlert;	// A panel that shows up when close to an interactable. Will show different text based on what kind it is. 
 	public GameObject							m_ItemPickedUpNotice;	// After picking up an item, this panel will be shown in order to let the player see what they've picked up.
 
@@ -143,16 +142,6 @@ public class InventoryUI : MonoBehaviour
 	}
 
 
-
-
-	public void UseCurrentlySelectedItem() // An ugly workaround to the problem where the item slot menus need to target a specific slot in order to trigger their functions. Since they can't access this gameobject in their button functions, this was the only way I found.
-	{
-		m_SelectedInventorySlot.ButtonUseItem();
-	}
-
-
-
-
 	// This function has 0 references because it gets called from a UI button press.
 	public void RemoveCurrentlySelectedItem() // An ugly workaround to the problem where the item slot menus need to target a specific slot in order to trigger their functions. Since they can't access this gameobject in their button functions, this was the only way I found.
 	{
@@ -176,20 +165,27 @@ public class InventoryUI : MonoBehaviour
 
 	}
 
+
+	public void ShowEquippedEquipment()
+	{
+		UI_Manager.Instance.rMenu.GoToPreviousWindowEvent -= ShowEquippedEquipment;
+		UI_Manager.Instance.rMenu.GoToPreviousWindowEvent += UI_Manager.Instance.rMenu.CloseOpenedScreen;
+
+		m_CurrentEquipmentWindow.SetActive( true );
+		m_DisplayedItemsParent.SetActive( false );
+
+		EquipmentManager.Instance.SelectedEquipmentSlot.GetComponent<Button>().Select();
+	}
+
+
 	// This function is called from a UI-button press. That's why it has 0 references.
 	public void ShowEquipmentCategory( EquipmentSlot _Category )
 	{
-		if ( _Category == EquipmentSlot.EQUIPMENTSLOT_EQUIPPEDTAB )
-		{
-			m_CurrentEquipmentWindow.SetActive( true );
-			m_DisplayedItemsParent.SetActive( false );
-		}
-		else
-		{
-			List<InventoryItem> Equipments = GameManager.Instance.rPlayer1.GetInventory.GetEquipmentGear( _Category );
+		UI_Manager.Instance.rMenu.GoToPreviousWindowEvent -= UI_Manager.Instance.rMenu.CloseOpenedScreen;
+		UI_Manager.Instance.rMenu.GoToPreviousWindowEvent += ShowEquippedEquipment;
 
-			UpdateDisplayedItems( Equipments );
-		}
+		List<InventoryItem> Equipments = GameManager.Instance.rPlayer1.GetInventory.GetEquipmentGear( _Category );
+		UpdateDisplayedItems( Equipments );
 	}
 
 
@@ -203,10 +199,8 @@ public class InventoryUI : MonoBehaviour
 
 		ItemSlot[] Slots =  m_DisplayedItemsParent.GetComponentsInChildren<ItemSlot>();
 
-		 Slots[ 0 ].GetComponent<Button>().Select(); // Select the first slot
-
-
-		InventoryItem EquippedItem = EquipmentManager.Instance.SelectedEquipmentSlot.Item; // Get the item in the selected slot, so that we can put the equipped icon there, and also later scroll to there if the inventory is too big to fit
+		InventoryItem EquippedItem	= EquipmentManager.Instance.SelectedEquipmentSlot.Item; // Get the item in the selected slot, so that we can put the equipped icon there, and also later scroll to there if the inventory is too big to fit
+		bool FoundEquippedItem		= false;
 
 		for ( int SlotIndex = 0; SlotIndex < Slots.Length; ++SlotIndex )
 		{
@@ -216,38 +210,32 @@ public class InventoryUI : MonoBehaviour
 
 				if ( Slots[ SlotIndex ].Item == EquippedItem )
 				{
-					SelectInventorySlot( Slots[ SlotIndex ] );
+					FoundEquippedItem = true;
+
+					Slots[ SlotIndex ].GetComponent<Button>().Select();
 					UpdateEquippedIcon();
 				}
 			}
 			else
 				Slots[ SlotIndex ].RemoveItemFromSlot();
 		}
+
+		if ( !FoundEquippedItem )
+			Slots[ 0 ].GetComponent<Button>().Select(); // Select the first slot
+
 	}
 
 
 
 	public void SelectInventorySlot( ItemSlot _SlotToSelect )
 	{
-		_SlotToSelect.GetComponent<Button>().Select();
-		m_SelectedInventorySlot					= _SlotToSelect;
-		m_CurrentSlotBorder.transform.position	= _SlotToSelect.transform.position;
-		m_CurrentSlotBorder.SetActive( true );
+		m_SelectedInventorySlot	= _SlotToSelect;
 	}
-
-
-	public void ShowSelectedSlot( ItemSlot _Slot )
-	{
-		m_CurrentSlotBorder.transform.position = _Slot.transform.position;
-		m_CurrentSlotBorder.SetActive( true );
-	}
-
-
 
 	public void UpdateEquippedIcon()
 	{
 		m_EquippedIcon.transform.SetParent( m_SelectedInventorySlot.transform );
-		m_EquippedIcon.transform.localPosition = new Vector3( 25.0f, 25.0f, 0.0f );
-		m_EquippedIcon.GetComponent<Image>().enabled = true;
+		m_EquippedIcon.transform.localPosition			= new Vector3( 25.0f, 25.0f, 0.0f );
+		m_EquippedIcon.GetComponent<Image>().enabled	= true;
 	}
 }

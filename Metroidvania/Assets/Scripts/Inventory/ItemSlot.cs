@@ -3,15 +3,15 @@ using UnityEngine.UI;
 
 public class ItemSlot : MonoBehaviour
 {
-	public InventoryItem					Item => m_Item;			// Getter for the item
-	[SerializeField]private InventoryItem					m_Item;					// The item stored in the slot.
+	public InventoryItem	Item => m_Item;			// Getter for the item
+	private InventoryItem	m_Item;					// The item stored in the slot.
 
-	private Image							m_Icon;					// The icon of the item when in a slot.
+	private Image			m_Icon;					// The icon of the item when in a slot.
 
-	private InventoryUI						m_rInventoryUI;				// A reference to the InventoryUI
-	private Image							m_rItemHoverIcon;			// A reference to the item-icon part of the item slot hover panel
-	private Text							m_rItemHoverName;			// A reference to the name part of the item slot hover panel
-	private Text							m_rItemHoverDescription;	// A reference to the description part of the item slot hover panel
+	private InventoryUI		m_rInventoryUI;				// A reference to the InventoryUI
+	private Image			m_rItemHoverIcon;			// A reference to the item-icon part of the item slot hover panel
+	private Text			m_rItemHoverName;			// A reference to the name part of the item slot hover panel
+	private Text			m_rItemHoverDescription;	// A reference to the description part of the item slot hover panel
 
 	void Start()
 	{
@@ -166,8 +166,6 @@ public class ItemSlot : MonoBehaviour
 			}
 
 			m_rInventoryUI.m_SelectedInventorySlot							= this;
-			m_rInventoryUI.m_CurrentSlotBorder.transform.position	= transform.position;
-			m_rInventoryUI.m_CurrentSlotBorder.SetActive( true );
 
 			PositionUIPanelNextToSlot( m_rInventoryUI.SlotMenuCurrent );
 
@@ -193,7 +191,6 @@ public class ItemSlot : MonoBehaviour
 		if ( m_rInventoryUI.SlotMenuCurrent.activeSelf )
 		{
 			m_rInventoryUI.SlotMenuCurrent.SetActive( false );
-			m_rInventoryUI.m_CurrentSlotBorder.SetActive( false );
 
 			Debug.Log( "Hiding the current inventory slot options... (-w- )" );
 		}

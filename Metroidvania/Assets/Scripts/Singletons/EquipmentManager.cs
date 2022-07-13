@@ -73,10 +73,9 @@ public class EquipmentManager : MonoBehaviour
 			Equip( CurrentEquip, false );
 		}
 
-		UnselectEquipmentSlot();
-
 		m_SelectedEquipmentSlot = m_EquipmentSlots[ 0 ];
-		UI_Manager.Instance.rInventoryUI.SelectInventorySlot( SelectedEquipmentSlot );
+
+		UI_Manager.Instance.rInventoryUI.ShowEquippedEquipment();
 	}
 
 	////////////////////////////////////////////////
@@ -115,7 +114,6 @@ public class EquipmentManager : MonoBehaviour
 
 		if ( _UpdateInventoryUI )
 			UI_Manager.Instance.rInventoryUI.UpdateEquippedIcon();
-			//UI_Manager.Instance.rInventoryUI.UpdateDisplayedItems( GameManager.Instance.rPlayer1.GetInventory.GetEquipmentGear( _NewEquipment.EquipmentSlots ) );
 
 		// TODO:: Add stats re-calculation in here
 	}
@@ -179,14 +177,4 @@ public class EquipmentManager : MonoBehaviour
 		UI_Manager.Instance.rInventoryUI.ShowEquipmentCategory( _SlotCategory );
 		// Call UI manager to show new slot category of items
 	}
-
-	public void UnselectEquipmentSlot()
-	{
-		m_SelectedEquipmentSlot = null;
-
-		UI_Manager.Instance.rInventoryUI.ShowEquipmentCategory( EquipmentSlot.EQUIPMENTSLOT_EQUIPPEDTAB );
-
-		// Call UI managetr and show equipped tab
-	}
-
 }
