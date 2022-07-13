@@ -6,20 +6,6 @@ using UnityEngine.EventSystems;
 
 public class Menu : MonoBehaviour
 {
-	public enum EMenuState
-	{
-		MENUSTATE_Closed,
-		MENUSTATE_Open,
-		MENUSTATE_EquipmentTab,
-		MENUSTATE_ChoosingEquipment,
-		MENUSTATE_InventoryTab,
-		MENUSTATE_InventoryOptions,
-		MENUSTATE_Options,
-		MENUSTATE_AdjustingOptions,
-	}
-
-	private Button		m_SelectedButton;
-
 	public delegate void GoToPreviousWindowHandler();
 	public GoToPreviousWindowHandler GoToPreviousWindowEvent;
 
@@ -47,14 +33,26 @@ public class Menu : MonoBehaviour
 		gameObject.SetActive( false );
 		m_SelectedButtonBorder.SetActive( false );
 
+		if ( GoToPreviousWindowEvent != null ) // If the amount of subscribers is more than 0
+		{
+			foreach ( var SubscribedFunction in GoToPreviousWindowEvent.GetInvocationList() ) // Unsubscribe all subscribers
+				GoToPreviousWindowEvent -= ( SubscribedFunction as GoToPreviousWindowHandler );
+		}
+
+		if ( m_OpenedScreen )
+		{
+			// TODO:: Make an enum switch here on which screen was opened. Otherwise this will crash later.
+
+			m_OpenedScreen.SetActive( false );
+			m_OpenedScreen = null;
+		}
+
 		GameManager.Instance.rPlayer1.GetComponent<PlayerController>().SetState( PlayerController.EPlayerControllerState.PCSTATE_Normal );
 	}
 
 
 	public void SelectButton( Button _ButtonToSelect )
 	{
-		m_SelectedButton = _ButtonToSelect;
-
 		RectTransform ButtonTransform = _ButtonToSelect.GetComponent<RectTransform>();
 		RectTransform BorderTransform =  m_SelectedButtonBorder.GetComponent<RectTransform>();
 
@@ -71,10 +69,12 @@ public class Menu : MonoBehaviour
 	{
 		gameObject.SetActive( false );
 
-		m_OpenedScreen = UI_Manager.Instance.rInventoryUI.gameObject;
+		InventoryUI rInventoryUI	= UI_Manager.Instance.rInventoryUI;
+		m_OpenedScreen				= rInventoryUI.gameObject;
 
 		m_OpenedScreen.SetActive( true );
-		m_OpenedScreen.GetComponentInChildren<Button>().Select();
+		EquipmentManager.Instance.UnselectEquipmentSlot(); // We need to call this here in order for it to always start on the first slot.
+		rInventoryUI.ShowEquippedEquipment();
 	}
 
 	public void ButtonOpenInventoryScreen()

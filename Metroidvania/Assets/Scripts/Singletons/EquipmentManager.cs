@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.IO;
 
 public class EquipmentManager : MonoBehaviour
@@ -74,8 +75,7 @@ public class EquipmentManager : MonoBehaviour
 		}
 
 		m_SelectedEquipmentSlot = m_EquipmentSlots[ 0 ];
-
-		UI_Manager.Instance.rInventoryUI.ShowEquippedEquipment();
+		m_SelectedEquipmentSlot.GetComponent<Button>().Select();
 	}
 
 	////////////////////////////////////////////////
@@ -176,5 +176,12 @@ public class EquipmentManager : MonoBehaviour
 
 		UI_Manager.Instance.rInventoryUI.ShowEquipmentCategory( _SlotCategory );
 		// Call UI manager to show new slot category of items
+	}
+
+
+
+	public void UnselectEquipmentSlot() // Set the selected equipmentslot as the first one.
+	{
+		m_SelectedEquipmentSlot = m_EquipmentSlots[0];
 	}
 }
