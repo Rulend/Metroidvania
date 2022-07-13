@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 using System.IO;
 
 public class EquipmentManager : MonoBehaviour
@@ -75,7 +74,6 @@ public class EquipmentManager : MonoBehaviour
 		}
 
 		m_SelectedEquipmentSlot = m_EquipmentSlots[ 0 ];
-		m_SelectedEquipmentSlot.GetComponent<Button>().Select();
 	}
 
 	////////////////////////////////////////////////
