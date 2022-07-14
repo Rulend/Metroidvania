@@ -56,6 +56,8 @@ public class Player_Movement : Character_Movement
 
 		m_BaseMovementSpeed		= 350.0f;
 		m_CurrentMovementSpeed	= m_BaseMovementSpeed;
+
+		m_rPlayer = GetComponent<Player>();
 	}
 
 	private void Update()

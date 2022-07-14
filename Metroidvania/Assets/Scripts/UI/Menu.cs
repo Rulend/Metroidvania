@@ -6,16 +6,21 @@ using UnityEngine.EventSystems;
 
 public class Menu : MonoBehaviour
 {
+	// Event used to handle going back in menus via pressing the back button 
 	public delegate void GoToPreviousWindowHandler();
 	public GoToPreviousWindowHandler GoToPreviousWindowEvent;
 
 	[SerializeField] private GameObject	m_SelectedButtonBorder;
 
-	private GameObject m_OpenedScreen;
+	private GameObject m_OpenedScreen;  // The gameobject of the currently selected screen. Screen meaning the button pressed in the menu.
+
+	UI_Manager rUIManager; // A reference to the UI manager since it is used a bit in here.
 
 
 	private void Start()
 	{
+		rUIManager = UI_Manager.Instance;
+
 		gameObject.SetActive( false );
 	}
 
@@ -26,6 +31,8 @@ public class Menu : MonoBehaviour
 		m_SelectedButtonBorder.SetActive( true );
 
 		GetComponentInChildren<Button>().Select();
+
+		rUIManager.UpdateDisplayedButtonPrompts( UI_Manager.EButtonPromptCombo.MenuRegular );
 	}
 
 	public void CloseMenu()
@@ -46,6 +53,8 @@ public class Menu : MonoBehaviour
 			m_OpenedScreen.SetActive( false );
 			m_OpenedScreen = null;
 		}
+
+		rUIManager.UpdateDisplayedButtonPrompts( UI_Manager.EButtonPromptCombo.None );
 
 		GameManager.Instance.rPlayer1.GetComponent<PlayerController>().SetState( PlayerController.EPlayerControllerState.PCSTATE_Normal );
 	}
@@ -75,6 +84,9 @@ public class Menu : MonoBehaviour
 		m_OpenedScreen.SetActive( true );
 		EquipmentManager.Instance.UnselectEquipmentSlot(); // We need to call this here in order for it to always start on the first slot.
 		rInventoryUI.ShowEquippedEquipment();
+
+
+		//rUIManager.UpdateDisplayedButtonPrompts( UI_Manager.EButtonPromptCombo.EquipmentScreen ); // This is called inside ShowEquippedEquipment instead
 	}
 
 	public void ButtonOpenInventoryScreen()
@@ -99,6 +111,9 @@ public class Menu : MonoBehaviour
 		m_OpenedScreen = null;
 
 		GetComponentInChildren<Button>().Select();
+
+
+		rUIManager.UpdateDisplayedButtonPrompts( UI_Manager.EButtonPromptCombo.MenuRegular );
 	}
 
 

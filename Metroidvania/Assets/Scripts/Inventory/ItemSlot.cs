@@ -9,9 +9,6 @@ public class ItemSlot : MonoBehaviour
 	private Image			m_Icon;					// The icon of the item when in a slot.
 
 	private InventoryUI		m_rInventoryUI;				// A reference to the InventoryUI
-	private Image			m_rItemHoverIcon;			// A reference to the item-icon part of the item slot hover panel
-	private Text			m_rItemHoverName;			// A reference to the name part of the item slot hover panel
-	private Text			m_rItemHoverDescription;	// A reference to the description part of the item slot hover panel
 
 	void Start()
 	{
@@ -20,12 +17,6 @@ public class ItemSlot : MonoBehaviour
 		// TODO: Instead of doing player 1, do it the correct way (which includes being able to handle multiple players and not showing each others inventory).
 
 		m_rInventoryUI			= UI_Manager.Instance.rInventoryUI;
-
-		m_rItemHoverIcon		= m_rInventoryUI.ItemInfoDisplay.transform.GetChild( 0 ).transform.GetChild( 0 ).GetComponent<Image>();
-
-		m_rItemHoverName		= m_rInventoryUI.ItemInfoDisplay.transform.GetChild( 1 ).transform.GetChild( 0 ).transform.GetChild( 0 ).GetComponent<Text>();
-
-		m_rItemHoverDescription = m_rInventoryUI.ItemInfoDisplay.transform.GetChild( 1 ).transform.GetChild( 1 ).transform.GetChild( 0 ).GetComponent<Text>();
 
 		// TODO: Add so that the slot menu options buttons get assigned their functions automatically if it's not filled in.
 	}
@@ -94,31 +85,12 @@ public class ItemSlot : MonoBehaviour
 			return;
 		}
 
-		m_rItemHoverIcon.sprite		= m_Item.m_Icon; // TODO:: Save this monstrocisy of a way to do this.
-		m_rItemHoverName.text		= m_Item.m_ItemName;
-
-		if ( m_Item.m_ItemType == InventoryItem.ITEMTYPE.ITEMTYPE_EQUIPMENT )
-		{
-			Equipment EquipmentItem = (Equipment)m_Item;
-
-			// TODO:: Display this in a more interesting way, add an icon or something. Also add some kind of info about the item itself to be displayed here. Also make the display box move (maybe).
-
-			m_rItemHoverDescription.text = 
-				$" Damage: {EquipmentItem.m_DamageModifier} \n " +
-				$" Armor: {EquipmentItem.m_ArmorModifier} ";
-		}
-		else
-		{
-			m_rItemHoverDescription.text	= m_Item.m_ItemDescription;
-		}
-
-		//PositionUIPanelNextToSlot( m_rInventoryUI.ItemInfoDisplay );
-		m_rInventoryUI.ItemInfoDisplay.SetActive( true );
+		m_rInventoryUI.ItemInfoPanel.ShowPanel( m_Item );
 	}
 
 	public void HideItemInfo()
 	{
-		m_rInventoryUI.ItemInfoDisplay.SetActive( false );
+		m_rInventoryUI.ItemInfoPanel.HidePanel();
 	}
 
 
@@ -164,8 +136,6 @@ public class ItemSlot : MonoBehaviour
 					Debug.Log( "Unspecified what kind of menu should appear when left-clicking an item of type " + m_Item.m_ItemType.ToString() );
 					break;
 			}
-
-			m_rInventoryUI.m_SelectedInventorySlot							= this;
 
 			PositionUIPanelNextToSlot( m_rInventoryUI.SlotMenuCurrent );
 

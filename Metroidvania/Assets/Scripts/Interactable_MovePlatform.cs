@@ -6,7 +6,7 @@ public class Interactable_MovePlatform : Interactable
 
 	private void Awake()
 	{
-		m_InteractableAlertText += "Move pillars";
+		m_InteractableAlertText = "Move pillars";
 	}
 
 

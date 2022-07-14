@@ -8,7 +8,7 @@ public class Interactable_Teleporter : Interactable
     // Start is called before the first frame update
     void Awake()
     {
-		m_InteractableAlertText += "Take Teleport";
+		m_InteractableAlertText = "Take Teleport";
     }
 
 	public override void Interact()

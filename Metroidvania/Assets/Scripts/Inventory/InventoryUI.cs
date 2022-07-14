@@ -10,8 +10,8 @@ public class InventoryUI : MonoBehaviour
 
 	//private InventorySlot[][]					m_InventorySlots;		// An array of references to all of the inventory slots inside the "InventoryPanel"-object in the scene.
 
-	[ SerializeField ] private GameObject		m_DraggedItem;		// The object which follows the mouse and displays an icon when dragging an item.
-	[ SerializeField ] private GameObject		m_ItemInfoDisplay;		// A gameobject used to display information about an item while hovering over it in the inventory.
+	[ SerializeField ] private GameObject		m_DraggedItem;			// The object which follows the mouse and displays an icon when dragging an item.
+	[ SerializeField ] private ItemInfoPanel	m_ItemInfoPanel;		// A gameobject used to display information about an item while hovering over it in the inventory.
 
 	[ SerializeField ] private GameObject		m_SlotMenuCurrent;		//	The current slot-menu.
 	[ SerializeField ] private GameObject		m_SlotMenuMisc;			//	The Slot-Menu for ITEMTYPE_MISC items. 
@@ -19,17 +19,12 @@ public class InventoryUI : MonoBehaviour
 	[ SerializeField ] private GameObject		m_SlotMenuEquippable;	//	The Slot-Menu for ITEMTYPE_EQUIPPABLE items. 
 	[ SerializeField ] private GameObject		m_SlotMenuQuest;		//	The Slot-Menu for ITEMTYPE_QUEST items. 
 
-	public ItemSlot								m_SelectedInventorySlot;			// The slot was lastly left-clicked.
-	public GameObject							m_InteractableAlert;	// A panel that shows up when close to an interactable. Will show different text based on what kind it is. 
-	public GameObject							m_ItemPickedUpNotice;	// After picking up an item, this panel will be shown in order to let the player see what they've picked up.
-
-	private Vector3								m_InteractableAlertStartPos;
-
-	public Vector3 InteractableAlertStartPos =>		m_InteractableAlertStartPos;
+	private ItemSlot							m_SelectedInventorySlot;    // The slot was lastly left-clicked.
+	[SerializeField] private GameObject			m_ItemPickedUpAlert;		// After picking up an item, this panel will be shown in order to let the player see what they've picked up.
 
 	// TODO:: Clean this document up. So messy
 
-	public GameObject ItemInfoDisplay => m_ItemInfoDisplay;
+	public ItemInfoPanel ItemInfoPanel => m_ItemInfoPanel;
 	public GameObject DraggedItem => m_DraggedItem;
 
 	public GameObject SlotMenuCurrent	
@@ -60,8 +55,6 @@ public class InventoryUI : MonoBehaviour
 	{
 		m_Inventory		= GameManager.Instance.rPlayer1.GetInventory;
 		m_Inventory.InventoryUpdateEvent += UpdateDisplayedItems;
-
-		m_InteractableAlertStartPos = m_InteractableAlert.transform.position;
 
 		// Example
 		//for ( int RowIndex = 0; RowIndex < 4; ++RowIndex)
@@ -149,12 +142,19 @@ public class InventoryUI : MonoBehaviour
 	}
 
 
-	public void ShowItemPickedUpNotice( InventoryItem pr_PickedUpItem )
+	public void ShowItemPickedUpAlert( InventoryItem _PickedUpItem )
 	{
-		m_ItemPickedUpNotice.transform.GetChild( 0 ).gameObject.transform.GetChild(0).GetComponent<Image>().sprite		= pr_PickedUpItem.m_Icon; // TODO:: Save this monstrocisy of a way to do this.
-		m_ItemPickedUpNotice.GetComponentInChildren<Text>().text														= pr_PickedUpItem.m_ItemName;
-		m_ItemPickedUpNotice.GetComponent<HideUIAfterDuration>().ResetAliveTimeLeft();
-		m_ItemPickedUpNotice.SetActive( true );
+		m_ItemPickedUpAlert.transform.GetChild( 0 ).gameObject.transform.GetChild(0).GetComponent<Image>().sprite	= _PickedUpItem.m_Icon; // TODO:: Save this monstrocisy of a way to do this.
+		m_ItemPickedUpAlert.GetComponentInChildren<Text>().text														= _PickedUpItem.m_ItemName;
+		m_ItemPickedUpAlert.GetComponent<HideUIAfterDuration>().ResetAliveTimeLeft();
+		m_ItemPickedUpAlert.SetActive( true );
+
+		UI_Manager.Instance.LowerInteractablePrompt();
+	}
+
+	public void HideItemPickedUpAlert()
+	{
+		UI_Manager.Instance.RaiseInteractablePrompt();
 	}
 
 
@@ -170,6 +170,7 @@ public class InventoryUI : MonoBehaviour
 	{
 		UI_Manager.Instance.rMenu.GoToPreviousWindowEvent -= ShowEquippedEquipment;							// Unsubscribe this event so that pressing back won't show the equipped equipment
 		UI_Manager.Instance.rMenu.GoToPreviousWindowEvent += UI_Manager.Instance.rMenu.CloseOpenedScreen;	// Subscribe this event so that if the player presses back, they go back to the menu
+		UI_Manager.Instance.UpdateDisplayedButtonPrompts( UI_Manager.EButtonPromptCombo.EquipmentScreen );	// Update button prompts to fit 
 
 		m_CurrentEquipmentWindow.SetActive( true );
 		m_DisplayedItemsParent.SetActive( false );
@@ -183,6 +184,7 @@ public class InventoryUI : MonoBehaviour
 	{
 		UI_Manager.Instance.rMenu.GoToPreviousWindowEvent -= UI_Manager.Instance.rMenu.CloseOpenedScreen;	// Unsubscribe this event so that pressing back won't go back to the menu
 		UI_Manager.Instance.rMenu.GoToPreviousWindowEvent += ShowEquippedEquipment;							// Subscribe this event so that if the player presses back, they go back to the equipment screen
+		UI_Manager.Instance.UpdateDisplayedButtonPrompts( UI_Manager.EButtonPromptCombo.EquipmentBrowse );	// Update button prompts to fit 
 
 		List<InventoryItem> Equipments = GameManager.Instance.rPlayer1.GetInventory.GetEquipmentGear( _Category );
 		UpdateDisplayedItems( Equipments );
