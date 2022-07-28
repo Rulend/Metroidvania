@@ -121,7 +121,11 @@ public class Player_Movement : Character_Movement
 				{
 					if ( m_DistanceFallen > m_FallDamageThreshold )
 					{
-						m_rPlayer.TakeDamage( (m_DistanceFallen - m_FallDamageThreshold) );	// Take damage equal to distance fallen - the threshold
+						Damage FallDamage = new Damage();
+						FallDamage.m_Type = DamageTypes.DT_TRUEDAMAGE;
+						FallDamage.m_Amount = ( m_DistanceFallen - m_FallDamageThreshold );
+
+						m_rPlayer.TakeDamage( FallDamage );	// Take damage equal to distance fallen - the threshold
 						Debug.Log( $"Fell { m_DistanceFallen } and took { m_DistanceFallen - m_FallDamageThreshold } damage from falling. \n" );
 					}
 

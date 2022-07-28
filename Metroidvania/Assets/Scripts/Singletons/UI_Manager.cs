@@ -19,15 +19,13 @@ public class UI_Manager : MonoBehaviour
 	}
 
 
-	[SerializeField] private InventoryUI m_rInventoryUI;
-	[SerializeField] private Menu m_rMenu;
+	[SerializeField] private InventoryUI	m_rInventoryUI;
+	[SerializeField] private Menu			m_rMenu;
+	[SerializeField] private HealthBar		m_HealthBar;
 
 
 	[Space]
-	[SerializeField] private ButtonPrompt m_PromptConfirm;
-	[SerializeField] private ButtonPrompt m_PromptAlternative;
 	[SerializeField] private ButtonPrompt m_PromptInteract;
-	[SerializeField] private ButtonPrompt m_PromptGoBack;
 
 
 	private Vector3 m_PromptInteractHighPos;
@@ -37,10 +35,7 @@ public class UI_Manager : MonoBehaviour
 
 	public InventoryUI rInventoryUI => m_rInventoryUI;
 	public Menu rMenu => m_rMenu;
-	public ButtonPrompt PromptConfirm => m_PromptConfirm;
-	public ButtonPrompt PromptAlternative => m_PromptAlternative;
 	public ButtonPrompt PromptInteract => m_PromptInteract;
-	public ButtonPrompt PromptGoBack => m_PromptGoBack;
 
 
 	private void Awake()
@@ -75,46 +70,9 @@ public class UI_Manager : MonoBehaviour
 	}
 
 
-	public void UpdateDisplayedButtonPrompts( EButtonPromptCombo _ButtonPromptsCombo )
+	private void Update()
 	{
-		switch ( _ButtonPromptsCombo )
-		{
-			case EButtonPromptCombo.None:
-				{
-					PromptConfirm.Deactivate();
-					PromptAlternative.Deactivate();
-					PromptInteract.Deactivate();
-					PromptGoBack.Deactivate();
-				}
-				break;
-
-			case EButtonPromptCombo.MenuRegular:
-				{
-					PromptConfirm.Activate( "Select" );
-					PromptAlternative.Deactivate();
-					PromptInteract.Deactivate();
-					PromptGoBack.Activate( "Cancel" );
-				}
-				break;
-
-			case EButtonPromptCombo.EquipmentScreen:
-				{
-					PromptConfirm.Activate( "Select" );
-					PromptAlternative.Activate( "Unequip" );
-					PromptInteract.Deactivate();
-					PromptGoBack.Activate( "Cancel" );
-				}
-				break;
-
-			case EButtonPromptCombo.EquipmentBrowse:
-				{
-					PromptConfirm.Activate( "Equip" );
-					PromptAlternative.Activate( "Discard" );
-					PromptInteract.Deactivate();
-					PromptGoBack.Activate( "Cancel" );
-				}
-				break;
-		}
+		
 	}
 
 
@@ -126,5 +84,11 @@ public class UI_Manager : MonoBehaviour
 	public void RaiseInteractablePrompt()
 	{
 		m_PromptInteract.transform.position = m_PromptInteractHighPos;
+	}
+
+
+	public void UpdateHealth( float _CurrentHeatlh, float _MaxHealth )
+	{
+		m_HealthBar.AdjustHealth( _CurrentHeatlh, _MaxHealth );
 	}
 }

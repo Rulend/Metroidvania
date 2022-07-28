@@ -24,7 +24,6 @@ public class Player : Character
 		//m_BaseMovementSpeed = 350.0f;
 		//m_CurrentMovementSpeed = m_BaseMovementSpeed /* * speedMultiplier */ ;
 		m_CurrentMovementSpeed = m_BaseMovementSpeed;
-		m_MaxHealth = 10.0f;
 		m_CurrentHealth = m_MaxHealth;
 
 		// Get inventory UI
@@ -34,5 +33,12 @@ public class Player : Character
 	void Awake()
 	{
 		m_Inventory = gameObject.GetComponent<Inventory>();
+	}
+
+	public override void TakeDamage( Damage pr_IncomingDamage )
+	{
+		base.TakeDamage( pr_IncomingDamage );
+
+		UI_Manager.Instance.UpdateHealth( m_CurrentHealth, m_MaxHealth );
 	}
 }

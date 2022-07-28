@@ -8,15 +8,20 @@ public class ItemSlot : MonoBehaviour
 
 	private Image			m_Icon;					// The icon of the item when in a slot.
 
-	private InventoryUI		m_rInventoryUI;				// A reference to the InventoryUI
+	private InventoryUI		m_rInventoryUI;              // A reference to the InventoryUI
+
+
+	private void Awake()
+	{
+		m_Icon = transform.GetChild( 0 ).GetComponent<Image>();
+	}
+
 
 	void Start()
 	{
-		m_Icon = transform.GetChild( 0 ).GetComponent<Image>();
-
 		// TODO: Instead of doing player 1, do it the correct way (which includes being able to handle multiple players and not showing each others inventory).
 
-		m_rInventoryUI			= UI_Manager.Instance.rInventoryUI;
+		m_rInventoryUI = UI_Manager.Instance.rInventoryUI;
 
 		// TODO: Add so that the slot menu options buttons get assigned their functions automatically if it's not filled in.
 	}

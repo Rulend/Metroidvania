@@ -168,9 +168,7 @@ public class InventoryUI : MonoBehaviour
 
 	public void ShowEquippedEquipment()
 	{
-		UI_Manager.Instance.rMenu.GoToPreviousWindowEvent -= ShowEquippedEquipment;							// Unsubscribe this event so that pressing back won't show the equipped equipment
-		UI_Manager.Instance.rMenu.GoToPreviousWindowEvent += UI_Manager.Instance.rMenu.CloseOpenedScreen;	// Subscribe this event so that if the player presses back, they go back to the menu
-		UI_Manager.Instance.UpdateDisplayedButtonPrompts( UI_Manager.EButtonPromptCombo.EquipmentScreen );	// Update button prompts to fit 
+		UI_Manager.Instance.rMenu.SetMenuState( Menu.EMenuState.EquipmentScreen );	// Call this in order to set correct actions to the controller's buttons
 
 		m_CurrentEquipmentWindow.SetActive( true );
 		m_DisplayedItemsParent.SetActive( false );
@@ -182,9 +180,7 @@ public class InventoryUI : MonoBehaviour
 	// This function is called from a UI-button press. That's why it has 0 references.
 	public void ShowEquipmentCategory( EquipmentSlot _Category )
 	{
-		UI_Manager.Instance.rMenu.GoToPreviousWindowEvent -= UI_Manager.Instance.rMenu.CloseOpenedScreen;	// Unsubscribe this event so that pressing back won't go back to the menu
-		UI_Manager.Instance.rMenu.GoToPreviousWindowEvent += ShowEquippedEquipment;							// Subscribe this event so that if the player presses back, they go back to the equipment screen
-		UI_Manager.Instance.UpdateDisplayedButtonPrompts( UI_Manager.EButtonPromptCombo.EquipmentBrowse );	// Update button prompts to fit 
+		UI_Manager.Instance.rMenu.SetMenuState( Menu.EMenuState.EquipmentBrowse );
 
 		List<InventoryItem> Equipments = GameManager.Instance.rPlayer1.GetInventory.GetEquipmentGear( _Category );
 		UpdateDisplayedItems( Equipments );

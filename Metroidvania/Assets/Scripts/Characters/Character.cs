@@ -4,8 +4,8 @@ using System.Collections.Generic;
 public class Character : MonoBehaviour
 {
     // Protected member variables
-    protected float					m_MaxHealth;
-    protected float					m_CurrentHealth;
+    [SerializeField] protected float	m_MaxHealth;
+    protected float						m_CurrentHealth;
 
 //	protected float					m_MaxStamina;
 //	protected float					m_CurrentStamina;
@@ -54,7 +54,7 @@ public class Character : MonoBehaviour
 	}
 
     
-	public void TakeDamage( Damage pr_IncomingDamage )
+	public virtual void TakeDamage( Damage pr_IncomingDamage )
 	{
 		float FinalDamage = pr_IncomingDamage.m_Amount;
 

@@ -42,6 +42,8 @@ public class PlayerController : MonoBehaviour
 
 	// Menu
 	private InputAction		m_ActionMenuConfirm;
+	private InputAction		m_ActionMenuAlternative1;
+	private InputAction		m_ActionMenuAlternative2;
 	private InputAction		m_ActionMenuGoBack;
 	private InputAction		m_ActionMenuExit;
 
@@ -63,9 +65,11 @@ public class PlayerController : MonoBehaviour
 
 
 		m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].Enable();
-		m_ActionMenuConfirm = m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "Confirm" );
-		m_ActionMenuGoBack	= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "GoBack" );
-		m_ActionMenuExit	= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "ExitMenu" );
+		m_ActionMenuConfirm			= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "Confirm" );
+		m_ActionMenuAlternative1	= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "Alternative1" );
+		m_ActionMenuAlternative2	= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "Alternative2" );
+		m_ActionMenuGoBack			= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "GoBack" );
+		m_ActionMenuExit			= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "ExitMenu" );
 		m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].Disable();
 
 
@@ -195,6 +199,19 @@ public class PlayerController : MonoBehaviour
 					if ( m_ActionMenuConfirm.triggered )
 					{
 					}
+
+
+					if ( m_ActionMenuAlternative1.triggered )
+					{
+						UI_Manager.Instance.rMenu.AlternativeButton1();
+					}
+
+
+					if ( m_ActionMenuAlternative2.triggered )
+					{
+						UI_Manager.Instance.rMenu.AlternativeButton2();
+					}
+
 
 					if ( m_ActionMenuGoBack.triggered )
 					{

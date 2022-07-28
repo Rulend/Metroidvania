@@ -1,12 +1,19 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 [ RequireComponent( typeof(ItemSlot) ) ]
-public class Equipment_Category_Component : MonoBehaviour
+public class Equipment_Category_Component : MonoBehaviour, ISelectHandler
 {
 	public EquipmentSlot m_EquipmentCategory;
 
-	public void SetSlotAsSelected()
+	public void ShowCategory()
 	{
-		EquipmentManager.Instance.SelectEquipmentSlot( gameObject.GetComponent<ItemSlot>(), m_EquipmentCategory );
+		UI_Manager.Instance.rInventoryUI.ShowEquipmentCategory( m_EquipmentCategory );
+	}
+
+
+	public void OnSelect( BaseEventData _Data )
+	{
+		EquipmentManager.Instance.SelectEquipmentSlot( gameObject.GetComponent<ItemSlot>() );
 	}
 }

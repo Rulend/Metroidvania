@@ -94,16 +94,13 @@ public class EquipmentManager : MonoBehaviour
 		if ( _NewEquipment == null )
 			return;
 
-		Equipment		CurrentEquipment	= (Equipment)m_SelectedEquipmentSlot.Item;
+		Equipment CurrentEquipment	= (Equipment)m_SelectedEquipmentSlot.Item;
 
 		// TODO:: Add level or stat requirements here or somewhere else to check whether the character can actually equip the item.
 
 		// If the item we're trying to equip is not the same as the equipped item, try to equip it.
 		if ( _NewEquipment != CurrentEquipment )
 		{
-			//GameManager.Instance.rPlayer1.GetInventory.RemoveItem( pr_NewEquipment, false ); // Remove the item that's about to be equipped from the inventory
-			// Update the inventory UI here, to show an Equipped Icon next to the newly equipped item
-
 			Unequip( CurrentEquipment ); // Unequip old item
 
 
@@ -168,11 +165,9 @@ public class EquipmentManager : MonoBehaviour
 
 
 
-	public void SelectEquipmentSlot( ItemSlot _SlotToSelect, EquipmentSlot _SlotCategory )
+	public void SelectEquipmentSlot( ItemSlot _SlotToSelect )
 	{
 		m_SelectedEquipmentSlot = _SlotToSelect;
-
-		UI_Manager.Instance.rInventoryUI.ShowEquipmentCategory( _SlotCategory );
 		// Call UI manager to show new slot category of items
 	}
 
