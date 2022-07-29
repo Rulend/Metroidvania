@@ -29,6 +29,9 @@ public class HealthBar : MonoBehaviour
 		m_DamageTakenUpdateTimeLeft -= Time.deltaTime;
 
 		m_DamageTaken.fillAmount = Mathf.Lerp( m_HealthPostDamage, m_HealthPreDamage, m_DamageTakenUpdateTimeLeft );
+
+		if ( m_DamageTakenUpdateTimeLeft < 0 )
+			enabled = false;
 	}
 
 	public void AdjustHealth( float _CurrentHeatlh, float _MaxHealth )

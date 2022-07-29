@@ -125,16 +125,16 @@ public class ItemSlot : MonoBehaviour
 			// based on what kind of item is in it. The submenu could be assignd when adding/removing an item from that slot. For now though, this works.
 			switch ( m_Item.m_ItemType )
 			{
-				case InventoryItem.ITEMTYPE.ITEMTYPE_MISC:
+				case ITEMTYPE.ITEMTYPE_MISC:
 					m_rInventoryUI.SlotMenuCurrent = m_rInventoryUI.SlotMenuMisc;
 					break;
-				case InventoryItem.ITEMTYPE.ITEMTYPE_CONSUMABLE:
+				case ITEMTYPE.ITEMTYPE_CONSUMABLE:
 					m_rInventoryUI.SlotMenuCurrent = m_rInventoryUI.SlotMenuConsumable;
 					break;
-				case InventoryItem.ITEMTYPE.ITEMTYPE_EQUIPMENT:
+				case ITEMTYPE.ITEMTYPE_EQUIPMENT:
 					m_rInventoryUI.SlotMenuCurrent = m_rInventoryUI.SlotMenuEquippable;
 					break;
-				case InventoryItem.ITEMTYPE.ITEMTYPE_QUEST:
+				case ITEMTYPE.ITEMTYPE_QUEST:
 					m_rInventoryUI.SlotMenuCurrent = m_rInventoryUI.SlotMenuQuest;
 					break;
 				default:

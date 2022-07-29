@@ -12,7 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7e24d7840b8314489f47e6961b131ae, type: 3}
   m_Name: Mug of Strange Liquid
   m_EditorClassIdentifier: 
+  m_ID: 0
+  m_InventoryID: 0
   m_ItemName: Mug of Strange Liquid
   m_Icon: {fileID: 21300000, guid: ce1096028b26e5a4296b37df8f30a633, type: 3}
   m_DefaultItem: 0
-  m_ItemType: 0
+  m_ItemType: 1
+  m_ItemDescription: No item description yet.

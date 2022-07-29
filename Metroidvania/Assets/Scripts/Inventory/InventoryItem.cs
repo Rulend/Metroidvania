@@ -1,5 +1,16 @@
 using UnityEngine;
 
+public enum ITEMTYPE
+{
+	ITEMTYPE_CONSUMABLE = 0,
+	ITEMTYPE_QUEST			,
+	ITEMTYPE_EQUIPMENT		, // Might split this into armor/weapons later. 
+	ITEMTYPE_MISC			,
+
+	NumItemTypes
+}
+
+
 [CreateAssetMenu(fileName = "New Item", menuName = "Inventory/Item")]
 public class InventoryItem : ScriptableObject // If it doesn't inherit from scriptable object, it won't appear inside ItemPickup.cs. Idk why. 
 {
@@ -12,16 +23,6 @@ public class InventoryItem : ScriptableObject // If it doesn't inherit from scri
 //	public bool			m_Stackable			= true;						// Whether or not the item is stackable
 	public string		m_ItemDescription	= "No item description yet."; // The description that shows up when hovering an item.
 //	public int			m_ItemValue			= 0;						// The rarity or "value" of the item. Can be used to prompt a "Are you sure you want to use that"-check.
-
-
-
-	public enum ITEMTYPE
-	{
-		ITEMTYPE_MISC			= 0	,
-		ITEMTYPE_CONSUMABLE			,
-		ITEMTYPE_EQUIPMENT			,	// Might split this into armor/weapons later. 
-		ITEMTYPE_QUEST				,
-	}
 
 	public virtual void Use()
 	{

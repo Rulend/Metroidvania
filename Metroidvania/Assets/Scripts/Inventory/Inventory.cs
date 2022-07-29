@@ -19,7 +19,7 @@ public class Inventory : MonoBehaviour
 	public List<InventoryItem> m_QuestItems;
 	public List<InventoryItem> m_MiscItems;
 
-	//private List<InventoryItem>[] GearLists;
+	private List<List<InventoryItem>> GearLists;
 	public List<InventoryItem> m_WeaponGear;
 	public List<InventoryItem> m_HeadGear;
 	public List<InventoryItem> m_ChestGear;
@@ -47,13 +47,13 @@ public class Inventory : MonoBehaviour
 		m_LegGear		= new List<InventoryItem>();
 		m_FeetGear		= new List<InventoryItem>();
 
-		//GearLists = new List<InventoryItem>[ 6 ];
-		//GearLists[0] = m_WeaponGear;
-		//GearLists[1] = m_HeadGear;
-		//GearLists[2] = m_ChestGear;
-		//GearLists[3] = m_HandGear;
-		//GearLists[4] = m_LegGear;
-		//GearLists[5] = m_FeetGear;
+		GearLists = new List<List<InventoryItem>>();
+		GearLists.Add( m_WeaponGear );
+		GearLists.Add( m_HeadGear	);
+		GearLists.Add( m_ChestGear	);
+		GearLists.Add( m_HandGear	);
+		GearLists.Add( m_LegGear	);
+		GearLists.Add( m_FeetGear	);
 	}
 
 	////////////////////////////////////////////////
@@ -79,19 +79,41 @@ public class Inventory : MonoBehaviour
 			List<InventoryItem> NewItemList = new List<InventoryItem>();
 
 
-			if ( _ItemToAdd.m_ItemType == InventoryItem.ITEMTYPE.ITEMTYPE_EQUIPMENT )
+			switch ( _ItemToAdd.m_ItemType )
 			{
-				Equipment Item = (Equipment)_ItemToAdd;
+				case ITEMTYPE.ITEMTYPE_MISC:
+					{
+						NewItemList = m_MiscItems;
+					}
+					break;
 
-				// TODO:: Remove the L_Hand/R_Hand equipslots. They aren't needed in order to identify weapon type anymore, just give it a generic weapon type. Then it will be equippable by both hands.
-				switch ( Item.m_Equipmentslots )
-				{
-					case EquipmentSlot.EQUIPMENTSLOT_HEAD:		NewItemList = m_HeadGear;	break;
-					case EquipmentSlot.EQUIPMENTSLOT_CHEST:		NewItemList = m_ChestGear;	break;
-					case EquipmentSlot.EQUIPMENTSLOT_GAUNTLETS:	NewItemList = m_HandGear;	break;
-					case EquipmentSlot.EQUIPMENTSLOT_LEGS:		NewItemList = m_LegGear;	break;
-					case EquipmentSlot.EQUIPMENTSLOT_FEET:		NewItemList = m_FeetGear;	break;
-				}
+				case ITEMTYPE.ITEMTYPE_CONSUMABLE:
+					{
+						NewItemList = m_Consumables;
+					}
+					break;
+
+				case ITEMTYPE.ITEMTYPE_EQUIPMENT:
+					{
+						Equipment Item = (Equipment)_ItemToAdd;
+
+						switch ( Item.m_Equipmentslots )
+						{
+							case EquipmentSlot.EQUIPMENTSLOT_HEAD:		NewItemList = m_HeadGear;	break;
+							case EquipmentSlot.EQUIPMENTSLOT_CHEST:		NewItemList = m_ChestGear;	break;
+							case EquipmentSlot.EQUIPMENTSLOT_GAUNTLETS:	NewItemList = m_HandGear;	break;
+							case EquipmentSlot.EQUIPMENTSLOT_LEGS:		NewItemList = m_LegGear;	break;
+							case EquipmentSlot.EQUIPMENTSLOT_FEET:		NewItemList = m_FeetGear;	break;
+						}
+
+					}
+					break;
+
+				case ITEMTYPE.ITEMTYPE_QUEST:
+					{
+						NewItemList = m_QuestItems;
+					}
+					break;
 			}
 
 			// TODO:: Check if the item is stackable. If it is, search through the inventory to see if it already exists. If it does, increase the stack amount rather than adding it.
@@ -124,7 +146,7 @@ public class Inventory : MonoBehaviour
 		List<InventoryItem> ListToUpdate = new List<InventoryItem>();
 
 
-		if ( _ItemToRemove.m_ItemType == InventoryItem.ITEMTYPE.ITEMTYPE_EQUIPMENT )
+		if ( _ItemToRemove.m_ItemType == ITEMTYPE.ITEMTYPE_EQUIPMENT )
 		{
 			Equipment Item = (Equipment)_ItemToRemove;
 
@@ -171,11 +193,11 @@ public class Inventory : MonoBehaviour
 
 
 
-	public List<InventoryItem> GetEquipmentGear( EquipmentSlot _ItemEquiSlot ) 
+	public List<InventoryItem> GetEquipmentGear( EquipmentSlot _ItemEquiPSlot ) 
 	{
 		List<InventoryItem> ReturnedList = new List<InventoryItem>();
 
-		switch ( _ItemEquiSlot )
+		switch ( _ItemEquiPSlot )
 		{
 			case EquipmentSlot.EQUIPMENTSLOT_WEAPON:		ReturnedList = m_WeaponGear;	break;
 			case EquipmentSlot.EQUIPMENTSLOT_HEAD:			ReturnedList = m_HeadGear;		break;
@@ -187,5 +209,20 @@ public class Inventory : MonoBehaviour
 
 		return ReturnedList;
 		//return GearLists[ _EquipSlotIndex ];
+	}
+
+	public List<List<InventoryItem>> GetItemsInCategory( ITEMTYPE _ItemCategory )
+	{
+		List<List<InventoryItem>> ReturnedList = new List<List<InventoryItem>>();
+
+		switch ( _ItemCategory )
+		{
+			case ITEMTYPE.ITEMTYPE_MISC:		ReturnedList.Add( m_MiscItems );	break;
+			case ITEMTYPE.ITEMTYPE_CONSUMABLE:	ReturnedList.Add( m_Consumables );	break;
+			case ITEMTYPE.ITEMTYPE_EQUIPMENT:	ReturnedList = GearLists;			break;
+			case ITEMTYPE.ITEMTYPE_QUEST:		ReturnedList.Add( m_QuestItems );	break;
+		}
+
+		return ReturnedList;
 	}
 }

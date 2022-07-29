@@ -342,6 +342,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "LeftTab",
+                    "type": "Button",
+                    "id": "3d68c19a-9972-4976-a14b-67f493d853be",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightTab",
+                    "type": "Button",
+                    "id": "3e5a43b1-ed70-49ed-a49a-66749879acce",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -430,6 +448,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "Alternative2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a181b25d-4c99-4a8f-a473-6599d9ec7c20",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftTab",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0cfccfa8-d494-4e55-a8f1-ad94eb3c4d2e",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightTab",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

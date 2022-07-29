@@ -8,10 +8,11 @@ public class Menu : MonoBehaviour
 {
 	public enum EMenuState
 	{
-		Closed			,
-		Opened			,
-		EquipmentScreen	,
-		EquipmentBrowse	,
+		Closed			,	// When menu is closed
+		Opened			,	// When menu is open and no other window has been gone to yet
+		EquipmentScreen	,	// When the currently equipped equipment tab has ben opened
+		EquipmentBrowse	,	// When an equipment slot has been selected, and the player is selecting an equipment to put in that slot
+		InventoryScreen	,	// When the inventory tab has been opened
 	}
 
 
@@ -107,7 +108,17 @@ public class Menu : MonoBehaviour
 
 	public void ButtonOpenInventoryScreen()
 	{
+		gameObject.SetActive( false );
 
+		SetMenuState( EMenuState.InventoryScreen );
+
+		InventoryUI rInventoryUI	= UI_Manager.Instance.rInventoryUI;
+		m_OpenedScreen				= rInventoryUI.gameObject;
+
+		m_OpenedScreen.SetActive( true );
+		rInventoryUI.ShowInventoryCategory( 0 ); // Show the category of items at index 0 of enumerator
+
+		//UpdateButtonPrompts( UI_Manager.EButtonPromptCombo.InventoryScreen ); // This is called inside ShowEquippedEquipment instead
 	}
 
 	public void ButtonOpenOptionsScreen()
@@ -155,23 +166,50 @@ public class Menu : MonoBehaviour
 	{
 		switch ( m_CurrentState )
 		{
-			case EMenuState.Closed:
+			case EMenuState.Closed:break;
 
-				break;
+			case EMenuState.Opened:break;
 
-			case EMenuState.Opened:
+			case EMenuState.EquipmentScreen:break;
 
-				break;
-
-			case EMenuState.EquipmentScreen:
-
-				break;
-
-			case EMenuState.EquipmentBrowse:
-
-				break;
+			case EMenuState.EquipmentBrowse:break;
 		}
 	}
+
+
+	public void LeftShoulderButton()
+	{
+		switch ( m_CurrentState )
+		{
+			case EMenuState.Closed: break;
+
+			case EMenuState.Opened: break;
+
+			case EMenuState.EquipmentScreen: break;
+
+			case EMenuState.EquipmentBrowse: break;
+
+			case EMenuState.InventoryScreen: UI_Manager.Instance.rInventoryUI.ShowPreviousInventoryCategory(); break;
+		}
+	}
+
+
+	public void RightShoulderButton()
+	{
+		switch ( m_CurrentState )
+		{
+			case EMenuState.Closed: break;
+
+			case EMenuState.Opened: break;
+
+			case EMenuState.EquipmentScreen: break;
+
+			case EMenuState.EquipmentBrowse: break;
+
+			case EMenuState.InventoryScreen: UI_Manager.Instance.rInventoryUI.ShowNextInventoryCategory(); break;
+		}
+	}
+
 
 
 
@@ -190,18 +228,6 @@ public class Menu : MonoBehaviour
 						foreach ( var SubscribedFunction in GoBackButtonEvent.GetInvocationList() ) // Unsubscribe all subscribers
 							GoBackButtonEvent -= ( SubscribedFunction as GoBackButtonHandler );
 					}
-
-					//if ( AlternativeButton1Event != null ) // If the amount of subscribers is more than 0
-					//{
-					//	foreach ( var SubscribedFunction in AlternativeButton1Event.GetInvocationList() ) // Unsubscribe all subscribers
-					//		AlternativeButton1Event -= ( SubscribedFunction as AlternativeButtonHandler );
-					//}
-
-					//if ( AlternativeButton2Event != null ) // If the amount of subscribers is more than 0
-					//{
-					//	foreach ( var SubscribedFunction in AlternativeButton2Event.GetInvocationList() ) // Unsubscribe all subscribers
-					//		AlternativeButton2Event -= ( SubscribedFunction as AlternativeButtonHandler );
-					//}
 				}
 				break;
 
@@ -225,6 +251,13 @@ public class Menu : MonoBehaviour
 				{
 					GoBackButtonEvent -= CloseOpenedScreen;											// Unsubscribe this event so that pressing back won't go back to the menu
 					GoBackButtonEvent += UI_Manager.Instance.rInventoryUI.ShowEquippedEquipment;    // Subscribe this event so that if the player presses back, they go back to the equipment screen
+				}
+				break;
+
+			case EMenuState.InventoryScreen:
+				{
+					GoBackButtonEvent -= CloseMenu;
+					GoBackButtonEvent += CloseOpenedScreen;                                         // Subscribe this event so that if the player presses back, they go back to the menu
 				}
 				break;
 		}
@@ -265,6 +298,14 @@ public class Menu : MonoBehaviour
 			case EMenuState.EquipmentBrowse:
 				{
 					m_PromptConfirm.Activate( "Equip" );
+					m_PromptAlternative1.Activate( "Discard" );
+					m_PromptAlternative2.Deactivate();
+					m_PromptGoBack.Activate( "Cancel" );
+				}
+				break;
+			case EMenuState.InventoryScreen:
+				{
+					m_PromptConfirm.Activate( "Use?" );
 					m_PromptAlternative1.Activate( "Discard" );
 					m_PromptAlternative2.Deactivate();
 					m_PromptGoBack.Activate( "Cancel" );

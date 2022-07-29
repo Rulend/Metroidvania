@@ -12,7 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7e24d7840b8314489f47e6961b131ae, type: 3}
   m_Name: Serri's Contract
   m_EditorClassIdentifier: 
+  m_ID: 0
+  m_InventoryID: 0
   m_ItemName: Serri's Contract
   m_Icon: {fileID: 21300000, guid: a2f9b60d472262a42b0519e8478bb111, type: 3}
   m_DefaultItem: 0
-  m_ItemType: 3
+  m_ItemType: 1
+  m_ItemDescription: No item description yet.

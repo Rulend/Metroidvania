@@ -45,6 +45,8 @@ public class PlayerController : MonoBehaviour
 	private InputAction		m_ActionMenuAlternative1;
 	private InputAction		m_ActionMenuAlternative2;
 	private InputAction		m_ActionMenuGoBack;
+	private InputAction		m_ActionMenuPreviousTab;
+	private InputAction		m_ActionMenuNextTab;
 	private InputAction		m_ActionMenuExit;
 
 	// Cutscene
@@ -69,6 +71,8 @@ public class PlayerController : MonoBehaviour
 		m_ActionMenuAlternative1	= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "Alternative1" );
 		m_ActionMenuAlternative2	= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "Alternative2" );
 		m_ActionMenuGoBack			= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "GoBack" );
+		m_ActionMenuPreviousTab		= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "LeftTab" );
+		m_ActionMenuNextTab			= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "RightTab" );
 		m_ActionMenuExit			= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "ExitMenu" );
 		m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].Disable();
 
@@ -216,6 +220,16 @@ public class PlayerController : MonoBehaviour
 					if ( m_ActionMenuGoBack.triggered )
 					{
 						UI_Manager.Instance.rMenu.GoBackToPreviousWindow();
+					}
+
+					if ( m_ActionMenuPreviousTab.triggered )
+					{
+						UI_Manager.Instance.rMenu.LeftShoulderButton();
+					}
+
+					if ( m_ActionMenuNextTab.triggered )
+					{
+						UI_Manager.Instance.rMenu.RightShoulderButton();
 					}
 
 					if ( m_ActionMenuExit.triggered )

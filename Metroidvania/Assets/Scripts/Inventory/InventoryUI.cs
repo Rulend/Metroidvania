@@ -22,7 +22,7 @@ public class InventoryUI : MonoBehaviour
 	private ItemSlot							m_SelectedInventorySlot;    // The slot was lastly left-clicked.
 	[SerializeField] private GameObject			m_ItemPickedUpAlert;		// After picking up an item, this panel will be shown in order to let the player see what they've picked up.
 
-	// TODO:: Clean this document up. So messy
+	// TODO:: Clean this document up. So messy, and most of these menus aren't really needed. Only 1 is needed, and then you adjust it based on what you want it to do.
 
 	public ItemInfoPanel ItemInfoPanel => m_ItemInfoPanel;
 	public GameObject DraggedItem => m_DraggedItem;
@@ -45,7 +45,15 @@ public class InventoryUI : MonoBehaviour
 	[ SerializeField ] private GameObject m_DisplayedItemsParent;
 	[ SerializeField ] private GameObject m_CurrentEquipmentWindow;
 	[ SerializeField ] private GameObject m_EquippedIcon; // Red icon used to show which item is equipped while browsing the inventory.
-
+	[Space]
+	[SerializeField] private GameObject m_InventoryItemTypesParent;
+	private Image[]						m_InventoryItemTypesImages;
+	[SerializeField] private Color		m_InventoryTabSelectedColor;
+	[SerializeField] private Color		m_InventoryTabUnselectedColor;
+	private ITEMTYPE					m_CurrentItemCategory;
+	private EquipmentSlot				m_CurrentEquipmentCategory;
+	[Space]
+	[SerializeField] private Text m_InventoryTabName;
 
 	//public delegate void InteractableAlertHandler();
 	//public event InteractableAlertHandler InteractableAlert;
@@ -54,7 +62,7 @@ public class InventoryUI : MonoBehaviour
 	void Start()
 	{
 		m_Inventory		= GameManager.Instance.rPlayer1.GetInventory;
-		m_Inventory.InventoryUpdateEvent += UpdateDisplayedItems;
+		m_Inventory.InventoryUpdateEvent += UpdateDisplayedEquipment;
 
 		// Example
 		//for ( int RowIndex = 0; RowIndex < 4; ++RowIndex)
@@ -131,6 +139,8 @@ public class InventoryUI : MonoBehaviour
 		SlotMenuEquippable.SetActive( false );
 		SlotMenuQuest.SetActive( false );
 
+		m_InventoryItemTypesImages = m_InventoryItemTypesParent.GetComponentsInChildren<Image>();
+
 		gameObject.SetActive( false );
 	}
 
@@ -158,12 +168,130 @@ public class InventoryUI : MonoBehaviour
 	}
 
 
-	public void ShowItemCategory()
+
+	// Updates the text in the box above the inventory.
+	public void UpdateTabName( bool _SelectingEquipment = false )
+	{
+		string NewTabName = "NoNameYet";
+
+		switch ( m_CurrentItemCategory )
+		{
+			case ITEMTYPE.ITEMTYPE_CONSUMABLE:
+				NewTabName = "Consumables";
+				break;
+
+			case ITEMTYPE.ITEMTYPE_QUEST:
+				NewTabName = "Key Items";
+				break;
+
+			case ITEMTYPE.ITEMTYPE_EQUIPMENT:
+
+				if ( !_SelectingEquipment )
+					NewTabName = "Equipment";
+				else
+				{
+					switch ( m_CurrentEquipmentCategory )
+					{
+						case EquipmentSlot.EQUIPMENTSLOT_WEAPON:
+							{
+								// TODO:: Add some sort of check to see which weaponslot is selected between 1,2 or 3.
+								NewTabName = "Weapon";
+							}
+							break;
+
+						case EquipmentSlot.EQUIPMENTSLOT_HEAD:			NewTabName = "Head";		break;
+						case EquipmentSlot.EQUIPMENTSLOT_CHEST:			NewTabName = "Chest";		break;
+						case EquipmentSlot.EQUIPMENTSLOT_GAUNTLETS:		NewTabName = "Gauntlets";	break;
+						case EquipmentSlot.EQUIPMENTSLOT_LEGS:			NewTabName = "Legs";		break;
+						case EquipmentSlot.EQUIPMENTSLOT_FEET:			NewTabName = "Feet";		break;
+						case EquipmentSlot.EQUIPMENTSLOT_EQUIPPEDTAB:	NewTabName = "Equipment";	break;
+					}
+				}
+				break;
+
+			case ITEMTYPE.ITEMTYPE_MISC:
+				NewTabName = "Misc. Items";
+				break;
+		}
+
+		m_InventoryTabName.text = NewTabName;
+	}
+
+
+	public void ShowInventoryCategory( ITEMTYPE _Category )
 	{
 
+		List<List<InventoryItem>> Items = GameManager.Instance.rPlayer1.GetInventory.GetItemsInCategory( _Category );
+		UpdateDisplayedItems( Items );
 
+		m_InventoryItemTypesImages[ (int)m_CurrentItemCategory ].color = m_InventoryTabUnselectedColor;
+		m_CurrentItemCategory = _Category;
+		m_InventoryItemTypesImages[ (int)m_CurrentItemCategory ].color = m_InventoryTabSelectedColor;
 
+		UpdateTabName();
 	}
+
+
+	public void ShowPreviousInventoryCategory()
+	{
+		ITEMTYPE NewCategory	= (m_CurrentItemCategory - 1) < 0 ? ITEMTYPE.NumItemTypes - 1 : m_CurrentItemCategory - 1; // Set category to current category -1, or max category if -1 would be less than 0
+
+		ShowInventoryCategory( NewCategory );
+	}
+
+
+	public void ShowNextInventoryCategory()
+	{
+		ITEMTYPE NewCategory	= m_CurrentItemCategory + 1 >= ITEMTYPE.NumItemTypes ? 0 : m_CurrentItemCategory + 1;
+
+		ShowInventoryCategory( NewCategory );
+	}
+
+
+	public void UpdateDisplayedItems( List<List<InventoryItem>> _ItemLists )
+	{
+		m_CurrentEquipmentWindow.SetActive( false );
+		m_DisplayedItemsParent.SetActive( true );
+		m_InventoryItemTypesParent.SetActive( true );
+
+		// Do these in order to reset them. The equipped icon might come in use later, when the item wheel for consumables is implemented, and then these should show up on those items.
+		m_EquippedIcon.transform.SetParent( gameObject.transform, false );		// Reset transform of the equipped icon
+		m_EquippedIcon.GetComponent<Image>().enabled	= false;				// Disable image component in case nothing is equipped in this category
+
+
+		ItemSlot[] Slots = m_DisplayedItemsParent.GetComponentsInChildren<ItemSlot>();
+
+		int SlotIndex = 0;
+		int ItemAmount = 0;
+
+		foreach ( List<InventoryItem> CurrentList in _ItemLists )
+			ItemAmount += CurrentList.Count;
+
+		if ( ItemAmount > Slots.Length )
+			Debug.LogWarning( "Inventory needs to be expanded to show all items." );
+
+
+		for ( int ListIndex = 0; ListIndex < _ItemLists.Count; ++ListIndex )
+		{
+			List<InventoryItem> CurrentList = _ItemLists[ ListIndex ];
+
+			for ( int CurrentListIndex = 0; CurrentListIndex < CurrentList.Count; ++CurrentListIndex )
+			{
+				Slots[ SlotIndex ].AddItemToSlot( CurrentList[ CurrentListIndex ] );
+				SlotIndex++;
+			}
+		}
+
+		while ( SlotIndex < Slots.Length )
+		{
+			Slots[ SlotIndex ].RemoveItemFromSlot();
+			SlotIndex++;
+		}
+		
+		Slots[ 0 ].GetComponent<Button>().Select(); // Select the first slot
+	}
+
+
 
 
 	public void ShowEquippedEquipment()
@@ -172,8 +300,14 @@ public class InventoryUI : MonoBehaviour
 
 		m_CurrentEquipmentWindow.SetActive( true );
 		m_DisplayedItemsParent.SetActive( false );
+		m_InventoryItemTypesParent.SetActive( false ); // Call false on this here in case it is still open
 
 		EquipmentManager.Instance.SelectedEquipmentSlot.GetComponent<Button>().Select();
+
+		m_CurrentItemCategory		= ITEMTYPE.ITEMTYPE_EQUIPMENT;
+		m_CurrentEquipmentCategory	= EquipmentSlot.EQUIPMENTSLOT_EQUIPPEDTAB;
+
+		UpdateTabName();
 	}
 
 
@@ -183,17 +317,21 @@ public class InventoryUI : MonoBehaviour
 		UI_Manager.Instance.rMenu.SetMenuState( Menu.EMenuState.EquipmentBrowse );
 
 		List<InventoryItem> Equipments = GameManager.Instance.rPlayer1.GetInventory.GetEquipmentGear( _Category );
-		UpdateDisplayedItems( Equipments );
+		UpdateDisplayedEquipment( Equipments );
+
+		m_CurrentEquipmentCategory = _Category;
+
+		UpdateTabName( true );
 	}
 
 
-	public void UpdateDisplayedItems( List<InventoryItem> _Items )
+	public void UpdateDisplayedEquipment( List<InventoryItem> _Items )
 	{
 		m_CurrentEquipmentWindow.SetActive( false );
 		m_DisplayedItemsParent.SetActive( true );
 
 		m_EquippedIcon.transform.SetParent( gameObject.transform, false );		// Reset transform of the equipped icon
-		m_EquippedIcon.GetComponent<Image>().enabled	= false;					// Disable image component in case nothing is equipped in this category
+		m_EquippedIcon.GetComponent<Image>().enabled	= false;				// Disable image component in case nothing is equipped in this category
 
 		ItemSlot[] Slots =  m_DisplayedItemsParent.GetComponentsInChildren<ItemSlot>();
 
@@ -220,7 +358,6 @@ public class InventoryUI : MonoBehaviour
 
 		if ( !FoundEquippedItem )
 			Slots[ 0 ].GetComponent<Button>().Select(); // Select the first slot
-
 	}
 
 
