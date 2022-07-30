@@ -15,19 +15,21 @@ public class Inventory : MonoBehaviour
 
 	// TODO:: Replace all of these lists with indices instead, so that all of them can use the same list.
 	// In other words, a start index and a count of how many of that item type exists.
-	public List<InventoryItem> m_Consumables;
-	public List<InventoryItem> m_QuestItems;
-	public List<InventoryItem> m_MiscItems;
+	private Dictionary<InventoryItem, int>	m_Consumables;
+	private Dictionary<InventoryItem, int>	m_QuestItems;
+	private Dictionary<InventoryItem, int>	m_MiscItems;
 
-	private List<List<InventoryItem>> GearLists;
-	public List<InventoryItem> m_WeaponGear;
-	public List<InventoryItem> m_HeadGear;
-	public List<InventoryItem> m_ChestGear;
-	public List<InventoryItem> m_HandGear;
-	public List<InventoryItem> m_LegGear;
-	public List<InventoryItem> m_FeetGear;
 
-	public delegate void	InventoryUpdateHandler( List<InventoryItem> _Items );
+	private List<Dictionary<InventoryItem, int>> GearDictionaries;
+
+	private Dictionary<InventoryItem, int> m_WeaponEquipment;
+	private Dictionary<InventoryItem, int> m_HeadEquipment;
+	private Dictionary<InventoryItem, int> m_ChestEquipment;
+	private Dictionary<InventoryItem, int> m_HandEquipment;
+	private Dictionary<InventoryItem, int> m_LegEquipment;
+	private Dictionary<InventoryItem, int> m_FeetEquipment;
+
+	public delegate void	InventoryUpdateHandler( Dictionary<InventoryItem, int> _Items );
 	public event			InventoryUpdateHandler InventoryUpdateEvent;
 
 	private void Start()
@@ -40,20 +42,27 @@ public class Inventory : MonoBehaviour
 			Debug.LogError( $"Failed to load ItemPickupPrefab at filepath {ItemPickupPrefabFilePath}" );
 
 
-		m_WeaponGear	= new List<InventoryItem>();
-		m_HeadGear		= new List<InventoryItem>();
-		m_ChestGear		= new List<InventoryItem>();
-		m_HandGear		= new List<InventoryItem>();
-		m_LegGear		= new List<InventoryItem>();
-		m_FeetGear		= new List<InventoryItem>();
+		m_Consumables	= new Dictionary<InventoryItem, int>();
+		m_QuestItems	= new Dictionary<InventoryItem, int>();
+		m_MiscItems		= new Dictionary<InventoryItem, int>();
 
-		GearLists = new List<List<InventoryItem>>();
-		GearLists.Add( m_WeaponGear );
-		GearLists.Add( m_HeadGear	);
-		GearLists.Add( m_ChestGear	);
-		GearLists.Add( m_HandGear	);
-		GearLists.Add( m_LegGear	);
-		GearLists.Add( m_FeetGear	);
+
+
+		m_WeaponEquipment	= new Dictionary<InventoryItem, int>();
+		m_HeadEquipment		= new Dictionary<InventoryItem, int>();
+		m_ChestEquipment	= new Dictionary<InventoryItem, int>();
+		m_HandEquipment		= new Dictionary<InventoryItem, int>();
+		m_LegEquipment		= new Dictionary<InventoryItem, int>();
+		m_FeetEquipment		= new Dictionary<InventoryItem, int>();
+
+
+		GearDictionaries = new List<Dictionary<InventoryItem, int>>();
+		GearDictionaries.Add( m_WeaponEquipment );
+		GearDictionaries.Add( m_HeadEquipment );
+		GearDictionaries.Add( m_ChestEquipment );
+		GearDictionaries.Add( m_HandEquipment );
+		GearDictionaries.Add( m_LegEquipment );
+		GearDictionaries.Add( m_FeetEquipment );
 	}
 
 	////////////////////////////////////////////////
@@ -73,23 +82,22 @@ public class Inventory : MonoBehaviour
 	{
 		// Is it stackable? Is there space in that stack? Is the inventory full? TODO:: Check these stuff.
 
-
 		if ( !_ItemToAdd.m_DefaultItem )
 		{
-			List<InventoryItem> NewItemList = new List<InventoryItem>();
+			Dictionary<InventoryItem, int> DictionaryToPlaceIn = new Dictionary<InventoryItem, int>();
 
 
 			switch ( _ItemToAdd.m_ItemType )
 			{
 				case ITEMTYPE.ITEMTYPE_MISC:
 					{
-						NewItemList = m_MiscItems;
+						DictionaryToPlaceIn = m_MiscItems;
 					}
 					break;
 
 				case ITEMTYPE.ITEMTYPE_CONSUMABLE:
 					{
-						NewItemList = m_Consumables;
+						DictionaryToPlaceIn = m_Consumables;
 					}
 					break;
 
@@ -99,28 +107,45 @@ public class Inventory : MonoBehaviour
 
 						switch ( Item.m_Equipmentslots )
 						{
-							case EquipmentSlot.EQUIPMENTSLOT_HEAD:		NewItemList = m_HeadGear;	break;
-							case EquipmentSlot.EQUIPMENTSLOT_CHEST:		NewItemList = m_ChestGear;	break;
-							case EquipmentSlot.EQUIPMENTSLOT_GAUNTLETS:	NewItemList = m_HandGear;	break;
-							case EquipmentSlot.EQUIPMENTSLOT_LEGS:		NewItemList = m_LegGear;	break;
-							case EquipmentSlot.EQUIPMENTSLOT_FEET:		NewItemList = m_FeetGear;	break;
+							case EquipmentSlot.EQUIPMENTSLOT_WEAPON:		DictionaryToPlaceIn = m_WeaponEquipment;	break;
+							case EquipmentSlot.EQUIPMENTSLOT_HEAD:			DictionaryToPlaceIn = m_HeadEquipment;		break;
+							case EquipmentSlot.EQUIPMENTSLOT_CHEST:			DictionaryToPlaceIn = m_ChestEquipment;		break;
+							case EquipmentSlot.EQUIPMENTSLOT_GAUNTLETS:		DictionaryToPlaceIn = m_HandEquipment;		break;
+							case EquipmentSlot.EQUIPMENTSLOT_LEGS:			DictionaryToPlaceIn = m_LegEquipment;		break;
+							case EquipmentSlot.EQUIPMENTSLOT_FEET:			DictionaryToPlaceIn = m_FeetEquipment;		break;
 						}
-
 					}
 					break;
 
 				case ITEMTYPE.ITEMTYPE_QUEST:
 					{
-						NewItemList = m_QuestItems;
+						DictionaryToPlaceIn = m_QuestItems;
 					}
 					break;
 			}
 
 			// TODO:: Check if the item is stackable. If it is, search through the inventory to see if it already exists. If it does, increase the stack amount rather than adding it.
 			// TODO:: If the item already exists, don't do this:
+
+			if ( _ItemToAdd.m_Stackable )
+			{
+				if ( DictionaryToPlaceIn.ContainsKey( _ItemToAdd ) )
+				{
+					DictionaryToPlaceIn[ _ItemToAdd ] += 1;
+					Debug.Log( "Item was stackable and already in inventory, increasing count." );
+				}
+				else
+				{
+					DictionaryToPlaceIn.Add( _ItemToAdd, 1 );
+					Debug.Log( "Item is stackable but the examined instance does not already exist in inventory.,," );
+				}
+
+				return true;
+			}
+
 			InventoryItem InstancedItem = Object.Instantiate( _ItemToAdd ); // This needs to be done since otherwise there will only be one instance of the object. That's how it works.
 
-			NewItemList.Add( InstancedItem );
+			DictionaryToPlaceIn.Add( InstancedItem, 1 );
 
 			return true;
 		}
@@ -143,42 +168,53 @@ public class Inventory : MonoBehaviour
 
 	public void RemoveItem( InventoryItem _ItemToRemove, bool _SpawnItemPickup = true )
 	{
-		List<InventoryItem> ListToUpdate = new List<InventoryItem>();
+		Dictionary<InventoryItem, int> DictionaryToUpdate = new Dictionary<InventoryItem, int>();
 
 
-		if ( _ItemToRemove.m_ItemType == ITEMTYPE.ITEMTYPE_EQUIPMENT )
+		switch ( _ItemToRemove.m_ItemType )
 		{
-			Equipment Item = (Equipment)_ItemToRemove;
-
-			// TODO:: Remove the L_Hand/R_Hand equipslots. They aren't needed in order to identify weapon type anymore, just give it a generic weapon type. Then it will be equippable by both hands.
-			switch ( Item.m_Equipmentslots )
-			{
-				case EquipmentSlot.EQUIPMENTSLOT_HEAD:		ListToUpdate =	m_HeadGear;		break;
-				case EquipmentSlot.EQUIPMENTSLOT_CHEST:		ListToUpdate =	m_ChestGear;	break;
-				case EquipmentSlot.EQUIPMENTSLOT_GAUNTLETS:	ListToUpdate =	m_HandGear;		break;
-				case EquipmentSlot.EQUIPMENTSLOT_LEGS:		ListToUpdate =	m_LegGear;		break;
-				case EquipmentSlot.EQUIPMENTSLOT_FEET:		ListToUpdate =	m_FeetGear;		break;
-			}
-		}
-
-
-
-		//ListToUpdate.Remove( _ItemToRemove );
-
-		int RemovedItemIndex = 0;
-
-		for ( int ItemIndex = 0; ItemIndex < ListToUpdate.Count; ++ItemIndex )
-		{
-			if ( ListToUpdate[ ItemIndex ] == _ItemToRemove )
-			{
-				ListToUpdate.RemoveAt( ItemIndex );
-				RemovedItemIndex = ItemIndex;
+			case ITEMTYPE.ITEMTYPE_MISC:
+				{
+					DictionaryToUpdate = m_MiscItems;
+				}
 				break;
-			}
+
+			case ITEMTYPE.ITEMTYPE_CONSUMABLE:
+				{
+					DictionaryToUpdate = m_Consumables;
+				}
+				break;
+
+			case ITEMTYPE.ITEMTYPE_EQUIPMENT:
+				{
+					Equipment Item = (Equipment)_ItemToRemove;
+
+					switch ( Item.m_Equipmentslots )
+					{
+						case EquipmentSlot.EQUIPMENTSLOT_WEAPON:	DictionaryToUpdate = m_WeaponEquipment;	break;
+						case EquipmentSlot.EQUIPMENTSLOT_HEAD:		DictionaryToUpdate = m_HeadEquipment;	break;
+						case EquipmentSlot.EQUIPMENTSLOT_CHEST:		DictionaryToUpdate = m_ChestEquipment;	break;
+						case EquipmentSlot.EQUIPMENTSLOT_GAUNTLETS: DictionaryToUpdate = m_HandEquipment;	break;
+						case EquipmentSlot.EQUIPMENTSLOT_LEGS:		DictionaryToUpdate = m_LegEquipment;	break;
+						case EquipmentSlot.EQUIPMENTSLOT_FEET:		DictionaryToUpdate = m_FeetEquipment;	break;
+					}
+
+				}
+				break;
+
+			case ITEMTYPE.ITEMTYPE_QUEST:
+				{
+					DictionaryToUpdate = m_QuestItems;
+				}
+				break;
 		}
 
-		for ( int ListIndex = RemovedItemIndex; ListIndex < ListToUpdate.Count - 1; ++ListIndex ) // Reorganize the rest of the inventory to adjust for the removed item
-			ListToUpdate[ ListIndex ] = ListToUpdate[ ListIndex + 1 ];
+
+
+		DictionaryToUpdate[ _ItemToRemove ] -= 1;
+
+		if ( DictionaryToUpdate[ _ItemToRemove ] < 1 )
+			DictionaryToUpdate.Remove( _ItemToRemove );
 
 		if ( _SpawnItemPickup )
 		{
@@ -186,43 +222,51 @@ public class Inventory : MonoBehaviour
 			Instantiate( m_ItemPickupPrefab, GameManager.Instance.rPlayer1.transform.position, Quaternion.identity );
 		}
 
-		InventoryUpdateEvent.Invoke( ListToUpdate );
+		InventoryUpdateEvent.Invoke( DictionaryToUpdate );
 
 		return;
 	}
 
 
 
-	public List<InventoryItem> GetEquipmentGear( EquipmentSlot _ItemEquiPSlot ) 
+	public Dictionary<InventoryItem, int> GetEquipmentGear( EquipmentSlot _ItemEquipSlot ) 
 	{
-		List<InventoryItem> ReturnedList = new List<InventoryItem>();
+		Dictionary<InventoryItem, int> ReturnedDictionary = new Dictionary<InventoryItem, int>();
 
-		switch ( _ItemEquiPSlot )
+		switch ( _ItemEquipSlot )
 		{
-			case EquipmentSlot.EQUIPMENTSLOT_WEAPON:		ReturnedList = m_WeaponGear;	break;
-			case EquipmentSlot.EQUIPMENTSLOT_HEAD:			ReturnedList = m_HeadGear;		break;
-			case EquipmentSlot.EQUIPMENTSLOT_CHEST:			ReturnedList = m_ChestGear;		break;
-			case EquipmentSlot.EQUIPMENTSLOT_GAUNTLETS:		ReturnedList = m_HandGear;		break;
-			case EquipmentSlot.EQUIPMENTSLOT_LEGS:			ReturnedList = m_LegGear;		break;
-			case EquipmentSlot.EQUIPMENTSLOT_FEET:			ReturnedList = m_FeetGear;		break;
+			case EquipmentSlot.EQUIPMENTSLOT_WEAPON:		ReturnedDictionary = m_WeaponEquipment;		break;
+			case EquipmentSlot.EQUIPMENTSLOT_HEAD:			ReturnedDictionary = m_HeadEquipment;		break;
+			case EquipmentSlot.EQUIPMENTSLOT_CHEST:			ReturnedDictionary = m_ChestEquipment;		break;
+			case EquipmentSlot.EQUIPMENTSLOT_GAUNTLETS:		ReturnedDictionary = m_HandEquipment;		break;
+			case EquipmentSlot.EQUIPMENTSLOT_LEGS:			ReturnedDictionary = m_LegEquipment;		break;
+			case EquipmentSlot.EQUIPMENTSLOT_FEET:			ReturnedDictionary = m_FeetEquipment;		break;
 		}
 
-		return ReturnedList;
-		//return GearLists[ _EquipSlotIndex ];
+		return ReturnedDictionary;
 	}
 
-	public List<List<InventoryItem>> GetItemsInCategory( ITEMTYPE _ItemCategory )
+	public Dictionary<InventoryItem, int> GetItemsInCategory( ITEMTYPE _ItemCategory )
 	{
-		List<List<InventoryItem>> ReturnedList = new List<List<InventoryItem>>();
+		Dictionary<InventoryItem, int> ReturnedDictionary = new Dictionary<InventoryItem, int>();
 
 		switch ( _ItemCategory )
 		{
-			case ITEMTYPE.ITEMTYPE_MISC:		ReturnedList.Add( m_MiscItems );	break;
-			case ITEMTYPE.ITEMTYPE_CONSUMABLE:	ReturnedList.Add( m_Consumables );	break;
-			case ITEMTYPE.ITEMTYPE_EQUIPMENT:	ReturnedList = GearLists;			break;
-			case ITEMTYPE.ITEMTYPE_QUEST:		ReturnedList.Add( m_QuestItems );	break;
+			case ITEMTYPE.ITEMTYPE_MISC:		ReturnedDictionary = m_MiscItems;		break;
+			case ITEMTYPE.ITEMTYPE_CONSUMABLE:	ReturnedDictionary = m_Consumables;		break;
+			case ITEMTYPE.ITEMTYPE_EQUIPMENT:
+				{
+					foreach ( var EquipmentDictionary in GearDictionaries )
+					{
+						foreach ( var CurrentEquipment in EquipmentDictionary )
+							ReturnedDictionary.Add( CurrentEquipment.Key, CurrentEquipment.Value );
+					}
+				}
+				break;
+
+			case ITEMTYPE.ITEMTYPE_QUEST: ReturnedDictionary = m_QuestItems;	break;
 		}
 
-		return ReturnedList;
+		return ReturnedDictionary;
 	}
 }

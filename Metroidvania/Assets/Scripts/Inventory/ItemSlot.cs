@@ -5,15 +5,19 @@ public class ItemSlot : MonoBehaviour
 {
 	public InventoryItem	Item => m_Item;			// Getter for the item
 	private InventoryItem	m_Item;					// The item stored in the slot.
+	private int				m_Amount;				// How many of the item there are
 
 	private Image			m_Icon;					// The icon of the item when in a slot.
+	private Text			m_AmountText;			// The text showing how many of the item there are.
 
-	private InventoryUI		m_rInventoryUI;              // A reference to the InventoryUI
+	private InventoryUI		m_rInventoryUI;			// A reference to the InventoryUI
 
 
 	private void Awake()
 	{
-		m_Icon = transform.GetChild( 0 ).GetComponent<Image>();
+		m_Icon					= transform.GetChild( 0 ).GetComponent<Image>();
+		m_AmountText			= transform.GetChild( 1 ).GetComponent<Text>();
+		m_AmountText.enabled	= false;
 	}
 
 
@@ -40,12 +44,22 @@ public class ItemSlot : MonoBehaviour
 	/// InventoryItem pr_ItemToAdd	: the item to be added in the slot.
 	/// 
 	////////////////////////////////////////////////
-	public void AddItemToSlot( InventoryItem _ItemToAdd )
+	public void AddItemToSlot( InventoryItem _ItemToAdd, int _Amount = 1 )
 	{
 		m_Item = _ItemToAdd;
 
 		m_Icon.sprite	= m_Item.m_Icon;
 		m_Icon.enabled	= true;
+
+		m_Amount = _Amount;
+
+		if ( m_Amount > 1 )
+		{
+			m_AmountText.text		= $"{m_Amount}";
+			m_AmountText.enabled	= true;
+		}
+		else
+			m_AmountText.enabled = false;
 	}
 
 
@@ -62,9 +76,11 @@ public class ItemSlot : MonoBehaviour
 	////////////////////////////////////////////////
 	public void RemoveItemFromSlot()
 	{
-		m_Item				= null; // TODO: Maybe use destroy in order to destroy it? Or add it to an unload queue.
-		m_Icon.sprite		= null;
-		m_Icon.enabled		= false;
+		m_Item					= null; // TODO: Maybe use destroy in order to destroy it? Or add it to an unload queue.
+		m_Icon.sprite			= null;
+		m_Icon.enabled			= false;
+		m_AmountText.enabled	= false;
+		m_AmountText.text		= "0";
 		HideItemSlotOptions();
 	}
 

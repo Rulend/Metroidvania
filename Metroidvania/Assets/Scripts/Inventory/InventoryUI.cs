@@ -63,6 +63,7 @@ public class InventoryUI : MonoBehaviour
 	{
 		m_Inventory		= GameManager.Instance.rPlayer1.GetInventory;
 		m_Inventory.InventoryUpdateEvent += UpdateDisplayedEquipment;
+		m_Inventory.InventoryUpdateEvent += UpdateDisplayedItems;
 
 		// Example
 		//for ( int RowIndex = 0; RowIndex < 4; ++RowIndex)
@@ -221,7 +222,7 @@ public class InventoryUI : MonoBehaviour
 	public void ShowInventoryCategory( ITEMTYPE _Category )
 	{
 
-		List<List<InventoryItem>> Items = GameManager.Instance.rPlayer1.GetInventory.GetItemsInCategory( _Category );
+		Dictionary<InventoryItem, int> Items = GameManager.Instance.rPlayer1.GetInventory.GetItemsInCategory( _Category );
 		UpdateDisplayedItems( Items );
 
 		m_InventoryItemTypesImages[ (int)m_CurrentItemCategory ].color = m_InventoryTabUnselectedColor;
@@ -248,7 +249,7 @@ public class InventoryUI : MonoBehaviour
 	}
 
 
-	public void UpdateDisplayedItems( List<List<InventoryItem>> _ItemLists )
+	public void UpdateDisplayedItems( Dictionary<InventoryItem, int> _ItemDictionary )
 	{
 		m_CurrentEquipmentWindow.SetActive( false );
 		m_DisplayedItemsParent.SetActive( true );
@@ -261,24 +262,23 @@ public class InventoryUI : MonoBehaviour
 
 		ItemSlot[] Slots = m_DisplayedItemsParent.GetComponentsInChildren<ItemSlot>();
 
-		int SlotIndex = 0;
-		int ItemAmount = 0;
 
-		foreach ( List<InventoryItem> CurrentList in _ItemLists )
-			ItemAmount += CurrentList.Count;
-
-		if ( ItemAmount > Slots.Length )
+		if ( _ItemDictionary.Count > Slots.Length )
 			Debug.LogWarning( "Inventory needs to be expanded to show all items." );
 
 
-		for ( int ListIndex = 0; ListIndex < _ItemLists.Count; ++ListIndex )
-		{
-			List<InventoryItem> CurrentList = _ItemLists[ ListIndex ];
+		int SlotIndex = 0;
 
-			for ( int CurrentListIndex = 0; CurrentListIndex < CurrentList.Count; ++CurrentListIndex )
+		foreach ( var CurrentItem in _ItemDictionary )
+		{
+			Slots[ SlotIndex ].AddItemToSlot( CurrentItem.Key, CurrentItem.Value );
+
+			SlotIndex++;
+
+			if ( SlotIndex >= Slots.Length )
 			{
-				Slots[ SlotIndex ].AddItemToSlot( CurrentList[ CurrentListIndex ] );
-				SlotIndex++;
+				Debug.LogWarning( $"More items in inventory than can currently be displayed. Only displaying the first {Slots.Length}." );
+				break;
 			}
 		}
 
@@ -316,7 +316,7 @@ public class InventoryUI : MonoBehaviour
 	{
 		UI_Manager.Instance.rMenu.SetMenuState( Menu.EMenuState.EquipmentBrowse );
 
-		List<InventoryItem> Equipments = GameManager.Instance.rPlayer1.GetInventory.GetEquipmentGear( _Category );
+		Dictionary<InventoryItem, int> Equipments = GameManager.Instance.rPlayer1.GetInventory.GetEquipmentGear( _Category );
 		UpdateDisplayedEquipment( Equipments );
 
 		m_CurrentEquipmentCategory = _Category;
@@ -325,7 +325,7 @@ public class InventoryUI : MonoBehaviour
 	}
 
 
-	public void UpdateDisplayedEquipment( List<InventoryItem> _Items )
+	public void UpdateDisplayedEquipment( Dictionary<InventoryItem, int> _EquipmentDictionary )
 	{
 		m_CurrentEquipmentWindow.SetActive( false );
 		m_DisplayedItemsParent.SetActive( true );
@@ -338,22 +338,35 @@ public class InventoryUI : MonoBehaviour
 		InventoryItem EquippedItem	= EquipmentManager.Instance.SelectedEquipmentSlot.Item; // Get the item in the selected slot, so that we can put the equipped icon there, and also later scroll to there if the inventory is too big to fit
 		bool FoundEquippedItem		= false;
 
-		for ( int SlotIndex = 0; SlotIndex < Slots.Length; ++SlotIndex )
+
+
+		int SlotIndex = 0;
+
+		foreach ( var CurrentItem in _EquipmentDictionary )
 		{
-			if ( SlotIndex < _Items.Count )
+			Slots[ SlotIndex ].AddItemToSlot( CurrentItem.Key, CurrentItem.Value );
+
+			if ( Slots[ SlotIndex ].Item == EquippedItem )
 			{
-				Slots[ SlotIndex ].AddItemToSlot( _Items[ SlotIndex ] );
+				FoundEquippedItem = true;
 
-				if ( Slots[ SlotIndex ].Item == EquippedItem )
-				{
-					FoundEquippedItem = true;
-
-					Slots[ SlotIndex ].GetComponent<Button>().Select();
-					UpdateEquippedIcon();
-				}
+				Slots[ SlotIndex ].GetComponent<Button>().Select();
+				UpdateEquippedIcon();
 			}
-			else
-				Slots[ SlotIndex ].RemoveItemFromSlot();
+
+			SlotIndex++;
+
+			if ( SlotIndex >= Slots.Length )
+			{
+				Debug.LogWarning( $"More items in inventory than can currently be displayed. Only displaying the first {Slots.Length}." );
+				break;
+			}
+		}
+
+		while ( SlotIndex < Slots.Length )
+		{
+			Slots[ SlotIndex ].RemoveItemFromSlot();
+			SlotIndex++;
 		}
 
 		if ( !FoundEquippedItem )

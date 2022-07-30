@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_ID: 0
   m_InventoryID: 0
-  m_ItemName: Health Potion(s)
+  m_ItemName: Health Potion (small)
   m_Icon: {fileID: 21300000, guid: a8e09ab83d7f2904b9e892c0aeed0821, type: 3}
   m_DefaultItem: 0
   m_ItemType: 0
-  m_ItemDescription: No item description yet.
+  m_ItemDescription: A potion restoring a small amount of health upon consuming

@@ -40,8 +40,8 @@ public class Equipment : InventoryItem
 
 	private void Awake()
 	{
-		m_ItemType = ITEMTYPE.ITEMTYPE_EQUIPMENT;
+		m_ItemType	= ITEMTYPE.ITEMTYPE_EQUIPMENT;
+		m_Stackable = false;
 	}
-
 }
 

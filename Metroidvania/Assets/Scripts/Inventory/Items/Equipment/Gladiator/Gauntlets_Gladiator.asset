@@ -13,9 +13,11 @@ MonoBehaviour:
   m_Name: Gauntlets_Gladiator
   m_EditorClassIdentifier: 
   m_ID: 0
+  m_InventoryID: 0
   m_ItemName: Gauntlets of The Gladiator
-  m_Icon: {fileID: 21300000, guid: da9d7f75135245946ba06d9cf8361d3b, type: 3}
   m_DefaultItem: 0
+  m_Stackable: 0
+  m_Icon: {fileID: 21300000, guid: da9d7f75135245946ba06d9cf8361d3b, type: 3}
   m_ItemType: 2
   m_ItemDescription: Gauntlets drenched in the smell of blood.
   m_Equipmentslots: 3

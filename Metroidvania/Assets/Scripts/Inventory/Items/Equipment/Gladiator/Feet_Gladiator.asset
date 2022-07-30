@@ -13,9 +13,11 @@ MonoBehaviour:
   m_Name: Feet_Gladiator
   m_EditorClassIdentifier: 
   m_ID: 0
+  m_InventoryID: 0
   m_ItemName: Boots of The Gladiator
-  m_Icon: {fileID: 21300000, guid: 7a46031c38113104198373e68b64fdb8, type: 3}
   m_DefaultItem: 0
+  m_Stackable: 0
+  m_Icon: {fileID: 21300000, guid: 7a46031c38113104198373e68b64fdb8, type: 3}
   m_ItemType: 2
   m_ItemDescription: Feetwear of a warrior.
   m_Equipmentslots: 5

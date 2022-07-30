@@ -15,7 +15,8 @@ MonoBehaviour:
   m_ID: 0
   m_InventoryID: 0
   m_ItemName: Mug of Strange Liquid
-  m_Icon: {fileID: 21300000, guid: ce1096028b26e5a4296b37df8f30a633, type: 3}
   m_DefaultItem: 0
+  m_Stackable: 1
+  m_Icon: {fileID: 21300000, guid: ce1096028b26e5a4296b37df8f30a633, type: 3}
   m_ItemType: 1
   m_ItemDescription: No item description yet.
