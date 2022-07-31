@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 
@@ -9,11 +10,12 @@ public class EquipmentManager : MonoBehaviour
 	private static EquipmentManager			m_Instance;
 	public GameObject						m_EquipmentSlotsParent;		// only used once, should not be a member TODO:: Remove
 	public GameObject						m_WeaponSlotsParent;		// only used once, should not be a member TODO:: Remove
+	public GameObject						m_ConsumableSlotsParent;	// only used once, should not be a member TODO:: Remove
 	public ItemSlot[]						m_EquipmentSlots;		// An array of references to all of the inventory slots inside the "EquipmentPanel"-object in the scene. Used to store current equipment.
-	public SkinnedMeshRenderer[]			m_EquipmentMeshes;		// An array of the current equipment's meshes
+	public SkinnedMeshRenderer[]			m_EquipmentMeshes;      // An array of the current equipment's meshes
 
-	[SerializeField]private Equipment[]		m_DefaultEquipment; // SerializeFielded because I don't know how to create them from script.
-
+	[SerializeField] private InventoryItem[] m_DefaultSetupArray;
+	private Dictionary<EquipmentSlot, InventoryItem> m_DefaultEquipment;
 
 	private ItemSlot	m_SelectedEquipmentSlot;
 	public  ItemSlot	SelectedEquipmentSlot => m_SelectedEquipmentSlot;
@@ -37,41 +39,65 @@ public class EquipmentManager : MonoBehaviour
 
 		// dragged inside from inspector (cheating)
 		//};
+
+
+		m_EquipmentSlots	= m_EquipmentSlotsParent.GetComponentsInChildren<ItemSlot>();
+		m_NumberWeaponSlots = m_WeaponSlotsParent.GetComponentsInChildren<ItemSlot>().Length;
+
+
+		m_DefaultEquipment = new Dictionary<EquipmentSlot, InventoryItem>();
+
+		InventoryItem[] DefaultItems = Resources.LoadAll<InventoryItem>( "Scripts/Inventory/Items/Equipment/Default" );
+
+
+		foreach ( InventoryItem CurrentItem in DefaultItems )
+		{
+			Equipment CurrentEquipment = (Equipment)CurrentItem;
+			m_DefaultEquipment.Add( CurrentEquipment.EquipmentSlots, CurrentItem );
+		}
+
+		// Equip the items
+		for ( int EquipIndex = 0; EquipIndex < m_DefaultSetupArray.Length; ++EquipIndex )
+		{
+			m_SelectedEquipmentSlot = m_EquipmentSlots[ EquipIndex ]; // Set a current equipmentslot in order to make the next line work
+			Equip( (Equipment)m_DefaultSetupArray[ EquipIndex ], false );
+		}
 	}
 
 	private void Start()
 	{
-		m_EquipmentSlots	= m_EquipmentSlotsParent.GetComponentsInChildren<ItemSlot>();
+		//m_EquipmentSlots	= m_EquipmentSlotsParent.GetComponentsInChildren<ItemSlot>();
+		
+		//m_NumberWeaponSlots = m_WeaponSlotsParent.GetComponentsInChildren<ItemSlot>().Length;
 
-		m_NumberWeaponSlots = m_WeaponSlotsParent.GetComponentsInChildren<ItemSlot>().Length;
 
+		// This is how I used to load the equipment from a JSON file. It doesn't work good beacuse the ID for the images don't match between sessions. Gonna make a database to fix this later.
+		// TODO:: Make a database to store and load items like this.
+		//// How to write to JSON
+		//SerializableEquipmentArray TestArray = new SerializableEquipmentArray( m_DefaultEquipment.Length );
 
+		//// TODO:: Fix it so that the order of the default items is correct
+		//for ( int i = 0; i < m_DefaultEquipment.Length; ++i )
+		//{
+		//	TestArray.ItemArray[ i ] = (SerializableEquipment)m_DefaultEquipment[ i ];
+		//}
 
-		// How to write to JSON
-		SerializableEquipmentArray TestArray = new SerializableEquipmentArray( m_DefaultEquipment.Length );
+		//string JsonString = JsonUtility.ToJson( TestArray );
 
-		// TODO:: Fix it so that the order of the default items is correct
-		for ( int i = 0; i < m_DefaultEquipment.Length; ++i )
-		{
-			TestArray.ItemArray[ i ] = (SerializableEquipment)m_DefaultEquipment[ i ];
-		}
+		//File.WriteAllText( Application.dataPath + "/Resources/Items(Json)/DefaultItems.json", JsonString );
 
-		string JsonString = JsonUtility.ToJson( TestArray );
+		//// How to read from JSON
+		//string DefaultItemsFilePath = Application.dataPath + "/Resources/Items(Json)/DefaultItems.json";
 
-		File.WriteAllText( Application.dataPath + "/Resources/Items(Json)/DefaultItems.json", JsonString );
+		//SerializableEquipmentArray ArrayFromJson = JsonUtility.FromJson<SerializableEquipmentArray>( File.ReadAllText( DefaultItemsFilePath ) ); // Create equipment from Json-object
 
-		// How to read from JSON
-		string DefaultItemsFilePath = Application.dataPath + "/Resources/Items(Json)/DefaultItems.json";
+		//for ( int EquipIndex = 0; EquipIndex < ArrayFromJson.ItemArray.Length; ++EquipIndex )
+		//{
+		//	Equipment CurrentEquip = (Equipment)ArrayFromJson.ItemArray[EquipIndex];
 
-		SerializableEquipmentArray ArrayFromJson = JsonUtility.FromJson<SerializableEquipmentArray>( File.ReadAllText( DefaultItemsFilePath ) ); // Create equipment from Json-object
-
-		for ( int EquipIndex = 0; EquipIndex < ArrayFromJson.ItemArray.Length; ++EquipIndex )
-		{
-			Equipment CurrentEquip = (Equipment)ArrayFromJson.ItemArray[EquipIndex];
-
-			m_SelectedEquipmentSlot = m_EquipmentSlots[ EquipIndex ];
-			Equip( CurrentEquip, false );
-		}
+		//	m_SelectedEquipmentSlot = m_EquipmentSlots[ EquipIndex ];
+		//	Equip( CurrentEquip, false );
+		//}
 
 		m_SelectedEquipmentSlot = m_EquipmentSlots[ 0 ];
 	}
@@ -124,17 +150,15 @@ public class EquipmentManager : MonoBehaviour
 	/// parameters:
 	/// pr_EquipmentToUnequip	: the equipment that should be unequipped.
 	////////////////////////////////////////////////
-	public void Unequip( Equipment pr_EquipmentToUnequip )
+	public void Unequip( Equipment _EquipmentToUnequip )
 	{
-		if ( pr_EquipmentToUnequip == null )
+		if ( _EquipmentToUnequip == null )
 			return;
 
 		// TODO:: Add check to see if inventory is full before unequipping an item
 
-		int EquipmentSlot = (int)pr_EquipmentToUnequip.EquipmentSlots;
-
 		m_SelectedEquipmentSlot.RemoveItemFromSlot();
-		m_SelectedEquipmentSlot.AddItemToSlot( m_DefaultEquipment[ EquipmentSlot + m_NumberWeaponSlots - 1 ] );
+		m_SelectedEquipmentSlot.AddItemToSlot( m_DefaultEquipment[ _EquipmentToUnequip.EquipmentSlots ] );
 	}
 
 

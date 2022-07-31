@@ -205,6 +205,7 @@ public class InventoryUI : MonoBehaviour
 						case EquipmentSlot.EQUIPMENTSLOT_GAUNTLETS:		NewTabName = "Gauntlets";	break;
 						case EquipmentSlot.EQUIPMENTSLOT_LEGS:			NewTabName = "Legs";		break;
 						case EquipmentSlot.EQUIPMENTSLOT_FEET:			NewTabName = "Feet";		break;
+						case EquipmentSlot.EQUIPMENTSLOT_Consumable:	NewTabName = "Consumables";		break;
 						case EquipmentSlot.EQUIPMENTSLOT_EQUIPPEDTAB:	NewTabName = "Equipment";	break;
 					}
 				}

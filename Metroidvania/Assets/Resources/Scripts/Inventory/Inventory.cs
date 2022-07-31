@@ -241,6 +241,7 @@ public class Inventory : MonoBehaviour
 			case EquipmentSlot.EQUIPMENTSLOT_GAUNTLETS:		ReturnedDictionary = m_HandEquipment;		break;
 			case EquipmentSlot.EQUIPMENTSLOT_LEGS:			ReturnedDictionary = m_LegEquipment;		break;
 			case EquipmentSlot.EQUIPMENTSLOT_FEET:			ReturnedDictionary = m_FeetEquipment;		break;
+			case EquipmentSlot.EQUIPMENTSLOT_Consumable:	ReturnedDictionary = m_Consumables;			break;
 		}
 
 		return ReturnedDictionary;

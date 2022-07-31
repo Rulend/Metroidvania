@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a1865e63afaf9e49b3802510a72eed3, type: 3}
+  m_Name: HealthPotionSmall
+  m_EditorClassIdentifier: 
+  m_ID: 0
+  m_InventoryID: 0
+  m_ItemName: Health Potion (Small)
+  m_DefaultItem: 0
+  m_Stackable: 1
+  m_Icon: {fileID: 21300000, guid: a8e09ab83d7f2904b9e892c0aeed0821, type: 3}
+  m_ItemType: 0
+  m_ItemDescription: A potion used to restore a small amount of health.
+  m_Mesh: {fileID: 0}

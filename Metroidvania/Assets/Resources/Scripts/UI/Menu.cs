@@ -39,6 +39,8 @@ public class Menu : MonoBehaviour
 
 	private EMenuState m_CurrentState;
 
+	public EMenuState CurrentState => m_CurrentState;
+
 
 	private void Start()
 	{

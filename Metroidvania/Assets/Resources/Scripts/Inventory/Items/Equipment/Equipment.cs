@@ -8,6 +8,7 @@ public enum EquipmentSlot
 	EQUIPMENTSLOT_GAUNTLETS	,	// Armor for hands.	
 	EQUIPMENTSLOT_LEGS		,	// Armor for legs.
 	EQUIPMENTSLOT_FEET		,	// Armor for feet.
+	EQUIPMENTSLOT_Consumable,	// For the consumables that the player can put in their quick access bar.
 
 	EQUIPMENTSLOT_SIZE		,	// Always have under all the equipslots to measure how many they are.
 	EQUIPMENTSLOT_EQUIPPEDTAB	// This is used in the inventory UI to represent the Current-tab. Needed in order to not make stuff messy.
