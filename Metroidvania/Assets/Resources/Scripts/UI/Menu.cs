@@ -157,7 +157,7 @@ public class Menu : MonoBehaviour
 
 			case EMenuState.Opened:break;
 
-			case EMenuState.EquipmentScreen: EquipmentManager.Instance.Unequip( (Equipment)m_SelectedButton.GetComponent<ItemSlot>().Item ); break;
+			case EMenuState.EquipmentScreen: EquipmentManager.Instance.Unequip( m_SelectedButton.GetComponent<ItemSlot>().Item ); break;
 
 			case EMenuState.EquipmentBrowse: break;
 		}

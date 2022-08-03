@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5a1865e63afaf9e49b3802510a72eed3, type: 3}
-  m_Name: HealthPotionSmall
+  m_Name: Potion_Health_Small
   m_EditorClassIdentifier: 
   m_ID: 0
   m_InventoryID: 0
@@ -19,5 +19,5 @@ MonoBehaviour:
   m_Stackable: 1
   m_Icon: {fileID: 21300000, guid: a8e09ab83d7f2904b9e892c0aeed0821, type: 3}
   m_ItemType: 0
-  m_ItemDescription: A potion used to restore a small amount of health.
+  m_ItemDescription: Used to recover a small amount of health.
   m_Mesh: {fileID: 0}

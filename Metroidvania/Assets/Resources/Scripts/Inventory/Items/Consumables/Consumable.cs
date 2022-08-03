@@ -14,12 +14,12 @@ public class Consumable : InventoryItem
 		base.Use();
 
 
-		//if ( UI_Manager.Instance.rMenu.CurrentState == Menu.EMenuState.EquipmentBrowse )
-		//	EquipmentManager.Instance.Equip( this );
-		//else
-		//{
-		//	Debug.Log( "Not adding to slot, but actually using the item." );
-		//}
+		if ( UI_Manager.Instance.rMenu.CurrentState == Menu.EMenuState.EquipmentBrowse )
+			EquipmentManager.Instance.Equip( this );
+		else
+		{
+			Debug.Log( "Not adding to slot, but actually using the item." );
+		}
 		// Tries to equip this item. Removes it from inventory if it succeeds, also adds previous items back to inventory. Adds this item back to inventory if it was already equipped.
 		//EquipmentManager.Instance.Equip( this );
 	}

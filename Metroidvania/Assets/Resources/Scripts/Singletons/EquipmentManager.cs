@@ -105,32 +105,45 @@ public class EquipmentManager : MonoBehaviour
 	////////////////////////////////////////////////
 	/// Function information - Equip
 	/// 
-	/// Equips an item in the item's specified slot.
+	/// Equips an item in the selected slot.
 	/// 
-	/// return value: returns the previously equipped item.
+	/// return value: void
 	/// 
 	/// parameters:
-	/// pr_NewEquipment	: the equipment that should be equipped.
+	/// _NewItem : the item that should be equipped.
 	////////////////////////////////////////////////
-	public void Equip( Equipment _NewEquipment, bool _UpdateInventoryUI = true )
+	public void Equip( InventoryItem _ItemToEquip, bool _UpdateInventoryUI = true )
 	{
 		// TODO:: Remake this function. It doesn't work anymore becuase weapons are no longer tied to a specific hand. What this means is that: since there is no longer a LHAND/RHAND_Slot in the Equipslot-enum,
 		// this will need to be slightly rworked. TODO:: Remove the right hand / left hand shit, I don't have time for it right now.
 
-		if ( _NewEquipment == null )
+		if ( _ItemToEquip == null )
 			return;
-
-		Equipment CurrentEquipment	= (Equipment)m_SelectedEquipmentSlot.Item;
 
 		// TODO:: Add level or stat requirements here or somewhere else to check whether the character can actually equip the item.
 
-		// If the item we're trying to equip is not the same as the equipped item, try to equip it.
-		if ( _NewEquipment != CurrentEquipment )
+
+		// Maybe optimize this? It works but might come back to bite in ass later. What it does: Swaps places on two items if the current slot has an item and the equipped item is already equipped somewhere else
+		if ( _ItemToEquip.m_ItemType == ITEMTYPE.ITEMTYPE_CONSUMABLE )
 		{
-			Unequip( CurrentEquipment ); // Unequip old item
+			ItemSlot EquippedSlot = IsItemEquipped( _ItemToEquip );
+
+			if ( EquippedSlot ) // If the item that the player wants to equip is already equipped
+			{
+				if ( m_SelectedEquipmentSlot.Item )
+					EquippedSlot.AddItemToSlot( m_SelectedEquipmentSlot.Item );
+				else
+					Unequip( _ItemToEquip );
+			}
+		}
+
+		// If the item we're trying to equip is not the same as the equipped item, try to equip it.
+		if ( _ItemToEquip != m_SelectedEquipmentSlot.Item )
+		{
+			Unequip( m_SelectedEquipmentSlot.Item ); // Unequip old item
 
 
-			m_SelectedEquipmentSlot.AddItemToSlot( _NewEquipment ); // Equip new item
+			m_SelectedEquipmentSlot.AddItemToSlot( _ItemToEquip ); // Equip new item
 		}
 
 		if ( _UpdateInventoryUI )
@@ -143,22 +156,30 @@ public class EquipmentManager : MonoBehaviour
 	////////////////////////////////////////////////
 	/// Function information - Unequip
 	/// 
-	/// Unequips an item in the item's specified slot and equips default equipment in its place.
+	/// Unequips an item in the item's specified slot and equips a default item in its place.
+	/// This has to be InventoryItem rather than Equipment, because consumables can be equipped as well.
 	/// 
 	/// return value: void
 	/// 
 	/// parameters:
 	/// pr_EquipmentToUnequip	: the equipment that should be unequipped.
 	////////////////////////////////////////////////
-	public void Unequip( Equipment _EquipmentToUnequip )
+	public void Unequip( InventoryItem _ItemToUnequip )
 	{
-		if ( _EquipmentToUnequip == null )
+		if ( _ItemToUnequip == null )
 			return;
 
 		// TODO:: Add check to see if inventory is full before unequipping an item
 
 		m_SelectedEquipmentSlot.RemoveItemFromSlot();
-		m_SelectedEquipmentSlot.AddItemToSlot( m_DefaultEquipment[ _EquipmentToUnequip.EquipmentSlots ] );
+
+		if ( _ItemToUnequip.m_ItemType == ITEMTYPE.ITEMTYPE_EQUIPMENT )
+		{
+			Equipment EquipmentToUnequip = (Equipment)_ItemToUnequip;
+			m_SelectedEquipmentSlot.AddItemToSlot( m_DefaultEquipment[ EquipmentToUnequip.EquipmentSlots ] );
+		}
+		else
+			m_SelectedEquipmentSlot.AddItemToSlot( m_DefaultEquipment[ EquipmentSlot.EQUIPMENTSLOT_Consumable ] );
 	}
 
 
@@ -168,23 +189,20 @@ public class EquipmentManager : MonoBehaviour
 	/// 
 	/// Checks whether or not an item is equipped
 	/// 
-	/// return value: true if equipped, false if not.
+	/// return value: null if item isn't equipped, the item's ItemSlot if it is equipped
 	/// 
 	/// parameters:
 	/// pr_ItemToCheck	: the item to check
 	////////////////////////////////////////////////
-	public bool IsItemEquipped( InventoryItem pr_ItemToCheck )
+	private ItemSlot IsItemEquipped( InventoryItem _ItemToCheck )
 	{
-		if ( pr_ItemToCheck as Equipment == null )
-			return false;
-
 		foreach ( ItemSlot CurrentEquipSlot in m_EquipmentSlots )
 		{
-			if ( CurrentEquipSlot.Item == pr_ItemToCheck )
-				return true;
+			if ( CurrentEquipSlot.Item == _ItemToCheck )
+				return CurrentEquipSlot;
 		}
 
-		return false;
+		return null;
 	}
 
 
