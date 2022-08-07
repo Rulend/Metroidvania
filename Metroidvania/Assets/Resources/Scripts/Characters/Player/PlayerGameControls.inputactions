@@ -15,9 +15,9 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Jump",
+                    "name": "UseCurrentConsumable",
                     "type": "Button",
-                    "id": "56167e33-5266-4a00-8064-69844766c6f5",
+                    "id": "8fd8dc72-4f5b-4afd-8d2e-8dbbb435873b",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -27,6 +27,24 @@
                     "name": "Interact",
                     "type": "Button",
                     "id": "07b634bd-46de-4785-9671-9d7ef43d3355",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Roll",
+                    "type": "Button",
+                    "id": "1cb01f10-06b8-493b-8da0-b72ea31272a3",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Jump",
+                    "type": "Button",
+                    "id": "56167e33-5266-4a00-8064-69844766c6f5",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -54,6 +72,42 @@
                     "name": "LeftClick",
                     "type": "Button",
                     "id": "71c2ce72-379f-4b7b-9bc1-e7934943eaf7",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "EquipmentWheelNextConsumable",
+                    "type": "Value",
+                    "id": "92a035a3-a3cf-4b34-b45f-1bca77b05d57",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "EquipmentWheelPreviousConsumable",
+                    "type": "Button",
+                    "id": "3551b964-1674-4a3a-8d28-d16a263ff80b",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightAttackLight",
+                    "type": "Button",
+                    "id": "73414293-6cd7-48a2-b08b-e40f4ca9ec38",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightAttackHeavy",
+                    "type": "Button",
+                    "id": "7966d86c-a159-4b6c-82d6-91305fa87611",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -173,50 +227,6 @@
                 },
                 {
                     "name": "",
-                    "id": "061c747f-cfda-4c65-9037-666c3d8ee7e7",
-                    "path": "<Keyboard>/space",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard",
-                    "action": "Jump",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "1ff87a51-4411-41df-bae6-aac7ef491fd2",
-                    "path": "<Gamepad>/buttonSouth",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Jump",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "f876cd0b-ec64-4af0-a85c-e357ef63104d",
-                    "path": "<Keyboard>/e",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard",
-                    "action": "Interact",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "e383147a-428e-44ba-8777-4da717a2a9bc",
-                    "path": "<Gamepad>/buttonNorth",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Interact",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "5519625f-4efa-4528-aff2-a7207637dd4a",
                     "path": "<Keyboard>/r",
                     "interactions": "",
@@ -289,6 +299,127 @@
                     "processors": "",
                     "groups": "Keyboard",
                     "action": "LeftClick",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "02d0cf73-a2a5-4416-9f7e-69d2dc3cdaae",
+                    "path": "<Gamepad>/dpad/down",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EquipmentWheelNextConsumable",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "60c9940f-deeb-4709-ba9c-67148c2abd0d",
+                    "path": "<Gamepad>/dpad/up",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EquipmentWheelPreviousConsumable",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f56e3bcb-2d8c-4382-97a0-475c83fd27d6",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightAttackHeavy",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "86cd8394-bd70-4f23-b43f-d3ecb63a5d1a",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "UseCurrentConsumable",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cb416260-0b4e-4bc3-ae7a-b36197b70be0",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "UseCurrentConsumable",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f876cd0b-ec64-4af0-a85c-e357ef63104d",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e383147a-428e-44ba-8777-4da717a2a9bc",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1897a3cd-b78e-4050-8119-cb56dfe6017b",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Roll",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "061c747f-cfda-4c65-9037-666c3d8ee7e7",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1ff87a51-4411-41df-bae6-aac7ef491fd2",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cf6eda3f-5595-4e42-b1ce-b66082fec3c6",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightAttackLight",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

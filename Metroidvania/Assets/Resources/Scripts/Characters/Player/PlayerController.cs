@@ -31,10 +31,14 @@ public class PlayerController : MonoBehaviour
 
 	// Normal game
 	private InputAction		m_ActionMovement;
-	private InputAction		m_ActionJump;
+	private InputAction		m_ActionUseCurrentConsumable;
 	private InputAction		m_ActionInteract;
+	private InputAction		m_ActionRoll;
+	private InputAction		m_ActionJump;
 	private InputAction		m_ActionOpenMenu;
 	private InputAction		m_ActionReset;
+	private InputAction		m_ActionNextConsumable;
+	private InputAction		m_ActionPreviousConsumable;
 
 	private Player_Movement m_rPlayerMovement;
 	private Player			m_rPlayer;
@@ -78,11 +82,15 @@ public class PlayerController : MonoBehaviour
 
 
 		m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].Enable();
-		m_ActionMovement	= 	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "Move" );
-		m_ActionJump		= 	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "Jump" );
-		m_ActionInteract	= 	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "Interact" );
-		m_ActionOpenMenu	= 	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "OpenMenu" );
-		m_ActionReset		=	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "Reset" );
+		m_ActionMovement				= 	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "Move" );
+		m_ActionUseCurrentConsumable	= 	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "UseCurrentConsumable" );
+		m_ActionInteract				= 	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "Interact" );
+		m_ActionRoll					= 	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "Roll" );
+		m_ActionJump					= 	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "Jump" );
+		m_ActionOpenMenu				= 	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "OpenMenu" );
+		m_ActionReset					=	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "Reset" );
+		m_ActionNextConsumable			=	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "EquipmentWheelNextConsumable" );
+		m_ActionPreviousConsumable		=	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "EquipmentWheelPreviousConsumable" );
 
 
 		m_rPlayerMovement	= GetComponent<Player_Movement>();
@@ -176,6 +184,21 @@ public class PlayerController : MonoBehaviour
 						m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].Disable();
 						m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].Enable();
 						m_CurrentState = EPlayerControllerState.PCSTATE_Menu;
+					}
+
+					if ( m_ActionUseCurrentConsumable.triggered )
+					{
+						Debug.Log( "Using current consumable" );
+					}
+
+					if ( m_ActionNextConsumable.triggered )
+					{
+						EquipmentManager.Instance.EquipWheel.CycleConsumables( 1 );
+					}
+
+					if ( m_ActionPreviousConsumable.triggered )
+					{
+						EquipmentManager.Instance.EquipWheel.CycleConsumables( -1 );
 					}
 
 

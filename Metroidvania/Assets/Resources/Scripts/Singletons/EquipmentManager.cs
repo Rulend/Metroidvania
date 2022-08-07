@@ -21,6 +21,9 @@ public class EquipmentManager : MonoBehaviour
 	public  ItemSlot	SelectedEquipmentSlot => m_SelectedEquipmentSlot;
 	private int			m_NumberWeaponSlots;
 
+	[SerializeField] private EquipmentWheel m_EquipWheel;
+	public EquipmentWheel EquipWheel => m_EquipWheel;
+
 	private void Awake()
 	{
 		// Will set this to be the instance the first time, and delete any later attempts to create more.
@@ -43,6 +46,8 @@ public class EquipmentManager : MonoBehaviour
 
 		m_EquipmentSlots	= m_EquipmentSlotsParent.GetComponentsInChildren<ItemSlot>();
 		m_NumberWeaponSlots = m_WeaponSlotsParent.GetComponentsInChildren<ItemSlot>().Length;
+
+		m_EquipWheel.SetupWheel( m_ConsumableSlotsParent.GetComponentsInChildren<ItemSlot>() );
 
 
 		m_DefaultEquipment = new Dictionary<EquipmentSlot, InventoryItem>();
@@ -148,6 +153,11 @@ public class EquipmentManager : MonoBehaviour
 
 		if ( _UpdateInventoryUI )
 			UI_Manager.Instance.rInventoryUI.UpdateEquippedIcon();
+
+
+		// Update equipment wheels
+		m_EquipWheel.UpdateWheel();
+
 
 		// TODO:: Add stats re-calculation in here
 	}

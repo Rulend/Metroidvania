@@ -13,6 +13,7 @@ public class Menu : MonoBehaviour
 		EquipmentScreen	,	// When the currently equipped equipment tab has ben opened
 		EquipmentBrowse	,	// When an equipment slot has been selected, and the player is selecting an equipment to put in that slot
 		InventoryScreen	,	// When the inventory tab has been opened
+		OptionsScreen	,	// When the options tab has been opened
 	}
 
 
@@ -120,7 +121,7 @@ public class Menu : MonoBehaviour
 		m_OpenedScreen.SetActive( true );
 		rInventoryUI.ShowInventoryCategory( 0 ); // Show the category of items at index 0 of enumerator
 
-		//UpdateButtonPrompts( UI_Manager.EButtonPromptCombo.InventoryScreen ); // This is called inside ShowEquippedEquipment instead
+		//UpdateButtonPrompts( UI_Manager.EButtonPromptCombo.InventoryScreen ); // This is called inside ShowInventoryCategory instead
 	}
 
 	public void ButtonOpenOptionsScreen()
@@ -136,7 +137,7 @@ public class Menu : MonoBehaviour
 
 		m_OpenedScreen = null;
 
-		GetComponentInChildren<Button>().Select();
+		GetComponentInChildren<Button>().Select(); // Here is the problem, fix this
 
 		SetMenuState( EMenuState.Opened );
 	}
@@ -157,7 +158,7 @@ public class Menu : MonoBehaviour
 
 			case EMenuState.Opened:break;
 
-			case EMenuState.EquipmentScreen: EquipmentManager.Instance.Unequip( m_SelectedButton.GetComponent<ItemSlot>().Item ); break;
+			case EMenuState.EquipmentScreen: EquipmentManager.Instance.Unequip( m_SelectedButton.GetComponent<ItemSlot>().Item ); break; // If in this state, then the selected button will always have an itemslot component.
 
 			case EMenuState.EquipmentBrowse: break;
 		}
@@ -217,7 +218,8 @@ public class Menu : MonoBehaviour
 
 	public void SetMenuState( EMenuState _NewState )
 	{
-		m_CurrentState = _NewState;
+		EMenuState PreviousState	= m_CurrentState;
+		m_CurrentState				= _NewState;
 
 		UpdateButtonPrompts( m_CurrentState ); 
 
@@ -237,6 +239,21 @@ public class Menu : MonoBehaviour
 				{
 					GoBackButtonEvent -= CloseOpenedScreen;
 					GoBackButtonEvent += CloseMenu;
+
+
+					switch ( PreviousState )
+					{
+						case EMenuState.Closed:
+						case EMenuState.EquipmentScreen:
+							transform.GetChild( 0 ).GetComponent<Button>().Select();
+							break;
+						case EMenuState.InventoryScreen:
+							transform.GetChild( 1 ).GetComponent<Button>().Select();
+							break;
+						case EMenuState.OptionsScreen:
+							transform.GetChild( 2 ).GetComponent<Button>().Select();
+							break;
+					}
 				}
 				break;
 
@@ -244,7 +261,7 @@ public class Menu : MonoBehaviour
 				{
 					GoBackButtonEvent -= CloseMenu;
 					GoBackButtonEvent -= UI_Manager.Instance.rInventoryUI.ShowEquippedEquipment;	// Unsubscribe this event so that pressing back won't show the equipped equipment
-					GoBackButtonEvent += CloseOpenedScreen;                                         // Subscribe this event so that if the player presses back, they go back to the menu
+					GoBackButtonEvent += CloseOpenedScreen;											// Subscribe this event so that if the player presses back, they go back to the menu
 
 				}
 				break;
