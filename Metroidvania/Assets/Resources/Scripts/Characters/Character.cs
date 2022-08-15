@@ -42,6 +42,9 @@ public class Character : MonoBehaviour
 	// 2. Two or more points that can be traced between in ord er to check if a target has been hit
 	// 3. 
 
+	private HashSet<OverTimeEffect> m_OverTimeEffects;
+	private List<OverTimeEffect>	m_ExpiredEffects; // Effects that have gone through their duration or been cut short, so they should be removed from the list. Has to be a separate list, since removing right away would break enumeration of the list being looped through.
+
 	public void Attack()
 	{
 
@@ -53,36 +56,47 @@ public class Character : MonoBehaviour
 		//}
 	}
 
-    
-	public virtual void TakeDamage( Damage pr_IncomingDamage )
-	{
-		float FinalDamage = pr_IncomingDamage.m_Amount;
 
-		if ( pr_IncomingDamage.m_Type != DamageTypes.DT_TRUEDAMAGE )
-			FinalDamage -= m_Resistances[ pr_IncomingDamage.m_Type ];
+	public virtual void Heal( float _Amount )
+	{
+		if ( m_CurrentHealth <= 0 ) // Maybe unnecessary if death is handled in a good way. TODO:: Remove(?)
+			return;
+
+		m_CurrentHealth += _Amount;
+
+		if ( m_CurrentHealth > m_MaxHealth )
+			m_CurrentHealth = m_MaxHealth;
+	}
+
+
+    
+	public virtual void TakeDamage( Damage _IncomingDamage )
+	{
+		float FinalDamage = _IncomingDamage.m_Amount;
+
+		if ( _IncomingDamage.m_Type != DamageTypes.DT_TRUEDAMAGE )
+			FinalDamage -= m_Resistances[ _IncomingDamage.m_Type ];
 
 		if ( FinalDamage < 1.0f ) // used instead of clamp
 			FinalDamage = 1.0f;
 
 		m_CurrentHealth -= FinalDamage;
+
+		if ( m_CurrentHealth <= 0 )
+			Die();
 	}
 
-	public void TakeDamage( float pr_IncomingDamage )	// Not really neccessary, but it allows to deal damage to a character without having to create a new Dmage-instance with TrueDamage as the type.
-	{
-		m_CurrentHealth -= pr_IncomingDamage;
-	}
 
 
 	public virtual void Die()
 	{
-
+		Debug.Log( $"{gameObject.name} has died." );
 	}
 
 
 
-
     // Start is called before the first frame update
-    void Start()
+    public virtual void Start()
     {
 		//		m_MovementController = gameObject.GetComponent<CharacterController>();
 		m_Resistances = new Dictionary<DamageTypes, float>()
@@ -94,16 +108,40 @@ public class Character : MonoBehaviour
 			{ DamageTypes.DT_WIND		, 2	},
 			{ DamageTypes.DT_EARTH		, 2	},
 			{ DamageTypes.DT_LIGHTNING	, 2	},
-			{ DamageTypes.DT_POISON		, 2	}
+			{ DamageTypes.DT_POISON		, 2	},
+			{ DamageTypes.DT_TRUEDAMAGE	, 0	}
 		};
 
-    }
+		m_OverTimeEffects	= new HashSet<OverTimeEffect>();
+		m_ExpiredEffects	= new List<OverTimeEffect>();
+	}
 
-    // Update is called once per frame
-    void Update()
+	public void AddOverTimeEffect( OverTimeEffect _EffectToAdd )
+	{
+		m_OverTimeEffects.Add( _EffectToAdd );
+	}
+
+	public void RemoveOverTimeEffect( OverTimeEffect _EffectToRemove )
+	{
+		m_ExpiredEffects.Add( _EffectToRemove );
+	}
+
+	private void RemoveExpiredEffects()
+	{
+		foreach ( OverTimeEffect CurrentEffect in m_ExpiredEffects )
+			m_OverTimeEffects.Remove( CurrentEffect );
+
+		m_ExpiredEffects.Clear();
+	}
+
+	// Update is called once per frame
+	public virtual void Update()
     {
-        
-    }
+		foreach ( var CurrentEffect in m_OverTimeEffects )
+			CurrentEffect.TickDownTime( this );
+
+		RemoveExpiredEffects();
+	}
 
     // FixedUpdate is called 50 times a second
     private void FixedUpdate()

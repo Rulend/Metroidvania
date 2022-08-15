@@ -10,16 +10,12 @@ public class EquipmentWheel : MonoBehaviour
 
 	private int m_CurrentConsumable;
 
-	private void Awake()
-	{
-		m_WheelSlots			= GetComponentsInChildren<ItemSlot>();
-		m_EquippedConsumables	= new List<InventoryItem>();
-	}
-
 
 	public void SetupWheel( ItemSlot[] _ConsumableSlots )
 	{
-		m_ConsumableSlots = _ConsumableSlots;
+		m_WheelSlots			= GetComponentsInChildren<ItemSlot>( true );
+		m_EquippedConsumables	= new List<InventoryItem>();
+		m_ConsumableSlots		= _ConsumableSlots;
 	}
 
 

@@ -19,6 +19,7 @@ public enum DamageTypes
 
 public class Damage
 {
+	// TODO:: Make this into an array or list of floats, where each element's value is equal to the damage of that element dealt. 0, 0, 10 means 0 phys and mag damage, but 10 fire damage.
 	public DamageTypes	m_Type;
 	public float		m_Amount;
 }
