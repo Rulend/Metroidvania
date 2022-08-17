@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
+[CreateAssetMenu( fileName = "NewOverTimeEffect", menuName = "OverTimeEffect" )]
 public class OverTimeEffect : ScriptableObject
 {
 	public enum EOverTimeEffect
@@ -11,6 +11,8 @@ public class OverTimeEffect : ScriptableObject
 		RestoreMana		,
 		DecreaseHealth	,
 		DecreaseMana	,
+
+		NumEffects
 	}
 
 	public delegate void EffectOverTimeDelegate( Character _Character, float _Amount );
@@ -29,6 +31,8 @@ public class OverTimeEffect : ScriptableObject
 	[SerializeField]	private float	m_EffectCooldownDuration;
 						private float	m_EffectCooldownTimeLeft;
 	[SerializeField]	private float	m_EffectStrength;
+
+	// TODO:: Change this so you can choose between specifying the power per tick or the total power over the duration
 
 	//[Tooltip("Whether or not the above value is a percentage.")]
 	//[SerializeField]	private bool	m_PercentageValue;
@@ -51,6 +55,7 @@ public class OverTimeEffect : ScriptableObject
 				break;
 		}
 
+		m_TimeLeft = m_Duration;
 		m_EffectCooldownTimeLeft = m_EffectCooldownDuration;
 	}
 

@@ -5,18 +5,18 @@ using UnityEngine.UI;
 
 public class Interactable : MonoBehaviour
 {
-	public		float			m_InteractionRadius = 1.5f;
-	protected	string			m_InteractableAlertText = "";	// The text that will be when the player is within InteractionRadius. 
+	public		float		m_InteractionRadius = 1.5f;
+	protected	string		m_InteractableAlertText = "";	// The text that will be when the player is within InteractionRadius. 
 
 
-	protected	Player				m_rPlayer;				// A reference to the player.
-	private		float				m_DistanceToPlayer;		// Distance to the player.
+	protected	Player		m_rPlayer;				// A reference to the player.
+	private		float		m_DistanceToPlayer;		// Distance to the player.
 
 
 	// Start is called after creation, if the gameobject or component is not disabled
 	void Start()
     {
-		m_rPlayer				= GameManager.Instance.rPlayer1;
+		m_rPlayer	= GameManager.Instance.rPlayer1;
 	}
 
 

@@ -37,6 +37,15 @@ public class Player : Character
 		m_Inventory = gameObject.GetComponent<Inventory>();
 	}
 
+
+	public override void Heal( float _Amount )
+	{
+		base.Heal( _Amount );
+
+		UI_Manager.Instance.UpdateHealth( m_CurrentHealth, m_MaxHealth );
+	}
+
+
 	public override void TakeDamage( Damage pr_IncomingDamage )
 	{
 		base.TakeDamage( pr_IncomingDamage );

@@ -43,6 +43,7 @@ public class Character : MonoBehaviour
 	// 3. 
 
 	private HashSet<OverTimeEffect> m_OverTimeEffects;
+	//private OverTimeEffect[] m_OverTimeEffects;
 	private List<OverTimeEffect>	m_ExpiredEffects; // Effects that have gone through their duration or been cut short, so they should be removed from the list. Has to be a separate list, since removing right away would break enumeration of the list being looped through.
 
 	public void Attack()
@@ -114,11 +115,16 @@ public class Character : MonoBehaviour
 
 		m_OverTimeEffects	= new HashSet<OverTimeEffect>();
 		m_ExpiredEffects	= new List<OverTimeEffect>();
+
+		// Use this and a variable in the effect so see whether or not it is stackable, and also see which one is more powerful to decide whether or not to use the new effect when supplied with one
+		//m_OverTimeEffects = new OverTimeEffect[ (int)OverTimeEffect.EOverTimeEffect.NumEffects ];
 	}
 
 	public void AddOverTimeEffect( OverTimeEffect _EffectToAdd )
 	{
-		m_OverTimeEffects.Add( _EffectToAdd );
+		OverTimeEffect EffectInstance = Object.Instantiate<OverTimeEffect>( _EffectToAdd );
+
+		m_OverTimeEffects.Add( EffectInstance );
 	}
 
 	public void RemoveOverTimeEffect( OverTimeEffect _EffectToRemove )
