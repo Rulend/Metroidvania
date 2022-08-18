@@ -10,9 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 52bfc7e3a3230984e8388e16baebf5e2, type: 3}
-  m_Name: NewOverTimeEffect
+  m_Name: OTE_Heal
   m_EditorClassIdentifier: 
   m_EffectType: 0
-  m_Duration: 2
-  m_EffectCooldownDuration: 0.1
-  m_EffectStrength: 1
+  m_Duration: 0.5
+  m_TimeLeft: 0.5
+  m_EffectCooldownDuration: 0.016
+  m_EffectCooldownTimeLeft: 0.016
+  m_TotalEffectStrength: 8
+  m_EffectPerTick: 0.256

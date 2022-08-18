@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu( fileName = "NewOverTimeEffect", menuName = "OverTimeEffect" )]
-public class OverTimeEffect : ScriptableObject
+public class OverTimeEffect : ConsumableEffect
 {
 	public enum EOverTimeEffect
 	{
@@ -22,15 +22,18 @@ public class OverTimeEffect : ScriptableObject
 
 
 	[Tooltip( "Which effect to apply." )]
-	[SerializeField]	private EOverTimeEffect m_EffectType;
+	[SerializeField] private EOverTimeEffect			m_EffectType;
 
-	[SerializeField]	private float	m_Duration;
-						private float	m_TimeLeft;
+	[SerializeField]					private float	m_Duration;
+	[SerializeField] [HideInInspector]	private float	m_TimeLeft;
 
 	[Tooltip("The interval at which the effect is applied. Ex: 0.16 = 10 times every second.")]
-	[SerializeField]	private float	m_EffectCooldownDuration;
-						private float	m_EffectCooldownTimeLeft;
-	[SerializeField]	private float	m_EffectStrength;
+	[SerializeField]					private float	m_EffectCooldownDuration;
+	[SerializeField] [HideInInspector]	private float	m_EffectCooldownTimeLeft;
+
+	[Tooltip( "How much the effect will be in total. Use numbers between 0-1 in order to make it percentage based. Effect is applied evenly over the duration." )]
+	[SerializeField]					private float	m_TotalEffectStrength;
+	[SerializeField] [HideInInspector]	private float	m_EffectPerTick; // How strong the effect is per tick. 
 
 	// TODO:: Change this so you can choose between specifying the power per tick or the total power over the duration
 
@@ -55,15 +58,38 @@ public class OverTimeEffect : ScriptableObject
 				break;
 		}
 
-		m_TimeLeft = m_Duration;
-		m_EffectCooldownTimeLeft = m_EffectCooldownDuration;
 	}
 
 
-
-	public void Activate( Character _Character )
+	public override void Activate( Character _Affected )
 	{
-		_Character.AddOverTimeEffect( this );
+		float m_AmountAffectedStat = 0.0f;
+
+		switch ( m_EffectType )
+		{
+			case EOverTimeEffect.RestoreHealth:
+
+				m_AmountAffectedStat = _Affected.MaxHealth;
+				break;
+			case EOverTimeEffect.RestoreMana:
+				break;
+			case EOverTimeEffect.DecreaseHealth:
+				break;
+			case EOverTimeEffect.DecreaseMana:
+				break;
+			default:
+				break;
+		}
+
+		m_TimeLeft = m_Duration;
+		m_EffectCooldownTimeLeft = m_EffectCooldownDuration;
+
+		if ( m_TotalEffectStrength < 1 )
+			m_TotalEffectStrength = m_AmountAffectedStat * m_TotalEffectStrength;
+
+		m_EffectPerTick = m_TotalEffectStrength / ( m_Duration / m_EffectCooldownDuration );
+
+		_Affected.AddOverTimeEffect( this );
 	}
 
 // TODO:: Add a choice to add an effect at the end of the duration
@@ -77,7 +103,7 @@ public class OverTimeEffect : ScriptableObject
 		{
 			m_EffectCooldownTimeLeft = m_EffectCooldownDuration;
 			//m_Effect.ApplyEffect( _Character, m_EffectStrength );
-			m_EffectOverTimeEvent.Invoke( _Character, m_EffectStrength );
+			m_EffectOverTimeEvent.Invoke( _Character, m_EffectPerTick );
 
 			if ( m_TimeLeft < 0.0f )
 			{
@@ -112,9 +138,9 @@ public class Effect
 
 	public static void DecreaseHealth( Character _Character, float _Amount )
 	{
-		Damage NewDamage = new Damage();
-		NewDamage.m_Type = DamageTypes.DT_TRUEDAMAGE;
-		NewDamage.m_Amount = _Amount;
+		Damage NewDamage	= new Damage();
+		NewDamage.m_Type	= DamageTypes.DT_TRUEDAMAGE;
+		NewDamage.m_Amount	= _Amount;
 
 		_Character.TakeDamage( NewDamage );
 	}

@@ -11,7 +11,7 @@ public class Consumable : InventoryItem
 
 	[SerializeField] private ConsumableEffect m_Effect;
 
-	public override void Use()
+	public override void Use( Character _User )
 	{
 		base.Use();
 
@@ -38,10 +38,7 @@ public class Consumable : InventoryItem
 }
 
 
-public class ConsumableEffect : ScriptableObject
+public abstract class ConsumableEffect : ScriptableObject
 {
-	public virtual void Activate( Character _Character )
-	{
-
-	}
+	public abstract void Activate( Character _Character );
 }

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 public class Character : MonoBehaviour
 {
+	public float MaxHealth => m_MaxHealth;
+
+
     // Protected member variables
     [SerializeField] protected float	m_MaxHealth;
     protected float						m_CurrentHealth;
@@ -123,6 +126,8 @@ public class Character : MonoBehaviour
 	public void AddOverTimeEffect( OverTimeEffect _EffectToAdd )
 	{
 		OverTimeEffect EffectInstance = Object.Instantiate<OverTimeEffect>( _EffectToAdd );
+
+		//EffectInstance.Activate( this );
 
 		m_OverTimeEffects.Add( EffectInstance );
 	}
