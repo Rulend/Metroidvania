@@ -37,30 +37,8 @@ public class OverTimeEffect : ConsumableEffect
 
 	// TODO:: Change this so you can choose between specifying the power per tick or the total power over the duration
 
-	//[Tooltip("Whether or not the above value is a percentage.")]
-	//[SerializeField]	private bool	m_PercentageValue;
 
-	private void Awake()
-	{
-		switch ( m_EffectType )
-		{
-			case EOverTimeEffect.RestoreHealth:
-				m_EffectOverTimeEvent += Effect.RestoreHealth;
-				break;
-			case EOverTimeEffect.RestoreMana:
-				break;
-			case EOverTimeEffect.DecreaseHealth:
-				m_EffectOverTimeEvent += Effect.DecreaseHealth;
-				break;
-			case EOverTimeEffect.DecreaseMana:
-				break;
-			default:
-				break;
-		}
-
-	}
-
-
+	// This method is called from within Character.cs. All you have to do in order to use an OverTimeEffect is call ChosenCharacter.AddOverTimeEffect( OTE_To_Add ), and everything else will fix itself.
 	public override void Activate( Character _Affected )
 	{
 		float m_AmountAffectedStat = 0.0f;
@@ -68,12 +46,15 @@ public class OverTimeEffect : ConsumableEffect
 		switch ( m_EffectType )
 		{
 			case EOverTimeEffect.RestoreHealth:
+				m_EffectOverTimeEvent += Effect.RestoreHealth;
 
 				m_AmountAffectedStat = _Affected.MaxHealth;
 				break;
 			case EOverTimeEffect.RestoreMana:
 				break;
 			case EOverTimeEffect.DecreaseHealth:
+				m_EffectOverTimeEvent += Effect.DecreaseHealth;
+
 				break;
 			case EOverTimeEffect.DecreaseMana:
 				break;
@@ -82,14 +63,16 @@ public class OverTimeEffect : ConsumableEffect
 		}
 
 		m_TimeLeft = m_Duration;
+
 		m_EffectCooldownTimeLeft = m_EffectCooldownDuration;
 
 		if ( m_TotalEffectStrength < 1 )
 			m_TotalEffectStrength = m_AmountAffectedStat * m_TotalEffectStrength;
 
-		m_EffectPerTick = m_TotalEffectStrength / ( m_Duration / m_EffectCooldownDuration );
+		// If EfectCooldownDuration is left at 0 when creating an OTE, then it should be applied every frame. To do that, we need to substitute it's value for the framerate.
+		float DivisionValue = ( m_EffectCooldownDuration == 0.0f ? Time.deltaTime : m_EffectCooldownDuration );
 
-		_Affected.AddOverTimeEffect( this );
+		m_EffectPerTick = m_TotalEffectStrength / ( m_Duration / DivisionValue );
 	}
 
 // TODO:: Add a choice to add an effect at the end of the duration
@@ -102,7 +85,7 @@ public class OverTimeEffect : ConsumableEffect
 		if ( m_EffectCooldownTimeLeft < 0.0f )
 		{
 			m_EffectCooldownTimeLeft = m_EffectCooldownDuration;
-			//m_Effect.ApplyEffect( _Character, m_EffectStrength );
+
 			m_EffectOverTimeEvent.Invoke( _Character, m_EffectPerTick );
 
 			if ( m_TimeLeft < 0.0f )

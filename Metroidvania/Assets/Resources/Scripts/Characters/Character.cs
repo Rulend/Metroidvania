@@ -126,8 +126,9 @@ public class Character : MonoBehaviour
 	public void AddOverTimeEffect( OverTimeEffect _EffectToAdd )
 	{
 		OverTimeEffect EffectInstance = Object.Instantiate<OverTimeEffect>( _EffectToAdd );
+		//OverTimeEffect EffectInstance = new OverTimeEffect(  );
 
-		//EffectInstance.Activate( this );
+		EffectInstance.Activate( this );
 
 		m_OverTimeEffects.Add( EffectInstance );
 	}

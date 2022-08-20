@@ -5,41 +5,49 @@ using UnityEngine;
 public class EquipmentWheel : MonoBehaviour
 {
 	private ItemSlot[]				m_WheelSlots;				// The slots in the bottom left corner of the screen
-	private ItemSlot[]				m_ConsumableSlots;			// The bottom row when looking at the Equipped screen.
-	private List<InventoryItem>		m_EquippedConsumables;		
+	private ItemSlot[]				m_AllConsumableSlots;			// The bottom row when looking at the Equipped screen.
+	private List<ItemSlot>			m_NonEmptyConsumableSlots;
 
-	private int m_CurrentConsumable;
+	private int m_CurrentSlotIndex;
 
-
+	// Setup the wheel; providing a reference to the slots of the equipmentmanager that has the consumables in them.
 	public void SetupWheel( ItemSlot[] _ConsumableSlots )
 	{
-		m_WheelSlots			= GetComponentsInChildren<ItemSlot>( true );
-		m_EquippedConsumables	= new List<InventoryItem>();
-		m_ConsumableSlots		= _ConsumableSlots;
+		m_WheelSlots				= GetComponentsInChildren<ItemSlot>( true );
+		m_AllConsumableSlots		= _ConsumableSlots;
+		m_NonEmptyConsumableSlots	= new List<ItemSlot>();
 	}
 
 
 	public void UpdateWheel()
 	{
-		m_CurrentConsumable = 0;
+		m_CurrentSlotIndex = 0;
 		// Loop through the slots and fix the list of consumables accordingly´, since not all slots will have items in them
 		Debug.Log( "Updating equipment-wheel" );
-		m_EquippedConsumables.Clear();
+		m_NonEmptyConsumableSlots.Clear();
 
-		foreach ( ItemSlot CurrentSlot in m_ConsumableSlots )
+		foreach ( ItemSlot CurrentSlot in m_AllConsumableSlots )
 		{
 			if ( CurrentSlot.Item && !CurrentSlot.Item.m_DefaultItem )
-				m_EquippedConsumables.Add( CurrentSlot.Item );
+				m_NonEmptyConsumableSlots.Add( CurrentSlot );
 		}
 
-		if ( m_EquippedConsumables.Count > 1 )
+		if ( m_NonEmptyConsumableSlots.Count > 1 )
 		{
-			m_WheelSlots[ 3 ].AddItemToSlot( m_EquippedConsumables[ m_CurrentConsumable ] );
-			m_WheelSlots[ 4 ].AddItemToSlot( m_EquippedConsumables[ m_CurrentConsumable + 1 ] );
+			ItemSlot CurrentSlot = m_NonEmptyConsumableSlots[ m_CurrentSlotIndex ];
+			ItemSlot NextSlot = m_NonEmptyConsumableSlots[ m_CurrentSlotIndex + 1 ];
+
+			m_WheelSlots[ 3 ].AddItemToSlot( CurrentSlot.Item, CurrentSlot.Amount );
+			m_WheelSlots[ 4 ].AddItemToSlot( NextSlot.Item, NextSlot.Amount );
 
 		}
-		else if ( m_EquippedConsumables.Count > 0 )
-			m_WheelSlots[ 3 ].AddItemToSlot( m_EquippedConsumables[ m_CurrentConsumable ] );
+		else if ( m_NonEmptyConsumableSlots.Count > 0 )
+			m_WheelSlots[ 3 ].AddItemToSlot( m_NonEmptyConsumableSlots[ m_CurrentSlotIndex ].Item, m_NonEmptyConsumableSlots[ m_CurrentSlotIndex ].Amount );
+		else
+		{
+			// TODO:: Add if statement to check if the slot should be emptied when 0 stacks is reached 
+			m_WheelSlots[ 3 ].RemoveItemFromSlot();
+		}
 	} 
 
 	private void UpdateVisuals()
@@ -49,32 +57,44 @@ public class EquipmentWheel : MonoBehaviour
 
 
 	// Changes which item is the currently 
-	public InventoryItem CycleConsumables( int _CycleWay )
+	public void CycleConsumables( int _CycleDirection )
 	{
-		if ( m_EquippedConsumables.Count == 0 )
+		if ( m_NonEmptyConsumableSlots.Count == 0 )
 		{
 			Debug.LogWarning( "No shit equipped in the equipment wheel" );
-			return null;
+			//return null;
+			return;
 		}
 
-		m_CurrentConsumable += _CycleWay;
-		int NextConsumable	= m_CurrentConsumable + 1;
+		m_CurrentSlotIndex += _CycleDirection;
+		int NextConsumable	= m_CurrentSlotIndex + 1;
 
 		//if ( m_CurrentConsumable < 0 )
 		//	m_CurrentConsumable = m_EquippedConsumables.Count;
 		//else 
-		if ( m_CurrentConsumable >= m_EquippedConsumables.Count )
+		if ( m_CurrentSlotIndex >= m_NonEmptyConsumableSlots.Count )
 		{
-			m_CurrentConsumable = 0;
-			NextConsumable = ( m_CurrentConsumable + 1 ) % m_EquippedConsumables.Count;
+			m_CurrentSlotIndex = 0;
+			NextConsumable = ( m_CurrentSlotIndex + 1 ) % m_NonEmptyConsumableSlots.Count;
 		}
 
-		if ( NextConsumable >= m_EquippedConsumables.Count )
+		if ( NextConsumable >= m_NonEmptyConsumableSlots.Count )
 			NextConsumable = 0;
 
-		m_WheelSlots[ 3 ].AddItemToSlot( m_EquippedConsumables[ m_CurrentConsumable ] );
-		m_WheelSlots[ 4 ].AddItemToSlot( m_EquippedConsumables[ NextConsumable ] );
+		ItemSlot CurrentSlot	= m_NonEmptyConsumableSlots[ m_CurrentSlotIndex ];
+		ItemSlot NextSlot		= m_NonEmptyConsumableSlots[ NextConsumable ];
 
-		return m_WheelSlots[ 3 ].Item;
+		m_WheelSlots[ 3 ].AddItemToSlot( CurrentSlot.Item, CurrentSlot.Amount );
+		m_WheelSlots[ 4 ].AddItemToSlot( NextSlot.Item, NextSlot.Amount );
+
+		//return m_WheelSlots[ 3 ].Item;
+	}
+
+	public void UseCurrentConsumable( Player _Player )
+	{
+		if ( !m_WheelSlots[ 3 ].Item )
+			return;
+
+		m_WheelSlots[ 3 ].Item.Use( 1, _Player );
 	}
 }

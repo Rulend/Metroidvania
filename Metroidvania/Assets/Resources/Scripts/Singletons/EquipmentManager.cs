@@ -65,7 +65,7 @@ public class EquipmentManager : MonoBehaviour
 		for ( int EquipIndex = 0; EquipIndex < m_DefaultSetupArray.Length; ++EquipIndex )
 		{
 			m_SelectedEquipmentSlot = m_EquipmentSlots[ EquipIndex ]; // Set a current equipmentslot in order to make the next line work
-			Equip( (Equipment)m_DefaultSetupArray[ EquipIndex ], false );
+			Equip( (Equipment)m_DefaultSetupArray[ EquipIndex ], 1, false, false );
 		}
 	}
 
@@ -117,7 +117,7 @@ public class EquipmentManager : MonoBehaviour
 	/// parameters:
 	/// _NewItem : the item that should be equipped.
 	////////////////////////////////////////////////
-	public void Equip( InventoryItem _ItemToEquip, bool _UpdateInventoryUI = true )
+	public void Equip( InventoryItem _ItemToEquip, int _Amount = 1, bool _UpdateEquipmentWheel = false, bool _UpdateInventoryUI = true )
 	{
 		// TODO:: Remake this function. It doesn't work anymore becuase weapons are no longer tied to a specific hand. What this means is that: since there is no longer a LHAND/RHAND_Slot in the Equipslot-enum,
 		// this will need to be slightly rworked. TODO:: Remove the right hand / left hand shit, I don't have time for it right now.
@@ -136,7 +136,7 @@ public class EquipmentManager : MonoBehaviour
 			if ( EquippedSlot ) // If the item that the player wants to equip is already equipped
 			{
 				if ( m_SelectedEquipmentSlot.Item )
-					EquippedSlot.AddItemToSlot( m_SelectedEquipmentSlot.Item );
+					EquippedSlot.AddItemToSlot( m_SelectedEquipmentSlot.Item, m_SelectedEquipmentSlot.Amount );
 				else
 					Unequip( _ItemToEquip );
 			}
@@ -148,7 +148,7 @@ public class EquipmentManager : MonoBehaviour
 			Unequip( m_SelectedEquipmentSlot.Item ); // Unequip old item
 
 
-			m_SelectedEquipmentSlot.AddItemToSlot( _ItemToEquip ); // Equip new item
+			m_SelectedEquipmentSlot.AddItemToSlot( _ItemToEquip, _Amount ); // Equip new item
 		}
 
 		if ( _UpdateInventoryUI )
@@ -156,7 +156,8 @@ public class EquipmentManager : MonoBehaviour
 
 
 		// Update equipment wheels
-		m_EquipWheel.UpdateWheel();
+		if ( _UpdateEquipmentWheel )
+			m_EquipWheel.UpdateWheel();
 
 
 		// TODO:: Add stats re-calculation in here
@@ -204,7 +205,7 @@ public class EquipmentManager : MonoBehaviour
 	/// parameters:
 	/// pr_ItemToCheck	: the item to check
 	////////////////////////////////////////////////
-	private ItemSlot IsItemEquipped( InventoryItem _ItemToCheck )
+	public ItemSlot IsItemEquipped( InventoryItem _ItemToCheck )
 	{
 		foreach ( ItemSlot CurrentEquipSlot in m_EquipmentSlots )
 		{

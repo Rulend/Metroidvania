@@ -189,6 +189,7 @@ public class PlayerController : MonoBehaviour
 					if ( m_ActionUseCurrentConsumable.triggered )
 					{
 						Debug.Log( "Using current consumable" );
+						EquipmentManager.Instance.EquipWheel.UseCurrentConsumable( m_rPlayer );
 					}
 
 					if ( m_ActionNextConsumable.triggered )

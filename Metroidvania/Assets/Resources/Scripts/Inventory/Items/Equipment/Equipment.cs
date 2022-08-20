@@ -30,7 +30,7 @@ public class Equipment : InventoryItem
 	[SerializeField] public int				m_RequiredStats;
 
 
-	public override void Use( Character _User )
+	public override void Use( int _Amount, Character _User )
 	{
 		base.Use();
 

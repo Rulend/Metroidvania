@@ -211,10 +211,23 @@ public class Inventory : MonoBehaviour
 
 
 
+
+		// If the item is equipped, save down the equipped slot so we can update it 
+		ItemSlot EquippedSlot = EquipmentManager.Instance.IsItemEquipped( _ItemToRemove );
+
 		DictionaryToUpdate[ _ItemToRemove ] -= 1;
 
 		if ( DictionaryToUpdate[ _ItemToRemove ] < 1 )
+		{
 			DictionaryToUpdate.Remove( _ItemToRemove );
+
+			if ( EquippedSlot )	// Remove item if it's equipped
+				EquipmentManager.Instance.Unequip( _ItemToRemove );
+		}
+		else if ( EquippedSlot )	// Since item wasn't removed, update the equipped slot if there is one
+			EquippedSlot.AddItemToSlot( _ItemToRemove, DictionaryToUpdate[ _ItemToRemove ] );
+
+
 
 		if ( _SpawnItemPickup )
 		{

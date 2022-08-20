@@ -15,7 +15,7 @@ public class Interactable_Trap : Interactable
 		//foreach ( OverTimeEffect CurrentEffect in m_EffectsToApply )
 		//m_rPlayer.AddOverTimeEffect( Object.Instantiate<OverTimeEffect>( CurrentEffect ) );
 		//m_rPlayer.AddOverTimeEffect( CurrentEffect );
-		//m_rPlayer.AddOverTimeEffect( m_EffectToApply );
-		m_EffectToApply.Activate( m_rPlayer );
+		m_rPlayer.AddOverTimeEffect( m_EffectToApply );
+		//m_EffectToApply.Activate( m_rPlayer );
 	}
 }

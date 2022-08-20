@@ -3,7 +3,9 @@ using UnityEngine.UI;
 
 public class ItemSlot : MonoBehaviour
 {
-	public InventoryItem	Item => m_Item;			// Getter for the item
+	public InventoryItem	Item => m_Item;         // Getter for the item
+	public int				Amount => m_Amount;		//Getter for amount of items
+
 	private InventoryItem	m_Item;					// The item stored in the slot.
 	private int				m_Amount;				// How many of the item there are
 
@@ -229,7 +231,7 @@ public class ItemSlot : MonoBehaviour
 			if ( m_Item.m_DefaultItem )
 				return;
 
-			m_Item.Use();
+			m_Item.Use( m_Amount );
 		}
 	}
 }
