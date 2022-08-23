@@ -116,7 +116,7 @@ public class Effect
 {
 	public static void RestoreHealth( Character _Character, float _Amount )
 	{
-		_Character.Heal( _Amount );
+		_Character.RestoreHealth( _Amount );
 	}
 
 	public static void DecreaseHealth( Character _Character, float _Amount )
@@ -127,4 +127,14 @@ public class Effect
 
 		_Character.TakeDamage( NewDamage );
 	}
+
+	//public static void RestoreMana( Character _Character, float _Amount )
+	//{
+	//	_Character.RestoreMana( _Amount );
+	//}
+
+	//public static void DecreaseMana( Character _Character, float _Amount )
+	//{
+	//	_Character.RestoreMana( _Amount );
+	//}
 }

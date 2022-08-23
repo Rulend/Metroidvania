@@ -25,8 +25,9 @@ public class Player : Character
 		//m_CurrentMovementSpeed = m_BaseMovementSpeed /* * speedMultiplier */ ;
 		base.Start();
 
-		m_CurrentMovementSpeed = m_BaseMovementSpeed;
-		m_CurrentHealth = m_MaxHealth;
+		m_CurrentMovementSpeed	= m_BaseMovementSpeed;
+		m_CurrentHealth			= m_MaxHealth;
+		m_CurrentMana			= m_MaxMana;
 
 		// Get inventory UI
 		m_rInventoryUI = UI_Manager.Instance.rInventoryUI.gameObject;
@@ -38,9 +39,9 @@ public class Player : Character
 	}
 
 
-	public override void Heal( float _Amount )
+	public override void RestoreHealth( float _Amount )
 	{
-		base.Heal( _Amount );
+		base.RestoreHealth( _Amount );
 
 		UI_Manager.Instance.UpdateHealth( m_CurrentHealth, m_MaxHealth );
 	}

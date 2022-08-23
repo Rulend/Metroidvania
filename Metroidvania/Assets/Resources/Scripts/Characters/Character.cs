@@ -13,11 +13,11 @@ public class Character : MonoBehaviour
 //	protected float					m_MaxStamina;
 //	protected float					m_CurrentStamina;
 
-//	protected float					m_MaxSpellResource;
-//	protected float					m_CurrentSpellResource;
+	[SerializeField] protected float	m_MaxMana;
+	protected float						m_CurrentMana;
 
-    protected float					m_BaseMovementSpeed;
-    protected float					m_CurrentMovementSpeed;
+	[SerializeField] protected float	m_BaseMovementSpeed;
+    protected float						m_CurrentMovementSpeed;
 
 //	protected uint					m_Strength;		// Increase sword damage.
 //	protected uint					m_Dexterity;	// Increase bow damage.
@@ -61,7 +61,7 @@ public class Character : MonoBehaviour
 	}
 
 
-	public virtual void Heal( float _Amount )
+	public virtual void RestoreHealth( float _Amount )
 	{
 		if ( m_CurrentHealth <= 0 ) // Maybe unnecessary if death is handled in a good way. TODO:: Remove(?)
 			return;
@@ -73,7 +73,20 @@ public class Character : MonoBehaviour
 	}
 
 
-    
+
+	public virtual void RestoreMana( float _Amount )
+	{
+		if ( m_CurrentMana <= 0 ) // Maybe unnecessary if death is handled in a good way. TODO:: Remove(?)
+			return;
+
+		m_CurrentMana += _Amount;
+
+		if ( m_CurrentMana > m_MaxMana )
+			m_CurrentMana = m_MaxMana;
+	}
+
+
+
 	public virtual void TakeDamage( Damage _IncomingDamage )
 	{
 		float FinalDamage = _IncomingDamage.m_Amount;
@@ -81,8 +94,8 @@ public class Character : MonoBehaviour
 		if ( _IncomingDamage.m_Type != DamageTypes.DT_TRUEDAMAGE )
 			FinalDamage -= m_Resistances[ _IncomingDamage.m_Type ];
 
-		if ( FinalDamage < 1.0f ) // used instead of clamp
-			FinalDamage = 1.0f;
+		//if ( FinalDamage < 0.05f ) // used instead of clamp
+		//	FinalDamage = 0.05f;
 
 		m_CurrentHealth -= FinalDamage;
 

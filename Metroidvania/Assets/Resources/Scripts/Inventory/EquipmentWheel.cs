@@ -26,6 +26,9 @@ public class EquipmentWheel : MonoBehaviour
 		Debug.Log( "Updating equipment-wheel" );
 		m_NonEmptyConsumableSlots.Clear();
 
+		foreach ( ItemSlot CurrentSlot in m_WheelSlots )
+			CurrentSlot.RemoveItemFromSlot();
+
 		foreach ( ItemSlot CurrentSlot in m_AllConsumableSlots )
 		{
 			if ( CurrentSlot.Item && !CurrentSlot.Item.m_DefaultItem )

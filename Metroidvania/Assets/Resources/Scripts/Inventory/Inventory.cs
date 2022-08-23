@@ -140,12 +140,18 @@ public class Inventory : MonoBehaviour
 					Debug.Log( "Item is stackable but the examined instance does not already exist in inventory.,," );
 				}
 
+				InventoryUpdateEvent.Invoke( DictionaryToPlaceIn );
+				EquipmentManager.Instance.EquipWheel.UpdateWheel();
+
 				return true;
 			}
 
 			InventoryItem InstancedItem = Object.Instantiate( _ItemToAdd ); // This needs to be done since otherwise there will only be one instance of the object. That's how it works.
 
 			DictionaryToPlaceIn.Add( InstancedItem, 1 );
+
+			InventoryUpdateEvent.Invoke( DictionaryToPlaceIn );
+			EquipmentManager.Instance.EquipWheel.UpdateWheel();
 
 			return true;
 		}

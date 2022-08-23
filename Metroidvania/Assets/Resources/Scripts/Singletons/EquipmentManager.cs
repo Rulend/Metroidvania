@@ -190,7 +190,10 @@ public class EquipmentManager : MonoBehaviour
 			m_SelectedEquipmentSlot.AddItemToSlot( m_DefaultEquipment[ EquipmentToUnequip.EquipmentSlots ] );
 		}
 		else
+		{
 			m_SelectedEquipmentSlot.AddItemToSlot( m_DefaultEquipment[ EquipmentSlot.EQUIPMENTSLOT_Consumable ] );
+			m_EquipWheel.UpdateWheel();
+		}
 	}
 
 
