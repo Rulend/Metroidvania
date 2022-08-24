@@ -27,7 +27,7 @@ public class Consumable : InventoryItem
 			EquipmentManager.Instance.Equip( this, _Amount, true );
 		else
 		{
-			Debug.Log( "Not adding to slot, but actually using the item." );
+			Debug.Log( $"Using consumable {m_ItemName}." );
 
 			// NOTE:: I know this code underneath is a shit way to do this, but hear me out: this is the best way.
 			// This cast is safe, since OverTimEffect inherits from ConsumableEffect, and by doing this, we get to skip repeating a switch statement inside OverTimeEffect.

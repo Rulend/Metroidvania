@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_ID: 0
   m_InventoryID: 0
-  m_ItemName: New Item
+  m_ItemName: Bottle of Poison (S)
   m_DefaultItem: 0
   m_Stackable: 1
   m_Icon: {fileID: 0}
   m_ItemType: 0
-  m_ItemDescription: No item description yet.
+  m_ItemDescription: A small bottle of cheap poison. Easy to make and detect.
   m_Mesh: {fileID: 0}
-  m_Effect: {fileID: 0}
+  m_Effect: {fileID: 11400000, guid: 9c6df6fe8cf572148a04e2f1c7333008, type: 2}

@@ -145,7 +145,7 @@ public class EquipmentManager : MonoBehaviour
 		// If the item we're trying to equip is not the same as the equipped item, try to equip it.
 		if ( _ItemToEquip != m_SelectedEquipmentSlot.Item )
 		{
-			Unequip( m_SelectedEquipmentSlot.Item ); // Unequip old item
+			Unequip( m_SelectedEquipmentSlot.Item, true ); // Unequip old item
 
 
 			m_SelectedEquipmentSlot.AddItemToSlot( _ItemToEquip, _Amount ); // Equip new item
@@ -175,24 +175,43 @@ public class EquipmentManager : MonoBehaviour
 	/// parameters:
 	/// pr_EquipmentToUnequip	: the equipment that should be unequipped.
 	////////////////////////////////////////////////
-	public void Unequip( InventoryItem _ItemToUnequip )
+	public void Unequip( InventoryItem _ItemToUnequip, bool _RemovingItemFromMenu = false )
 	{
 		if ( _ItemToUnequip == null )
 			return;
 
 		// TODO:: Add check to see if inventory is full before unequipping an item
 
-		m_SelectedEquipmentSlot.RemoveItemFromSlot();
-
 		if ( _ItemToUnequip.m_ItemType == ITEMTYPE.ITEMTYPE_EQUIPMENT )
 		{
+			m_SelectedEquipmentSlot.RemoveItemFromSlot();
+
 			Equipment EquipmentToUnequip = (Equipment)_ItemToUnequip;
 			m_SelectedEquipmentSlot.AddItemToSlot( m_DefaultEquipment[ EquipmentToUnequip.EquipmentSlots ] );
 		}
-		else
+		else // Consumables can be unequipped after using them from the EquipmentWheel, so some extra steps are necessary to make sure the correct slot is emptied
 		{
-			m_SelectedEquipmentSlot.AddItemToSlot( m_DefaultEquipment[ EquipmentSlot.EQUIPMENTSLOT_Consumable ] );
-			m_EquipWheel.UpdateWheel();
+			if ( _RemovingItemFromMenu ) // If we're removing or swapping an item from the menu, then the swap won't work if we cycle through the items and are trying to move an item from an earlier slot; for example from slot 1 to 3. That's because the item from slot 3 has already been put into slot 1, so trying to unequip that item from slot 3 would unequip the one from slot 1 instead of we cycled through them.
+			{
+				m_SelectedEquipmentSlot.RemoveItemFromSlot();
+				m_SelectedEquipmentSlot.AddItemToSlot( m_DefaultEquipment[ EquipmentSlot.EQUIPMENTSLOT_Consumable ] );
+				m_EquipWheel.UpdateWheel();
+				return;
+			}
+
+
+			ItemSlot[] ConsumableSlots = m_ConsumableSlotsParent.GetComponentsInChildren<ItemSlot>();
+
+			foreach ( ItemSlot CurrentItemslot in ConsumableSlots )
+			{
+				if ( CurrentItemslot.Item == _ItemToUnequip )
+				{
+					CurrentItemslot.RemoveItemFromSlot();
+					CurrentItemslot.AddItemToSlot( m_DefaultEquipment[ EquipmentSlot.EQUIPMENTSLOT_Consumable ] );
+					m_EquipWheel.UpdateWheel();
+					break;
+				}
+			}
 		}
 	}
 

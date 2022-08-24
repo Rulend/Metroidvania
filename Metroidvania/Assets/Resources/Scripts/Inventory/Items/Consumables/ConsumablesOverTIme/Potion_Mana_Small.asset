@@ -21,3 +21,4 @@ MonoBehaviour:
   m_ItemType: 0
   m_ItemDescription: Used to recoved a small amount of mana.
   m_Mesh: {fileID: 0}
+  m_Effect: {fileID: 11400000, guid: c8e24cbc67f48b544825742e8cafdc37, type: 2}

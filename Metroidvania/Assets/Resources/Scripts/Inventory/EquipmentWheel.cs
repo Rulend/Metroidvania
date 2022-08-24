@@ -21,7 +21,6 @@ public class EquipmentWheel : MonoBehaviour
 
 	public void UpdateWheel()
 	{
-		m_CurrentSlotIndex = 0;
 		// Loop through the slots and fix the list of consumables accordingly´, since not all slots will have items in them
 		Debug.Log( "Updating equipment-wheel" );
 		m_NonEmptyConsumableSlots.Clear();
@@ -37,15 +36,32 @@ public class EquipmentWheel : MonoBehaviour
 
 		if ( m_NonEmptyConsumableSlots.Count > 1 )
 		{
-			ItemSlot CurrentSlot = m_NonEmptyConsumableSlots[ m_CurrentSlotIndex ];
-			ItemSlot NextSlot = m_NonEmptyConsumableSlots[ m_CurrentSlotIndex + 1 ];
+			int NextSlotIndex = m_CurrentSlotIndex + 1;
+
+			if ( m_CurrentSlotIndex < m_NonEmptyConsumableSlots.Count )
+			{
+				if ( NextSlotIndex >= m_NonEmptyConsumableSlots.Count )
+					NextSlotIndex = 0;
+			}
+			else
+			{
+				m_CurrentSlotIndex = 0;
+				NextSlotIndex = 1;
+			}
+
+
+			ItemSlot CurrentSlot	= m_NonEmptyConsumableSlots[ m_CurrentSlotIndex ];
+			ItemSlot NextSlot		= m_NonEmptyConsumableSlots[ NextSlotIndex ];
 
 			m_WheelSlots[ 3 ].AddItemToSlot( CurrentSlot.Item, CurrentSlot.Amount );
 			m_WheelSlots[ 4 ].AddItemToSlot( NextSlot.Item, NextSlot.Amount );
 
 		}
 		else if ( m_NonEmptyConsumableSlots.Count > 0 )
+		{
+			m_CurrentSlotIndex = 0;
 			m_WheelSlots[ 3 ].AddItemToSlot( m_NonEmptyConsumableSlots[ m_CurrentSlotIndex ].Item, m_NonEmptyConsumableSlots[ m_CurrentSlotIndex ].Amount );
+		}
 		else
 		{
 			// TODO:: Add if statement to check if the slot should be emptied when 0 stacks is reached 
@@ -70,7 +86,7 @@ public class EquipmentWheel : MonoBehaviour
 		}
 
 		m_CurrentSlotIndex += _CycleDirection;
-		int NextConsumable	= m_CurrentSlotIndex + 1;
+		int NextSlotIndex	= m_CurrentSlotIndex + 1;
 
 		//if ( m_CurrentConsumable < 0 )
 		//	m_CurrentConsumable = m_EquippedConsumables.Count;
@@ -78,17 +94,20 @@ public class EquipmentWheel : MonoBehaviour
 		if ( m_CurrentSlotIndex >= m_NonEmptyConsumableSlots.Count )
 		{
 			m_CurrentSlotIndex = 0;
-			NextConsumable = ( m_CurrentSlotIndex + 1 ) % m_NonEmptyConsumableSlots.Count;
+			NextSlotIndex = ( m_CurrentSlotIndex + 1 ) % m_NonEmptyConsumableSlots.Count;
 		}
 
-		if ( NextConsumable >= m_NonEmptyConsumableSlots.Count )
-			NextConsumable = 0;
+
+		if ( NextSlotIndex >= m_NonEmptyConsumableSlots.Count )
+			NextSlotIndex = 0;
 
 		ItemSlot CurrentSlot	= m_NonEmptyConsumableSlots[ m_CurrentSlotIndex ];
-		ItemSlot NextSlot		= m_NonEmptyConsumableSlots[ NextConsumable ];
+		ItemSlot NextSlot		= m_NonEmptyConsumableSlots[ NextSlotIndex ];
 
 		m_WheelSlots[ 3 ].AddItemToSlot( CurrentSlot.Item, CurrentSlot.Amount );
-		m_WheelSlots[ 4 ].AddItemToSlot( NextSlot.Item, NextSlot.Amount );
+
+		if ( m_CurrentSlotIndex != NextSlotIndex )
+			m_WheelSlots[ 4 ].AddItemToSlot( NextSlot.Item, NextSlot.Amount );
 
 		//return m_WheelSlots[ 3 ].Item;
 	}
