@@ -5,7 +5,7 @@ ModelImporter:
   internalIDToNameTable:
   - first:
       74: -203655887218126122
-    second: A_PlayerRun
+    second: AClip_Player_Run_Default
   externalObjects: {}
   materials:
     materialImportMode: 2
@@ -35,7 +35,7 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: A_PlayerRun
+      name: AClip_Player_Run_Default
       takeName: mixamo.com
       internalID: 0
       firstFrame: 0

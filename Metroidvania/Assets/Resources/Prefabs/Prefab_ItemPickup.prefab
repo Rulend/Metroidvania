@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7635412046767582150}
   - component: {fileID: 5785253368971614947}
   m_Layer: 0
-  m_Name: ItemPickup
+  m_Name: Prefab_ItemPickup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
