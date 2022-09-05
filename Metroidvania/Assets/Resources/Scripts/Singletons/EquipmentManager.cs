@@ -49,9 +49,10 @@ public class EquipmentManager : MonoBehaviour
 
 		m_EquipWheel.SetupWheel( m_ConsumableSlotsParent.GetComponentsInChildren<ItemSlot>() );
 
+		// TODO:: Instead of just loading in the default items and equipping them like below,
+		// Setup a save system so that the player's last equipped items will be equipped instead
 
 		m_DefaultEquipment = new Dictionary<EquipmentSlot, InventoryItem>();
-
 		InventoryItem[] DefaultItems = Resources.LoadAll<InventoryItem>( "Scripts/Inventory/Items/Equipment/Default" );
 
 

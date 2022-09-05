@@ -18,6 +18,14 @@ public class Consumable : InventoryItem
 
 	[SerializeField] private ConsumableEffect m_Effect;
 
+
+	public void StartConsumableAnimation()
+	{
+
+	}
+
+
+	// When not used from the inventory, this function should be called from an animation event.
 	public override void Use( int _Amount, Character _User )
 	{
 		base.Use( _Amount );
@@ -36,11 +44,11 @@ public class Consumable : InventoryItem
 			// a percentage of any kind. So to summarize: doing it this way lets us skip implementing the awake method of OverTimeEffect, where we would need an unnecessary switch statement on the type.
 
 			if ( m_Effect as OverTimeEffect != null )
-				_User.AddOverTimeEffect( m_Effect as OverTimeEffect );
+				_User.AddOverTimeEffect( m_Effect as OverTimeEffect ); // Also, calling "Target.AddOverTimeEffect", makes more sense when an attack applies an over time effect. At least I think so at the moment of writing this; might revisit this later.
 			else
 				m_Effect.Activate( _User );
 
-			GameManager.Instance.rPlayer1.GetInventory.RemoveItem( this, false );
+			GameManager.Instance.rPlayer1.GetInventory.RemoveItem( this, false );	// 
 			EquipmentManager.Instance.EquipWheel.UpdateWheel();
 		}
 		// Tries to equip this item. Removes it from inventory if it succeeds, also adds previous items back to inventory. Adds this item back to inventory if it was already equipped.

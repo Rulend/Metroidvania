@@ -25,6 +25,7 @@ public class InventoryItem : ScriptableObject // If it doesn't inherit from scri
 	public string		m_ItemDescription	= "No item description yet."; // The description that shows up when hovering an item.
 																		  //	public int			m_ItemValue			= 0;						// The rarity or "value" of the item. Can be used to prompt a "Are you sure you want to use that"-check.
 
+	
 	public virtual void Use( int _Amount = 1, Character _User = null )
 	{
 		// Use the item, but do something different depending on what type it is. That's why this function is virtual

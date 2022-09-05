@@ -120,11 +120,23 @@ public class PlayerController : MonoBehaviour
 	}
 
 
+	////////////////////////////////////////////////
+	/// Method Information - RemoveItem
+	/// 
+	/// Removes an item from the player's inventory.
+	/// 
+	/// parameters:
+	/// pr_ItemToRemove		: the item which should be removed from the inventory.
+	/// pr_SpawnItemPickup	: whether or not an item pickup should be spawned on the ground after removing the item. Used when dropping an item.
+	/// 
+	////////////////////////////////////////////////
+
 	void TakeInput(  )
     {
 
 		// TODO: Look up how to handle the input from a joystick based on how much it's being tilted in a direction. Tilting it fully should move the player faster than tilting it just a small bit.
 		// TODO: Setup so that the type of buttons with available pressing depends on what kind of control-state it is currently in. If NOJUMP is set, then don't allow jumping, don't even check for jumping.
+		// TODO:: Optimize this monster of a mess
 
 		// Temporary reset function. Once a loading screen has been implemented, play the loading screen and respawn player at last checkpoint.
 		if ( m_ActionReset.triggered )
@@ -171,7 +183,7 @@ public class PlayerController : MonoBehaviour
 					if ( m_ActionInteract.triggered )
 					{
 						if ( CanInteract() )
-							m_rPlayer.m_CurrentlyFocusedInteractable.Interact(); // Invoke an event called Interact, which invokes it on the closest one which should be subscribed to the event.
+							m_rPlayer.m_CurrentlyFocusedInteractable.Interact(); //TODO:: Invoke an event called Interact, which invokes it on the closest one which should be subscribed to the event.
 					}
 
 					if ( m_ActionOpenMenu.triggered )
@@ -188,7 +200,7 @@ public class PlayerController : MonoBehaviour
 
 					if ( m_ActionUseCurrentConsumable.triggered )
 					{
-						Debug.Log( "Using current consumable" );
+						//Debug.Log( "Using current consumable" );
 						EquipmentManager.Instance.EquipWheel.UseCurrentConsumable( m_rPlayer );
 					}
 

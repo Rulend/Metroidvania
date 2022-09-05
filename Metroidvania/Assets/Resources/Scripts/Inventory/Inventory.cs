@@ -15,6 +15,7 @@ public class Inventory : MonoBehaviour
 
 	// TODO:: Replace all of these lists with indices instead, so that all of them can use the same list.
 	// In other words, a start index and a count of how many of that item type exists.
+	// Note: Since I wrote the above comment I've changed these to dictionaries; don't think it's really all that practical to change it now. I'll have to look at it sometime soon.
 	private Dictionary<InventoryItem, int>	m_Consumables;
 	private Dictionary<InventoryItem, int>	m_QuestItems;
 	private Dictionary<InventoryItem, int>	m_MiscItems;
@@ -34,7 +35,7 @@ public class Inventory : MonoBehaviour
 
 	private void Start()
 	{
-		string ItemPickupPrefabFilePath = "Prefabs/ItemPickup";
+		string ItemPickupPrefabFilePath = "Prefabs/Prefab_ItemPickup";
 
 		m_ItemPickupPrefab = (GameObject)Resources.Load( ItemPickupPrefabFilePath );
 
@@ -65,8 +66,10 @@ public class Inventory : MonoBehaviour
 		GearDictionaries.Add( m_FeetEquipment );
 	}
 
+
+
 	////////////////////////////////////////////////
-	/// Function information - AddItem
+	/// Method Information - AddItem
 	/// 
 	/// Adds an item to the inventory.
 	/// 
@@ -75,80 +78,77 @@ public class Inventory : MonoBehaviour
 	///					space in inventory, otherwise returns true.
 	/// 
 	/// parameters:
-	/// pr_ItemToAdd	: the item that should be added to inventory.
+	/// _ItemToAdd	: the item that should be added to inventory.
 	/// 
 	////////////////////////////////////////////////
 	public bool AddItem( InventoryItem _ItemToAdd )
 	{
 		// Is it stackable? Is there space in that stack? Is the inventory full? TODO:: Check these stuff.
 
-		if ( !_ItemToAdd.m_DefaultItem )
+		if ( _ItemToAdd.m_DefaultItem )
 		{
-			Dictionary<InventoryItem, int> DictionaryToPlaceIn = new Dictionary<InventoryItem, int>();
+			// TODO:: Add a define for testing vs running the game
+			Debug.Log( "Can't add a default item to the inventory." );
+			return false;
+		}
 
 
-			switch ( _ItemToAdd.m_ItemType )
-			{
-				case ITEMTYPE.ITEMTYPE_MISC:
-					{
-						DictionaryToPlaceIn = m_MiscItems;
-					}
-					break;
 
-				case ITEMTYPE.ITEMTYPE_CONSUMABLE:
-					{
-						DictionaryToPlaceIn = m_Consumables;
-					}
-					break;
+		Dictionary<InventoryItem, int> DictionaryToPlaceIn = new Dictionary<InventoryItem, int>();
 
-				case ITEMTYPE.ITEMTYPE_EQUIPMENT:
-					{
-						Equipment Item = (Equipment)_ItemToAdd;
 
-						switch ( Item.m_Equipmentslots )
-						{
-							case EquipmentSlot.EQUIPMENTSLOT_WEAPON:		DictionaryToPlaceIn = m_WeaponEquipment;	break;
-							case EquipmentSlot.EQUIPMENTSLOT_HEAD:			DictionaryToPlaceIn = m_HeadEquipment;		break;
-							case EquipmentSlot.EQUIPMENTSLOT_CHEST:			DictionaryToPlaceIn = m_ChestEquipment;		break;
-							case EquipmentSlot.EQUIPMENTSLOT_GAUNTLETS:		DictionaryToPlaceIn = m_HandEquipment;		break;
-							case EquipmentSlot.EQUIPMENTSLOT_LEGS:			DictionaryToPlaceIn = m_LegEquipment;		break;
-							case EquipmentSlot.EQUIPMENTSLOT_FEET:			DictionaryToPlaceIn = m_FeetEquipment;		break;
-						}
-					}
-					break;
-
-				case ITEMTYPE.ITEMTYPE_QUEST:
-					{
-						DictionaryToPlaceIn = m_QuestItems;
-					}
-					break;
-			}
-
-			// TODO:: Check if the item is stackable. If it is, search through the inventory to see if it already exists. If it does, increase the stack amount rather than adding it.
-			// TODO:: If the item already exists, don't do this:
-
-			if ( _ItemToAdd.m_Stackable )
-			{
-				if ( DictionaryToPlaceIn.ContainsKey( _ItemToAdd ) )
+		switch ( _ItemToAdd.m_ItemType )
+		{
+			case ITEMTYPE.ITEMTYPE_MISC:
 				{
-					DictionaryToPlaceIn[ _ItemToAdd ] += 1;
-					Debug.Log( "Item was stackable and already in inventory, increasing count." );
+					DictionaryToPlaceIn = m_MiscItems;
 				}
-				else
+				break;
+
+			case ITEMTYPE.ITEMTYPE_CONSUMABLE:
 				{
-					DictionaryToPlaceIn.Add( _ItemToAdd, 1 );
-					Debug.Log( "Item is stackable but the examined instance does not already exist in inventory.,," );
+					DictionaryToPlaceIn = m_Consumables;
 				}
+				break;
 
-				InventoryUpdateEvent.Invoke( DictionaryToPlaceIn );
-				EquipmentManager.Instance.EquipWheel.UpdateWheel();
+			case ITEMTYPE.ITEMTYPE_EQUIPMENT:
+				{
+					Equipment Item = (Equipment)_ItemToAdd;
 
-				return true;
+					switch ( Item.m_Equipmentslots )
+					{
+						case EquipmentSlot.EQUIPMENTSLOT_WEAPON:		DictionaryToPlaceIn = m_WeaponEquipment;	break;
+						case EquipmentSlot.EQUIPMENTSLOT_HEAD:			DictionaryToPlaceIn = m_HeadEquipment;		break;
+						case EquipmentSlot.EQUIPMENTSLOT_CHEST:			DictionaryToPlaceIn = m_ChestEquipment;		break;
+						case EquipmentSlot.EQUIPMENTSLOT_GAUNTLETS:		DictionaryToPlaceIn = m_HandEquipment;		break;
+						case EquipmentSlot.EQUIPMENTSLOT_LEGS:			DictionaryToPlaceIn = m_LegEquipment;		break;
+						case EquipmentSlot.EQUIPMENTSLOT_FEET:			DictionaryToPlaceIn = m_FeetEquipment;		break;
+					}
+				}
+				break;
+
+			case ITEMTYPE.ITEMTYPE_QUEST:
+				{
+					DictionaryToPlaceIn = m_QuestItems;
+				}
+				break;
+		}
+
+		// TODO:: Check if the item is stackable. If it is, search through the inventory to see if it already exists. If it does, increase the stack amount rather than adding it.
+		// TODO:: If the item already exists, don't do this:
+
+		if ( _ItemToAdd.m_Stackable )
+		{
+			if ( DictionaryToPlaceIn.ContainsKey( _ItemToAdd ) )
+			{
+				DictionaryToPlaceIn[ _ItemToAdd ] += 1;
+				Debug.Log( "Item was stackable and already in inventory, increasing count." );
 			}
-
-			InventoryItem InstancedItem = Object.Instantiate( _ItemToAdd ); // This needs to be done since otherwise there will only be one instance of the object. That's how it works.
-
-			DictionaryToPlaceIn.Add( InstancedItem, 1 );
+			else
+			{
+				DictionaryToPlaceIn.Add( _ItemToAdd, 1 );
+				Debug.Log( "Item is stackable but the examined instance does not already exist in inventory.,," );
+			}
 
 			InventoryUpdateEvent.Invoke( DictionaryToPlaceIn );
 			EquipmentManager.Instance.EquipWheel.UpdateWheel();
@@ -156,13 +156,21 @@ public class Inventory : MonoBehaviour
 			return true;
 		}
 
+		InventoryItem InstancedItem = Object.Instantiate( _ItemToAdd ); // This needs to be done since otherwise there will only be one instance of the object. That's how it works.
+
+		DictionaryToPlaceIn.Add( InstancedItem, 1 );
+
+		InventoryUpdateEvent.Invoke( DictionaryToPlaceIn );
+		EquipmentManager.Instance.EquipWheel.UpdateWheel();
+
+		return true;
 		// TODO:: Show the player a prompt that tells them why they couldn't add the item.
-		Debug.Log( "Couldn't add item to inventory. \n" );
-		return false;
 	}
 
+
+
 	////////////////////////////////////////////////
-	/// Function information - RemoveItem
+	/// Method Information - RemoveItem
 	/// 
 	/// Removes an item from the player's inventory.
 	/// 
@@ -171,7 +179,6 @@ public class Inventory : MonoBehaviour
 	/// pr_SpawnItemPickup	: whether or not an item pickup should be spawned on the ground after removing the item. Used when dropping an item.
 	/// 
 	////////////////////////////////////////////////
-
 	public void RemoveItem( InventoryItem _ItemToRemove, bool _SpawnItemPickup = true )
 	{
 		Dictionary<InventoryItem, int> DictionaryToUpdate = new Dictionary<InventoryItem, int>();
@@ -247,7 +254,19 @@ public class Inventory : MonoBehaviour
 	}
 
 
-
+	////////////////////////////////////////////////
+	/// Method Information - GetEquipmentGear
+	/// 
+	/// Desc:	Returns the dictionary that contains gear
+	///			of the selected equipmentslot
+	/// 
+	/// return	value: the dictionary with gear of the selected
+	///			equipmentslot
+	/// 
+	/// parameters:
+	/// _ItemEquipSlot: which type of dictionary to get
+	/// 
+	////////////////////////////////////////////////
 	public Dictionary<InventoryItem, int> GetEquipmentGear( EquipmentSlot _ItemEquipSlot ) 
 	{
 		Dictionary<InventoryItem, int> ReturnedDictionary = new Dictionary<InventoryItem, int>();

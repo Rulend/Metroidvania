@@ -36,7 +36,7 @@ public class ItemSlot : MonoBehaviour
 
 
 	////////////////////////////////////////////////
-	/// Function information - AddItemToSlot
+	/// Method Information - AddItemToSlot
 	/// 
 	/// Adds an item to a an itemslot.
 	/// 
@@ -66,7 +66,7 @@ public class ItemSlot : MonoBehaviour
 
 
 	////////////////////////////////////////////////
-	/// Function information - RemoveItemFromSlot
+	/// Method Information - RemoveItemFromSlot
 	/// 
 	/// Removes the item from the slot, sets the slot icon to null, and disables the icon.
 	/// 
@@ -91,7 +91,7 @@ public class ItemSlot : MonoBehaviour
 
 
 	////////////////////////////////////////////////
-	/// Function information - DisplayItemInfo
+	/// Method Information - DisplayItemInfo
 	/// 
 	/// Displays information about an item while hovering over it with the mouse.
 	/// 
@@ -119,7 +119,7 @@ public class ItemSlot : MonoBehaviour
 
 
 	////////////////////////////////////////////////
-	/// Function information - ButtonShowItemSlotOptions
+	/// Method Information - ButtonShowItemSlotOptions
 	/// 
 	/// Shows a submenu for when left clicking on an item slot that contains an item. 
 	///	Brings up a different submenu for different item-types.
@@ -169,8 +169,10 @@ public class ItemSlot : MonoBehaviour
 			HideItemSlotOptions();
 	}
 
+
+
 	////////////////////////////////////////////////
-	/// Function information - HideItemSlotOptions
+	/// Method Information - HideItemSlotOptions
 	/// 
 	/// Hides the current ItemSlotsSubmenu.
 	/// 
@@ -185,42 +187,64 @@ public class ItemSlot : MonoBehaviour
 		{
 			m_rInventoryUI.SlotMenuCurrent.SetActive( false );
 
-			Debug.Log( "Hiding the current inventory slot options... (-w- )" );
+			//Debug.Log( "Hiding the current inventory slot options... (-w- )" );
 		}
 	}
 
 
-	private void PositionUIPanelNextToSlot( GameObject pr_PanelToPosition )
-	{	
-		RectTransform PanelRectTransform = pr_PanelToPosition.GetComponent<RectTransform>();
 
-		float PanelWidth	= PanelRectTransform.rect.width		* PanelRectTransform.localScale.x;
-		float Panelheight	= PanelRectTransform.rect.height	* PanelRectTransform.localScale.y;
+	////////////////////////////////////////////////
+	/// Method Information - PositionUIPanelNextToSlot
+	/// 
+	/// Desc:	Currently only used to position the ItemInfo-panel,
+	///			this method is a relic from when the game was more 
+	///			mouse oriented.
+	/// 
+	/// return value: void
+	/// 
+	/// parameters:
+	///			_PanelToPosition - the panel that should be positioned 
+	///			next to the slot, inside the screen.
+	////////////////////////////////////////////////
+	private void PositionUIPanelNextToSlot( GameObject _PanelToPosition )
+	{	
+		RectTransform PanelRectTransform = _PanelToPosition.GetComponent<RectTransform>();
+
+		float PanelWidth	= PanelRectTransform.rect.width	 * PanelRectTransform.localScale.x;
+		float Panelheight	= PanelRectTransform.rect.height * PanelRectTransform.localScale.y;
 
 		float NewPanelPosX = gameObject.transform.position.x + ( PanelWidth / 2.0f ) + ( gameObject.GetComponent<RectTransform>().rect.width / 2.0f ) + 5.0f;
 		float NewPanelPosY = gameObject.transform.position.y - ( Panelheight * 0.75f );
 
-		if ( NewPanelPosX + ( PanelWidth * 0.25f ) > Screen.width ) // If the panel would be put outside the screen by more than 25%
+		if ( NewPanelPosX + ( PanelWidth * 0.25f ) > Screen.width ) // If the panel would be put outside the screen on the right by more than 25%
 		{
-			NewPanelPosX = gameObject.transform.position.x - ( PanelWidth / 2.0f ) - ( gameObject.GetComponent<RectTransform>().rect.width / 2.0f ) - 5.0f;
-			Debug.Log( $"Had to move xposition of {pr_PanelToPosition.name}, it would have been outside the screen on the right." );
+			NewPanelPosX = gameObject.transform.position.x - ( PanelWidth / 2.0f ) - ( gameObject.GetComponent<RectTransform>().rect.width / 2.0f ) - 5.0f; // Put _PanelToPosition to the left of this slot, far enough away to not overlap + 5.0f.
+			Debug.Log( $"Had to move xposition of {_PanelToPosition.name}, it would have been outside the screen on the right." );
 		}
 
-		if ( NewPanelPosY + m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.height > Screen.height )
+		if ( NewPanelPosY + m_rInventoryUI.SlotMenuCurrent.GetComponent<RectTransform>().rect.height > Screen.height ) // If panel would go below the screen, position it upwards.
 		{
-			NewPanelPosY += 100.0f; // TODO: Don't let this be static.
-			Debug.Log( $"Had to move yposition of {pr_PanelToPosition.name}, it would have been below the screen." );
+			NewPanelPosY += 100.0f; // TODO: Make this adjustable.
+			Debug.Log( $"Had to move yposition of {_PanelToPosition.name}, it would have been below the screen." );
 		}
 
 		Vector3 NewSlotMenuPos = new Vector3( NewPanelPosX, NewPanelPosY, 0.0f );
 
-		pr_PanelToPosition.transform.position = NewSlotMenuPos;
+		_PanelToPosition.transform.position = NewSlotMenuPos;
 	}
 
 
-	// Button-functions to be called from the UI
-
-
+	////////////////////////////////////////////////
+	/// Method Information - ButtonUseItem
+	/// 
+	/// Desc:	Uses the item. For a consumable, this will consume it. 
+	///			For an equipment, this will equip it, etc.
+	/// 
+	/// return value: void
+	/// 
+	/// parameters:
+	/// N/A
+	////////////////////////////////////////////////
 	// "Uses" the item. For a consumable, this will consume it. For an equipment, this will equip it, etc.
 	public void ButtonUseItem()
 	{
@@ -231,7 +255,7 @@ public class ItemSlot : MonoBehaviour
 			if ( m_Item.m_DefaultItem )
 				return;
 
-			m_Item.Use( m_Amount );
+			m_Item.Use( m_Amount, GameManager.Instance.rPlayer1 ); // TODO URGENT:: Fix this monstrosity, not a good way to get the player
 		}
 	}
 }

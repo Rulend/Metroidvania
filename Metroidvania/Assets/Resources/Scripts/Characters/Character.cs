@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public class Character : MonoBehaviour
 {
 	public float MaxHealth => m_MaxHealth;
+	public float MaxMana => m_MaxMana;
 
 
     // Protected member variables

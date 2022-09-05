@@ -46,18 +46,34 @@ public class OverTimeEffect : ConsumableEffect
 		switch ( m_EffectType )
 		{
 			case EOverTimeEffect.RestoreHealth:
-				m_EffectOverTimeEvent += Effect.RestoreHealth;
+				{
+					m_EffectOverTimeEvent += Effect.RestoreHealth;
 
-				m_AmountAffectedStat = _Affected.MaxHealth;
+					m_AmountAffectedStat = _Affected.MaxHealth;
+				}
 				break;
+
 			case EOverTimeEffect.RestoreMana:
-				break;
-			case EOverTimeEffect.DecreaseHealth:
-				m_EffectOverTimeEvent += Effect.DecreaseHealth;
+				{
+					m_EffectOverTimeEvent += Effect.RestoreMana;
 
+					m_AmountAffectedStat = _Affected.MaxMana;
+				}
 				break;
+
+			case EOverTimeEffect.DecreaseHealth:
+				{
+					m_EffectOverTimeEvent += Effect.DecreaseHealth;
+
+				}
+				break;
+
 			case EOverTimeEffect.DecreaseMana:
+				{
+
+				}
 				break;
+
 			default:
 				break;
 		}
@@ -117,6 +133,12 @@ public class Effect
 	public static void RestoreHealth( Character _Character, float _Amount )
 	{
 		_Character.RestoreHealth( _Amount );
+	}
+
+
+	public static void RestoreMana( Character _Character, float _Amount )
+	{
+		_Character.RestoreMana( _Amount );
 	}
 
 	public static void DecreaseHealth( Character _Character, float _Amount )
