@@ -86,9 +86,11 @@ public class OverTimeEffect : ConsumableEffect
 			m_TotalEffectStrength = m_AmountAffectedStat * m_TotalEffectStrength;
 
 		// If EfectCooldownDuration is left at 0 when creating an OTE, then it should be applied every frame. To do that, we need to substitute it's value for the framerate.
-		float DivisionValue = ( m_EffectCooldownDuration == 0.0f ? Time.deltaTime : m_EffectCooldownDuration );
+		// Actually, about the comment above this line; for whatever reason this doesn't work correctly if framerate is above 60. 
+		// TODO:: Find out why.
+		float EffectCooldownDuration = ( m_EffectCooldownDuration > 0.0f ? m_EffectCooldownDuration : Time.deltaTime );
 
-		m_EffectPerTick = m_TotalEffectStrength / ( m_Duration / DivisionValue );
+		m_EffectPerTick = m_TotalEffectStrength / ( m_Duration / EffectCooldownDuration);
 	}
 
 // TODO:: Add a choice to add an effect at the end of the duration

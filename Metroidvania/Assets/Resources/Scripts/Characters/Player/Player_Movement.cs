@@ -37,11 +37,12 @@ public class Player_Movement : Character_Movement
 	// State machine for player
 	private enum EPlayerState
 	{
-		PLAYERSTATE_IDLE	= 0	,
-		PLAYERSTATE_RUNNING		,
-		PLAYERSTATE_JUMPING		,
-		PLAYERSTATE_FALLING		,
-		PLAYERSTATE_SLIDING		,
+		PlayerState_Idle	= 0	,
+		PlayerState_Running		,
+		PlayerState_Rolling		,
+		PlayerState_Jumping		,
+		PlayerState_Falling		,
+		PlayerState_Sliding		,
 	}
 
 
@@ -64,7 +65,7 @@ public class Player_Movement : Character_Movement
 	{
 		float DeltaTime = Time.deltaTime;
 
-		//m_CoyoteTimeLeft			-= DeltaTime;	// Only needs to be decreased inside STATE_FALLING.
+		//m_CoyoteTimeLeft			-= DeltaTime;	// Only needs to be decreased inside STATE_Falling.
 		m_SlideCooldownTimeLeft		-= DeltaTime;
 	}
 
@@ -75,7 +76,7 @@ public class Player_Movement : Character_Movement
 		m_GravityVelocity.y += m_Gravity * ( -9.82f ) * Time.fixedDeltaTime;
 		m_GravityVelocity.y = Mathf.Clamp( m_GravityVelocity.y, -50.0f, 20.0f );
 
-		// Set to false if player is jumping, set to true if collision is found underneath the player
+		// Set to false if player is Jumping, set to true if collision is found underneath the player
 		m_Grounded = CheckForGround();
 		m_rAnimator.SetBool( "Grounded", m_Grounded );
 
@@ -91,62 +92,75 @@ public class Player_Movement : Character_Movement
 		// Temporarily like this until I make it better
 		switch ( m_CurrentState )
 		{
-			case EPlayerState.PLAYERSTATE_IDLE:
-				// Play idle animation
-
-				break;
-			case EPlayerState.PLAYERSTATE_RUNNING:
-				// Play running animation
-
-				break;
-			case EPlayerState.PLAYERSTATE_JUMPING:
-
-				m_JumpWindowTimeLeft -= Time.fixedDeltaTime;
-
-				m_GravityVelocity.y = 0.0f; // Set velocity to 0 so player isn't pushed down
-				m_rRigidbody.AddForce( new Vector3( 0.0f, ( m_MaxJumpHeight / m_JumpWindowDuration ), 0.0f ), ForceMode.VelocityChange ); // Use velocity in order to move the player upwards // This way sucks, because the jump becomes really floaty
-
-				if ( m_JumpWindowTimeLeft <= 0.0f )
-					SetState( EPlayerState.PLAYERSTATE_FALLING );
-
-				break;
-			case EPlayerState.PLAYERSTATE_FALLING:
-
-				m_CoyoteTimeLeft -= Time.fixedDeltaTime; // Decrease this in here
-
-				m_DistanceFallen += -0.01f * m_GravityVelocity.y;	// Might revisit this amount later, for now it works.
-
-				// TODO: Remove this, it ain't a good way to use a state machine.
-				if ( m_Grounded )
+			case EPlayerState.PlayerState_Idle:
 				{
-					if ( m_DistanceFallen > m_FallDamageThreshold )
-					{
-						Damage FallDamage = new Damage();
-						FallDamage.m_Type = DamageTypes.DT_TRUEDAMAGE;
-						FallDamage.m_Amount = ( m_DistanceFallen - m_FallDamageThreshold );
+					// Idle animation will play.
+				}
+				break;
 
-						m_rPlayer.TakeDamage( FallDamage );	// Take damage equal to distance fallen - the threshold
-						Debug.Log( $"Fell { m_DistanceFallen } and took { m_DistanceFallen - m_FallDamageThreshold } damage from falling. \n" );
+			case EPlayerState.PlayerState_Running:
+				{
+					// Running animation will play.
+				}
+				break;
+
+			case EPlayerState.PlayerState_Rolling:
+				{
+
+				}
+				break;
+
+			case EPlayerState.PlayerState_Jumping:
+				{
+					m_JumpWindowTimeLeft -= Time.fixedDeltaTime;
+
+					m_GravityVelocity.y = 0.0f; // Set velocity to 0 so player isn't pushed down
+					m_rRigidbody.AddForce(new Vector3(0.0f, (m_MaxJumpHeight / m_JumpWindowDuration), 0.0f), ForceMode.VelocityChange); // Use velocity in order to move the player upwards // This way sucks, because the jump becomes really floaty
+
+					if (m_JumpWindowTimeLeft <= 0.0f)
+						SetState(EPlayerState.PlayerState_Falling);
+				}
+				break;
+
+			case EPlayerState.PlayerState_Falling:
+				{
+					m_CoyoteTimeLeft -= Time.fixedDeltaTime; // Decrease this in here
+
+					m_DistanceFallen += -0.01f * m_GravityVelocity.y;   // Will revisit this later revisit this amount later, for now it works.
+
+					// TODO: Remove this, it ain't a good way to use a state machine.
+					if ( m_Grounded )
+					{
+						if ( m_DistanceFallen > m_FallDamageThreshold )
+						{
+							Damage FallDamage = new Damage();
+							FallDamage.m_Type = DamageTypes.DT_TRUEDAMAGE;
+							FallDamage.m_Amount = (m_DistanceFallen - m_FallDamageThreshold);
+
+							m_rPlayer.TakeDamage( FallDamage );   // Take damage equal to distance fallen - the threshold
+							Debug.Log($"Fell { m_DistanceFallen } and took { m_DistanceFallen - m_FallDamageThreshold } damage from Falling. \n");
+						}
+
+						m_DistanceFallen = 0.0f;
+						SetState(EPlayerState.PlayerState_Idle);
+					}
+				}
+				break;
+
+			case EPlayerState.PlayerState_Sliding:
+				{
+					if ( m_SlideDistanceLeft > 0.0f )
+					{
+						Slide();
+						m_FullBodyCollider.enabled = false;
+					}
+					else
+					{
+						SetState(EPlayerState.PlayerState_Idle);
+						m_FullBodyCollider.enabled = true;
 					}
 
-					m_DistanceFallen = 0.0f;
-					SetState( EPlayerState.PLAYERSTATE_IDLE );
 				}
-
-				break;
-			case EPlayerState.PLAYERSTATE_SLIDING:
-
-				if ( m_SlideDistanceLeft > 0.0f ) 
-				{
-					Slide();
-					m_FullBodyCollider.enabled = false;
-				}
-				else
-				{
-					SetState( EPlayerState.PLAYERSTATE_IDLE );
-					m_FullBodyCollider.enabled = true;
-				}
-
 				break;
 
 			default:
@@ -154,66 +168,89 @@ public class Player_Movement : Character_Movement
 		}
 
 		if ( m_GravityVelocity.y < 0.0f )
-			SetState( EPlayerState.PLAYERSTATE_FALLING );
+			SetState( EPlayerState.PlayerState_Falling );
 
 		m_rRigidbody.velocity = ( m_MovementVelocity + m_GravityVelocity );
 	}
 
 
-	private void SetState( EPlayerState pr_State )
+	private void SetState( EPlayerState _State )
 	{
 		m_PreviousState = m_CurrentState;
-		m_CurrentState	= pr_State;
+		m_CurrentState	= _State;
 
 		// Switch on previous state
 		switch( m_PreviousState )
 		{
-			case EPlayerState.PLAYERSTATE_IDLE:
+			case EPlayerState.PlayerState_Idle:
+				{
 
-
+				}
 				break;
-			case EPlayerState.PLAYERSTATE_RUNNING:
 
+			case EPlayerState.PlayerState_Running:
+				{
 
+				}
 				break;
-			case EPlayerState.PLAYERSTATE_JUMPING:
-				m_rAnimator.SetBool( "Jumping", false ); // Has to be set here instead of above, because this state can also be entered by releasing the space key
 
+			case EPlayerState.PlayerState_Jumping:
+				{
+
+					m_rAnimator.SetBool( "Jumping", false ); // Has to be set here instead of above, because this state can also be entered by releasing the space key
+				}
 				break;
-			case EPlayerState.PLAYERSTATE_FALLING:
-				m_rAnimator.SetBool( "Falling", false );
 
+			case EPlayerState.PlayerState_Falling:
+				{
+					m_rAnimator.SetBool( "Falling", false );
+				}
 				break;
-			case EPlayerState.PLAYERSTATE_SLIDING:
-				m_rAnimator.SetBool( "Sliding", false );
 
-				m_SlideCollider.enabled		= false;
-				m_FullBodyCollider.enabled	= true;
+			case EPlayerState.PlayerState_Sliding:
+				{
+					m_rAnimator.SetBool( "Sliding", false );
 
+					m_SlideCollider.enabled		= false;
+					m_FullBodyCollider.enabled	= true;
+				}
 				break;
 		}
 
 		// Switch on new state
-		switch ( pr_State )
+		switch ( _State )
 		{
-			case EPlayerState.PLAYERSTATE_IDLE:
-
+			case EPlayerState.PlayerState_Idle:
+				{
+				}
 				break;
-			case EPlayerState.PLAYERSTATE_RUNNING:
 
+			case EPlayerState.PlayerState_Running:
+				{
+				}
 				break;
-			case EPlayerState.PLAYERSTATE_JUMPING:
 
-				m_rAnimator.SetBool( "Jumping", true );
-
+			case EPlayerState.PlayerState_Jumping:
+				{
+					m_rAnimator.SetBool( "Jumping", true );
+				}
 				break;
-			case EPlayerState.PLAYERSTATE_FALLING:
 
-				m_rAnimator.SetBool( "Falling", true );
-
+			case EPlayerState.PlayerState_Falling:
+				{
+					m_rAnimator.SetBool( "Falling", true );
+				}
 				break;
-			case EPlayerState.PLAYERSTATE_SLIDING:
 
+			case EPlayerState.PlayerState_Sliding:
+				{
+					m_SlideCooldownTimeLeft		= m_SlideCooldownDuration;
+					m_SlideDistanceLeft			= m_SlideDistanceTotal;
+					m_CurrentState				= EPlayerState.PlayerState_Sliding;
+					m_FullBodyCollider.enabled	= false;
+					m_SlideCollider.enabled		= true;
+
+				}
 				break;
 		}
 
@@ -225,11 +262,7 @@ public class Player_Movement : Character_Movement
 		if ( m_SlideCooldownTimeLeft > 0.0f )
 			return;
 
-		m_SlideCooldownTimeLeft		= m_SlideCooldownDuration;
-        m_SlideDistanceLeft			= m_SlideDistanceTotal;
-		m_CurrentState				= EPlayerState.PLAYERSTATE_SLIDING;
-		m_FullBodyCollider.enabled	= false;
-		m_SlideCollider.enabled		= true;
+		SetState( EPlayerState.PlayerState_Sliding );
     }
 
 	private void Slide()
@@ -248,7 +281,7 @@ public class Player_Movement : Character_Movement
 	// Timers that always need to be decreased, regardless of state
 	private void DecreaseTimersDT( float pr_DeltaTime )
 	{
-//		m_CoyoteTimeLeft			-= pr_DeltaTime;	// Only needs to be decreased inside STATE_FALLING.
+//		m_CoyoteTimeLeft			-= pr_DeltaTime;	// Only needs to be decreased inside STATE_Falling.
 		m_SlideCooldownTimeLeft		-= pr_DeltaTime;
 	}
 
@@ -267,8 +300,8 @@ public class Player_Movement : Character_Movement
 		m_MovementDirection = Vector3.Cross( ( new Vector3( 0.0f, 0.0f, -pr_LRInput ) ), m_GroundNormal );
 
 		// Update animator and apply movement
-		m_rAnimator.SetFloat( "Moving", Mathf.Abs( pr_LRInput ), 0.05f, Time.deltaTime );   // TODO: Switch the string out for ID later.
-		m_MovementVelocity = m_MovementDirection * m_CurrentMovementSpeed * Time.fixedDeltaTime;    // Rigidbody way
+		m_rAnimator.SetFloat( "Moving", Mathf.Abs( pr_LRInput ), 0.05f, Time.deltaTime );			// TODO: Switch the string out for ID later.
+		m_MovementVelocity = m_MovementDirection * m_CurrentMovementSpeed * Time.fixedDeltaTime;	// Rigidbody way
 
 		//m_rRigidbody.velocity = ( m_MovementVelocity + m_GravityVelocity );
 		//m_rRigidbody.MovePosition()
@@ -295,7 +328,7 @@ public class Player_Movement : Character_Movement
 	{
 		if ( m_CoyoteTimeLeft > 0.0f )
 		{
-			SetState( EPlayerState.PLAYERSTATE_JUMPING );
+			SetState( EPlayerState.PlayerState_Jumping );
 			m_CoyoteTimeLeft	= 0.0f;
 		}
 	}
@@ -304,17 +337,17 @@ public class Player_Movement : Character_Movement
 
 	public void StopJump()
 	{
-		if ( m_CurrentState == EPlayerState.PLAYERSTATE_JUMPING )
-			SetState( EPlayerState.PLAYERSTATE_FALLING ); 
+		if ( m_CurrentState == EPlayerState.PlayerState_Jumping )
+			SetState( EPlayerState.PlayerState_Falling ); 
 	}
 
 
-
+	// TODO:: Rework this mess
     bool CheckForGround()
     {
 		m_GroundNormal = Vector3.up;
 
-		if ( m_CurrentState == EPlayerState.PLAYERSTATE_JUMPING )
+		if ( m_CurrentState == EPlayerState.PlayerState_Jumping )
 			return false;
 
 		// if ( DownInput && Down.Raycast == fallthrough )

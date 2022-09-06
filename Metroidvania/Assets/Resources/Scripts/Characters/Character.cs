@@ -90,6 +90,9 @@ public class Character : MonoBehaviour
 
 	public virtual void TakeDamage( Damage _IncomingDamage )
 	{
+		// TODO:: Make the damage class contain an array or a list of different damages;
+		// loop through those damages in here and decrease them based on resistances
+
 		float FinalDamage = _IncomingDamage.m_Amount;
 
 		if ( _IncomingDamage.m_Type != DamageTypes.DT_TRUEDAMAGE )

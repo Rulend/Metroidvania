@@ -17,7 +17,7 @@ MonoBehaviour:
   m_ItemName: Bottle of Poison (S)
   m_DefaultItem: 0
   m_Stackable: 1
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 21300000, guid: a8080edccceed7848b852c1f66052e53, type: 3}
   m_ItemType: 0
   m_ItemDescription: A small bottle of cheap poison. Easy to make and detect.
   m_Mesh: {fileID: 0}
