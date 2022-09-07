@@ -250,6 +250,8 @@ public class Player_Movement : Character_Movement
 					m_FullBodyCollider.enabled	= false;
 					m_SlideCollider.enabled		= true;
 
+					m_rAnimator.SetBool( "Sliding", true );
+
 				}
 				break;
 		}
