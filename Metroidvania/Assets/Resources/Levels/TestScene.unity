@@ -20365,10 +20365,15 @@ MonoBehaviour:
   m_FallDamageThreshold: 10
   m_MaxJumpHeight: 3.3
   m_JumpWindowDuration: 0.3
+  m_RollCooldownDuration: 0.75
+  m_RollDuration: 0.5
+  m_RollDistanceTotal: 2.8
+  m_SlideCooldownDuration: 0.75
   m_SlideDuration: 0.25
-  m_SlideDistanceTotal: 0.5
+  m_SlideDistanceTotal: 2.8
   m_FullBodyCollider: {fileID: 1972942622}
   m_SlideCollider: {fileID: 1972942621}
+  m_CurrentState: 0
 --- !u!114 &1972942618
 MonoBehaviour:
   m_ObjectHideFlags: 0

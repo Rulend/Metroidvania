@@ -16,6 +16,8 @@ public class PlayerController : MonoBehaviour
 		NUM_PCSTATES
 	}
 
+	// TODO:: I know this is the PlayerController but uh, another look at how input is taken is defenitively required. There's so many variables in here that aren't needed.
+	// An easy way to solve it would be to have lists with the actions in, and then use an enum to check individual button inputs; another would be to make use of the context-based functions 
 
 	// Movement variables.
 	private bool	m_ActiveInput	= true;
@@ -63,6 +65,7 @@ public class PlayerController : MonoBehaviour
 
 	void Awake()
     {
+		// Setup all the action maps
 		m_ActionMaps = new InputActionMap[ (int)EPlayerControllerState.NUM_PCSTATES ];
 		m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ]		= m_InputActionAsset.FindActionMap( "MainGame" );
 		m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ]		= m_InputActionAsset.FindActionMap( "Menu" );
@@ -70,6 +73,7 @@ public class PlayerController : MonoBehaviour
 		m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Dialogue ]	= m_InputActionAsset.FindActionMap( "Dialogue" );
 
 
+		// Set up actions for the menu
 		m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].Enable();
 		m_ActionMenuConfirm			= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "Confirm" );
 		m_ActionMenuAlternative1	= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "Alternative1" );
@@ -81,6 +85,7 @@ public class PlayerController : MonoBehaviour
 		m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].Disable();
 
 
+		// Setup the actions for gameplay
 		m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].Enable();
 		m_ActionMovement				= 	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "Move" );
 		m_ActionUseCurrentConsumable	= 	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "UseCurrentConsumable" );
@@ -170,7 +175,7 @@ public class PlayerController : MonoBehaviour
 					// Always read this input TODO:: cHECK IF READING ALWAYS IS NECESSARY!	
 					m_LRInput = m_ActionMovement.ReadValue<Vector2>().x;
 
-
+					// Jump (button south)
 					if ( m_ActionJump.triggered )
 					{
 						if ( m_UDInput < 0.0f ) // If player presses down while jumping, slide instead. TODO::
@@ -179,13 +184,33 @@ public class PlayerController : MonoBehaviour
 							m_rPlayerMovement.Jump();
 					}
 
-					// Interact
+					// Interact (button north)
 					if ( m_ActionInteract.triggered )
 					{
 						if ( CanInteract() )
 							m_rPlayer.m_CurrentlyFocusedInteractable.Interact(); //TODO:: Invoke an event called Interact, which invokes it on the closest one which should be subscribed to the event.
 					}
 
+					// Use consumable (button west)
+					if ( m_ActionUseCurrentConsumable.triggered )
+						EquipmentManager.Instance.EquipWheel.UseCurrentConsumable( m_rPlayer );
+
+					// Cycle consumables next (dpad down)
+					if ( m_ActionNextConsumable.triggered )	
+						EquipmentManager.Instance.EquipWheel.CycleConsumables( 1 );
+
+					// Cycle consumables previous (dpad up) (Idk if I'm gonna use this, might do like most souls-likes and have some other type of item in the top slot)
+					if ( m_ActionPreviousConsumable.triggered )
+						EquipmentManager.Instance.EquipWheel.CycleConsumables( -1 );
+
+
+
+					// Roll (button east)
+					if ( m_ActionRoll.triggered )
+						m_rPlayerMovement.StartRoll();
+
+
+					// Open the menu (start button)
 					if ( m_ActionOpenMenu.triggered )
 					{
 						//			if ( CanOpenMenu() ) // TODO:: Implement this function when it becomes necessary.
@@ -196,22 +221,6 @@ public class PlayerController : MonoBehaviour
 						m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].Disable();
 						m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].Enable();
 						m_CurrentState = EPlayerControllerState.PCSTATE_Menu;
-					}
-
-					if ( m_ActionUseCurrentConsumable.triggered )
-					{
-						//Debug.Log( "Using current consumable" );
-						EquipmentManager.Instance.EquipWheel.UseCurrentConsumable( m_rPlayer );
-					}
-
-					if ( m_ActionNextConsumable.triggered )
-					{
-						EquipmentManager.Instance.EquipWheel.CycleConsumables( 1 );
-					}
-
-					if ( m_ActionPreviousConsumable.triggered )
-					{
-						EquipmentManager.Instance.EquipWheel.CycleConsumables( -1 );
 					}
 
 

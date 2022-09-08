@@ -10,24 +10,41 @@ public class Player_Movement : Character_Movement
 	private float m_DistanceFallen;
 	[SerializeField] private float m_FallDamageThreshold = 10.0f; // Distance fallen before damage should be dealt
 
+
 	// The player's jump
 	[SerializeField] private float	m_MaxJumpHeight			= 3.3f;
 	[SerializeField] private float	m_JumpWindowDuration	= 0.214f; // Static as this value only needs to be set once
 	private float					m_JumpWindowTimeLeft	= 0.214f;
 	private const float				m_CoyoteDuration		= 0.2f;
 	private float					m_CoyoteTimeLeft		= 0.2f;
+	[Space]
+
+
+	// The player's roll move.
+	[SerializeField] private float	m_RollCooldownDuration	= 0.75f;	// How long you have to wait to roll again.
+	private float					m_RollCooldownTimeLeft	= 0.0f;
+	[SerializeField] private float	m_RollDuration			= 0.5f;     // How long should it take to roll there
+	[SerializeField] private float	m_RollDistanceTotal		= 2.0f;     // How far should the roll go
+	private float					m_RollDistanceLeft		= 0.0f;
+	private Vector3					m_RollDirection			= Vector3.zero;
+	[Space]
+
 
 	// The player's slide move.
-	private float					m_SlideCooldownDuration	= 0.75f;
+	[SerializeField] private float	m_SlideCooldownDuration	= 0.75f;	// How long you have to wait to slide again.
 	private float					m_SlideCooldownTimeLeft	= 0.0f;
-	[SerializeField] private float	m_SlideDuration			= 0.5f;
-	[SerializeField] private float	m_SlideDistanceTotal	= 2.0f;
+	[SerializeField] private float	m_SlideDuration			= 0.5f;		// How long should it take to slide there
+	[SerializeField] private float	m_SlideDistanceTotal	= 2.0f;		// How far should the slide go
 	private float					m_SlideDistanceLeft		= 0.0f;
 	private Vector3					m_SlideDirection		= Vector3.zero;
+	[Space]
 
+	// This number is used for adjusting the force added to the player while rolling and sliding:
+	const float m_RollSlideAdjuster = 4.1806025f; // I found this number by trying out different stuff, this is what lets you add a linearly decreasing force over a duration and get the exact distance.
 
 	// References to other components
 	private Player m_rPlayer;
+	[Space]
 
 	// Hurtboxes - used for detecting hits.
 	[SerializeField] private BoxCollider m_FullBodyCollider;
@@ -39,14 +56,14 @@ public class Player_Movement : Character_Movement
 	{
 		PlayerState_Idle	= 0	,
 		PlayerState_Running		,
-		PlayerState_Rolling		,
 		PlayerState_Jumping		,
 		PlayerState_Falling		,
+		PlayerState_Rolling		,
 		PlayerState_Sliding		,
 	}
 
 
-	private EPlayerState m_CurrentState;
+	[SerializeField] private EPlayerState m_CurrentState;
 	private EPlayerState m_PreviousState;
 	// </End of Member variables>
 
@@ -65,7 +82,8 @@ public class Player_Movement : Character_Movement
 	{
 		float DeltaTime = Time.deltaTime;
 
-		//m_CoyoteTimeLeft			-= DeltaTime;	// Only needs to be decreased inside STATE_Falling.
+		//m_CoyoteTimeLeft			-= DeltaTime;	// Only needs to be decreased inside STATE_Falling, so it does that inside fixed update.
+		m_RollCooldownTimeLeft		-= DeltaTime;
 		m_SlideCooldownTimeLeft		-= DeltaTime;
 	}
 
@@ -101,12 +119,6 @@ public class Player_Movement : Character_Movement
 			case EPlayerState.PlayerState_Running:
 				{
 					// Running animation will play.
-				}
-				break;
-
-			case EPlayerState.PlayerState_Rolling:
-				{
-
 				}
 				break;
 
@@ -147,19 +159,31 @@ public class Player_Movement : Character_Movement
 				}
 				break;
 
+			case EPlayerState.PlayerState_Rolling:
+				{
+					if ( m_RollDistanceLeft > 0.0f )
+					{
+						// Change this formula later, the dash should have more speed during ~80% of the duration, and close to the end it should halt quickly.
+						m_RollDistanceLeft -= m_RollDistanceTotal / (m_RollDuration / Time.fixedDeltaTime);
+
+						Roll();
+					}
+					else
+						SetState( EPlayerState.PlayerState_Idle );
+				}
+				break;
+
 			case EPlayerState.PlayerState_Sliding:
 				{
 					if ( m_SlideDistanceLeft > 0.0f )
 					{
+						// Change this formula later, the dash should have more speed during ~80% of the duration, and close to the end it should halt quickly.
+						m_SlideDistanceLeft -= m_SlideDistanceTotal / (m_SlideDuration / Time.fixedDeltaTime);
+
 						Slide();
-						m_FullBodyCollider.enabled = false;
 					}
 					else
-					{
-						SetState(EPlayerState.PlayerState_Idle);
-						m_FullBodyCollider.enabled = true;
-					}
-
+						SetState( EPlayerState.PlayerState_Idle );
 				}
 				break;
 
@@ -184,13 +208,11 @@ public class Player_Movement : Character_Movement
 		{
 			case EPlayerState.PlayerState_Idle:
 				{
-
 				}
 				break;
 
 			case EPlayerState.PlayerState_Running:
 				{
-
 				}
 				break;
 
@@ -204,6 +226,15 @@ public class Player_Movement : Character_Movement
 			case EPlayerState.PlayerState_Falling:
 				{
 					m_rAnimator.SetBool( "Falling", false );
+				}
+				break;
+
+			case EPlayerState.PlayerState_Rolling:
+				{
+					m_rAnimator.SetBool( "Rolling", false );
+
+					m_SlideCollider.enabled		= false; // Rename this maybe? After checking that it works as it should
+					m_FullBodyCollider.enabled	= true;
 				}
 				break;
 
@@ -242,20 +273,47 @@ public class Player_Movement : Character_Movement
 				}
 				break;
 
+			case EPlayerState.PlayerState_Rolling:
+				{
+					m_RollCooldownTimeLeft		= m_RollCooldownDuration;
+					m_RollDistanceLeft			= m_RollDistanceTotal;
+					m_FullBodyCollider.enabled	= false;
+					m_SlideCollider.enabled		= true; // Rename this maybe
+					m_rAnimator.SetBool( "Rolling", true );
+				}
+				break;
+
 			case EPlayerState.PlayerState_Sliding:
 				{
 					m_SlideCooldownTimeLeft		= m_SlideCooldownDuration;
 					m_SlideDistanceLeft			= m_SlideDistanceTotal;
-					m_CurrentState				= EPlayerState.PlayerState_Sliding;
 					m_FullBodyCollider.enabled	= false;
 					m_SlideCollider.enabled		= true;
-
 					m_rAnimator.SetBool( "Sliding", true );
-
 				}
 				break;
 		}
 
+	}
+
+
+	public void StartRoll()
+	{
+		if ( m_RollCooldownTimeLeft > 0.0f )
+			return;
+
+		SetState( EPlayerState.PlayerState_Rolling );
+	}
+
+
+	private void Roll()
+	{
+		Vector3 DesiredRollPos = m_RollDistanceLeft * m_RollDirection;
+		DesiredRollPos.z = 0.0f; // Can't have this if the levels should rotate on the y-axis. Eh, I'll fix that later.
+
+		//m_rAnimator.SetFloat( "Movement", Mathf.Abs( pr_LRInput ), 0.05f, Time.deltaTime );   // TODO: Switch the string out for ID later.
+		//m_rRigidbody.AddForce( DesiredRollPos * ( m_RollSlideAdjuster / m_RollDuration ), ForceMode.VelocityChange );
+		m_rRigidbody.AddForce( DesiredRollPos * m_RollSlideAdjuster, ForceMode.VelocityChange );
 	}
 
 
@@ -269,14 +327,12 @@ public class Player_Movement : Character_Movement
 
 	private void Slide()
 	{
-		// Change this formula later, the dash should have more speed during ~80% of the duration, and close to the end it should halt quickly.
-		m_SlideDistanceLeft -= m_SlideDistanceTotal / ( m_SlideDuration / Time.fixedDeltaTime );
-
-		Vector3 DesiredSlidePosition = m_SlideDistanceLeft * m_SlideDirection;
-		DesiredSlidePosition.z = 0.0f;
+		Vector3 DesiredSlidePosition	= m_SlideDistanceLeft * m_SlideDirection; // This will make it go faster in the beginning and slower towards the end
+		DesiredSlidePosition.z			= 0.0f; // Can't have this if the levels should rotate on the y-axis. Eh, I'll fix that later.
 
 		//m_rAnimator.SetFloat( "Movement", Mathf.Abs( pr_LRInput ), 0.05f, Time.deltaTime );   // TODO: Switch the string out for ID later.
-		m_rRigidbody.AddForce( DesiredSlidePosition * 50.0f, ForceMode.VelocityChange );
+		//m_rRigidbody.AddForce( DesiredSlidePosition * ( m_RollSlideAdjuster / m_SlideDuration ), ForceMode.VelocityChange );
+		m_rRigidbody.AddForce( DesiredSlidePosition * m_RollSlideAdjuster, ForceMode.VelocityChange );
 	}
 
 
@@ -299,6 +355,7 @@ public class Player_Movement : Character_Movement
         else if ( pr_LRInput > 0.0f && !m_FacingRight )
             Flip();
 
+		// If you want the player to be able to move along levels on the z-axis, this needs to be changed, or you you could... rotate the entire level? First one seems a bit easier.
 		m_MovementDirection = Vector3.Cross( ( new Vector3( 0.0f, 0.0f, -pr_LRInput ) ), m_GroundNormal );
 
 		// Update animator and apply movement
@@ -372,7 +429,7 @@ public class Player_Movement : Character_Movement
 		{
 			m_GroundNormal		= RaycastHit.normal;
 			m_SlideDirection	= Vector3.Cross( transform.right.normalized, RaycastHit.normal );
-
+			m_RollDirection		= m_SlideDirection;
 			return true;
 		}
 
@@ -389,8 +446,9 @@ public class Player_Movement : Character_Movement
 
 		if ( Physics.Raycast( GroundCheckRay, out RaycastHit, RayMaxDistance, m_WhatIsGround ) ) // if no ground directly underneath, check behind
 		{
-			m_GroundNormal = RaycastHit.normal;
+			m_GroundNormal		= RaycastHit.normal;
 			m_SlideDirection	= Vector3.Cross( transform.right.normalized, RaycastHit.normal );
+			m_RollDirection		= m_SlideDirection;
 			return true;
 		}
 
@@ -409,6 +467,7 @@ public class Player_Movement : Character_Movement
 		{
 			m_GroundNormal		= RaycastHit.normal;
 			m_SlideDirection	= Vector3.Cross( transform.right.normalized, RaycastHit.normal );
+			m_RollDirection		= m_SlideDirection;
 			return true;
 		}
 
