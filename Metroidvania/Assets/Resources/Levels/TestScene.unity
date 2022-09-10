@@ -11619,7 +11619,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1172677759}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 25.0982, y: -3, z: 0}
+  m_LocalPosition: {x: 25.0982, y: -2.95, z: 0}
   m_LocalScale: {x: 25.131355, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 570857359}
@@ -20366,10 +20366,12 @@ MonoBehaviour:
   m_MaxJumpHeight: 3.3
   m_JumpWindowDuration: 0.3
   m_RollCooldownDuration: 0.75
-  m_RollDuration: 0.5
-  m_RollDistanceTotal: 2.8
+  m_RollDuration: 0.512
+  m_RollTimeLeft: 0.5
+  m_RollDistanceTotal: 2.6
+  m_RollAnimClip: {fileID: 7400000, guid: 2b5abb67feeb2a04b98dde9ede69fa54, type: 2}
   m_SlideCooldownDuration: 0.75
-  m_SlideDuration: 0.25
+  m_SlideDuration: 0.384
   m_SlideDistanceTotal: 2.8
   m_FullBodyCollider: {fileID: 1972942622}
   m_SlideCollider: {fileID: 1972942621}
@@ -20410,11 +20412,11 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1972942615}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
+  m_Avatar: {fileID: 9000000, guid: 589202386a68b2d49be070f4e872a9d5, type: 3}
   m_Controller: {fileID: 9100000, guid: e1f9232a14ea1a042896e359083cdba1, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
-  m_ApplyRootMotion: 0
+  m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1

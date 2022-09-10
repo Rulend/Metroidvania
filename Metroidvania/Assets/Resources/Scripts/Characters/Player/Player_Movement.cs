@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class Player_Movement : Character_Movement
 {
-	
+	// Whether or not to use root motion on the animations
+	private bool m_UseRootMotion; // Bring this to the character movement class later if it works as intended
+
+
 	// < Member variables>
 	// Used for measuring fall damage
 	private float m_DistanceFallen;
@@ -24,9 +27,11 @@ public class Player_Movement : Character_Movement
 	[SerializeField] private float	m_RollCooldownDuration	= 0.75f;	// How long you have to wait to roll again.
 	private float					m_RollCooldownTimeLeft	= 0.0f;
 	[SerializeField] private float	m_RollDuration			= 0.5f;     // How long should it take to roll there
+	[SerializeField] private float	m_RollTimeLeft			= 0.5f;     // How long should it take to roll there
 	[SerializeField] private float	m_RollDistanceTotal		= 2.0f;     // How far should the roll go
 	private float					m_RollDistanceLeft		= 0.0f;
 	private Vector3					m_RollDirection			= Vector3.zero;
+	[SerializeField] AnimationClip	m_RollAnimClip;
 	[Space]
 
 
@@ -40,7 +45,7 @@ public class Player_Movement : Character_Movement
 	[Space]
 
 	// This number is used for adjusting the force added to the player while rolling and sliding:
-	const float m_RollSlideAdjuster = 4.1806025f; // I found this number by trying out different stuff, this is what lets you add a linearly decreasing force over a duration and get the exact distance.
+	const float m_SlideAdjuster = 4.1806025f; // I found this number by trying out different stuff, this is what lets you add a linearly decreasing force over a duration and get the exact distance.
 
 	// References to other components
 	private Player m_rPlayer;
@@ -76,6 +81,11 @@ public class Player_Movement : Character_Movement
 		m_CurrentMovementSpeed	= m_BaseMovementSpeed;
 
 		m_rPlayer = GetComponent<Player>();
+
+		m_RollDuration = m_RollAnimClip.length - Time.fixedDeltaTime;
+
+		m_RollDistanceTotal		= m_RollDistanceTotal - 2.6f; // NOTE:: root motion moves the character 2.6 units by default, and since we need root motion since the animation isn't "in place", this is the easiest way I found to offset it.
+		m_SlideDistanceTotal	= m_SlideDistanceTotal - 0.0f; // The above doesn't apply for the slide, since it is a pose. Though, the bool "UsingRootmotion" is used by the slide in order to prevent the player's input. TODO:: Not really needed to fix this, but might as well implement some kind of bool or controlelr state that prevents player from inputting once they are sliding or rolling
 	}
 
 	private void Update()
@@ -161,10 +171,12 @@ public class Player_Movement : Character_Movement
 
 			case EPlayerState.PlayerState_Rolling:
 				{
-					if ( m_RollDistanceLeft > 0.0f )
+					if ( m_RollTimeLeft > 0.001f ) // TODO:: Switch this out for an epsilon later
 					{
+						m_RollTimeLeft -= Time.fixedDeltaTime;
 						// Change this formula later, the dash should have more speed during ~80% of the duration, and close to the end it should halt quickly.
 						m_RollDistanceLeft -= m_RollDistanceTotal / (m_RollDuration / Time.fixedDeltaTime);
+						//m_RollDistanceLeft -= (m_RollDistanceTotal / m_RollDuration) / 50.0f;
 
 						Roll();
 					}
@@ -194,7 +206,18 @@ public class Player_Movement : Character_Movement
 		if ( m_GravityVelocity.y < 0.0f )
 			SetState( EPlayerState.PlayerState_Falling );
 
-		m_rRigidbody.velocity = ( m_MovementVelocity + m_GravityVelocity );
+
+		if ( !m_UseRootMotion )
+			m_rRigidbody.velocity = ( m_MovementVelocity + m_GravityVelocity );
+	}
+
+
+	public void OnAnimatorMove()
+	{
+		if ( m_UseRootMotion )
+		{
+			m_rRigidbody.velocity = (  m_RollDirection * 5.0f + m_GravityVelocity );
+		}
 	}
 
 
@@ -232,6 +255,7 @@ public class Player_Movement : Character_Movement
 			case EPlayerState.PlayerState_Rolling:
 				{
 					m_rAnimator.SetBool( "Rolling", false );
+					m_UseRootMotion = false;
 
 					m_SlideCollider.enabled		= false; // Rename this maybe? After checking that it works as it should
 					m_FullBodyCollider.enabled	= true;
@@ -241,12 +265,16 @@ public class Player_Movement : Character_Movement
 			case EPlayerState.PlayerState_Sliding:
 				{
 					m_rAnimator.SetBool( "Sliding", false );
+					m_UseRootMotion = false;
 
 					m_SlideCollider.enabled		= false;
 					m_FullBodyCollider.enabled	= true;
 				}
 				break;
 		}
+
+
+
 
 		// Switch on new state
 		switch ( _State )
@@ -279,7 +307,9 @@ public class Player_Movement : Character_Movement
 					m_RollDistanceLeft			= m_RollDistanceTotal;
 					m_FullBodyCollider.enabled	= false;
 					m_SlideCollider.enabled		= true; // Rename this maybe
+					m_RollTimeLeft				= m_RollDuration;
 					m_rAnimator.SetBool( "Rolling", true );
+					m_UseRootMotion				= true;
 				}
 				break;
 
@@ -290,6 +320,7 @@ public class Player_Movement : Character_Movement
 					m_FullBodyCollider.enabled	= false;
 					m_SlideCollider.enabled		= true;
 					m_rAnimator.SetBool( "Sliding", true );
+					m_UseRootMotion = true; // This is set to true, eve
 				}
 				break;
 		}
@@ -308,12 +339,17 @@ public class Player_Movement : Character_Movement
 
 	private void Roll()
 	{
-		Vector3 DesiredRollPos = m_RollDistanceLeft * m_RollDirection;
-		DesiredRollPos.z = 0.0f; // Can't have this if the levels should rotate on the y-axis. Eh, I'll fix that later.
+		//Vector3 DesiredRollPos = m_RollDistanceLeft * m_RollDirection;
+		//DesiredRollPos.z = 0.0f; // Can't have this if the levels should rotate on the y-axis. Eh, I'll fix that later.
 
-		//m_rAnimator.SetFloat( "Movement", Mathf.Abs( pr_LRInput ), 0.05f, Time.deltaTime );   // TODO: Switch the string out for ID later.
-		//m_rRigidbody.AddForce( DesiredRollPos * ( m_RollSlideAdjuster / m_RollDuration ), ForceMode.VelocityChange );
-		m_rRigidbody.AddForce( DesiredRollPos * m_RollSlideAdjuster, ForceMode.VelocityChange );
+		////m_rAnimator.SetFloat( "Movement", Mathf.Abs( pr_LRInput ), 0.05f, Time.deltaTime );   // TODO: Switch the string out for ID later.
+		////m_rRigidbody.AddForce( DesiredRollPos * ( m_RollSlideAdjuster / m_RollDuration ), ForceMode.VelocityChange );
+		//m_rRigidbody.AddForce( DesiredRollPos * m_RollSlideAdjuster, ForceMode.VelocityChange );
+
+		Vector3 RollForce = m_RollDirection * ( (m_RollDistanceTotal / m_RollDuration) / 50.0f );
+		RollForce.z = 0.0f;
+
+		m_rRigidbody.AddForce( RollForce * 50.0f, ForceMode.VelocityChange );
 	}
 
 
@@ -332,7 +368,7 @@ public class Player_Movement : Character_Movement
 
 		//m_rAnimator.SetFloat( "Movement", Mathf.Abs( pr_LRInput ), 0.05f, Time.deltaTime );   // TODO: Switch the string out for ID later.
 		//m_rRigidbody.AddForce( DesiredSlidePosition * ( m_RollSlideAdjuster / m_SlideDuration ), ForceMode.VelocityChange );
-		m_rRigidbody.AddForce( DesiredSlidePosition * m_RollSlideAdjuster, ForceMode.VelocityChange );
+		m_rRigidbody.AddForce( DesiredSlidePosition * m_SlideAdjuster, ForceMode.VelocityChange );
 	}
 
 
@@ -362,6 +398,7 @@ public class Player_Movement : Character_Movement
 		m_rAnimator.SetFloat( "Moving", Mathf.Abs( pr_LRInput ), 0.05f, Time.deltaTime );			// TODO: Switch the string out for ID later.
 		m_MovementVelocity = m_MovementDirection * m_CurrentMovementSpeed * Time.fixedDeltaTime;	// Rigidbody way
 
+		// This is done in FixedUpdate instead
 		//m_rRigidbody.velocity = ( m_MovementVelocity + m_GravityVelocity );
 		//m_rRigidbody.MovePosition()
 	}
