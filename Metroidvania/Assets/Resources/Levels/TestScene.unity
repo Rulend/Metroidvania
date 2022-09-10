@@ -20371,8 +20371,8 @@ MonoBehaviour:
   m_RollDistanceTotal: 2.6
   m_RollAnimClip: {fileID: 7400000, guid: 2b5abb67feeb2a04b98dde9ede69fa54, type: 2}
   m_SlideCooldownDuration: 0.75
-  m_SlideDuration: 0.384
-  m_SlideDistanceTotal: 2.8
+  m_SlideDuration: 0.25
+  m_SlideDistanceTotal: 2.5
   m_FullBodyCollider: {fileID: 1972942622}
   m_SlideCollider: {fileID: 1972942621}
   m_CurrentState: 0
