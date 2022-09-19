@@ -20368,7 +20368,7 @@ MonoBehaviour:
   m_RollCooldownDuration: 0.75
   m_RollDuration: 0.512
   m_RollTimeLeft: 0.5
-  m_RollDistanceTotal: 2.6
+  m_RollDistanceTotal: 3
   m_RollAnimClip: {fileID: 7400000, guid: 2b5abb67feeb2a04b98dde9ede69fa54, type: 2}
   m_SlideCooldownDuration: 0.75
   m_SlideDuration: 0.25

@@ -29,7 +29,6 @@ public class Player_Movement : Character_Movement
 	[SerializeField] private float	m_RollDuration			= 0.5f;     // How long should it take to roll there
 	[SerializeField] private float	m_RollTimeLeft			= 0.5f;     // How long should it take to roll there
 	[SerializeField] private float	m_RollDistanceTotal		= 2.0f;     // How far should the roll go
-	private float					m_RollDistanceLeft		= 0.0f;
 	private Vector3					m_RollDirection			= Vector3.zero;
 	[SerializeField] AnimationClip	m_RollAnimClip;
 	[Space]
@@ -174,9 +173,6 @@ public class Player_Movement : Character_Movement
 					if ( m_RollTimeLeft > 0.001f ) // TODO:: Switch this out for an epsilon later
 					{
 						m_RollTimeLeft -= Time.fixedDeltaTime;
-						// Change this formula later, the dash should have more speed during ~80% of the duration, and close to the end it should halt quickly.
-						m_RollDistanceLeft -= m_RollDistanceTotal / (m_RollDuration / Time.fixedDeltaTime);
-						//m_RollDistanceLeft -= (m_RollDistanceTotal / m_RollDuration) / 50.0f;
 
 						Roll();
 					}
@@ -214,6 +210,7 @@ public class Player_Movement : Character_Movement
 
 	public void OnAnimatorMove()
 	{
+		// TODO:: If root motion is ever used for anything other than the roll, change this to reflect that
 		if ( m_UseRootMotion )
 		{
 			m_rRigidbody.velocity = (  m_RollDirection * 5.0f + m_GravityVelocity );
@@ -304,7 +301,6 @@ public class Player_Movement : Character_Movement
 			case EPlayerState.PlayerState_Rolling:
 				{
 					m_RollCooldownTimeLeft		= m_RollCooldownDuration;
-					m_RollDistanceLeft			= m_RollDistanceTotal;
 					m_FullBodyCollider.enabled	= false;
 					m_SlideCollider.enabled		= true; // Rename this maybe
 					m_RollTimeLeft				= m_RollDuration;

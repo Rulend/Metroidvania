@@ -50,6 +50,10 @@ public class Character : MonoBehaviour
 	//private OverTimeEffect[] m_OverTimeEffects;
 	private List<OverTimeEffect>	m_ExpiredEffects; // Effects that have gone through their duration or been cut short, so they should be removed from the list. Has to be a separate list, since removing right away would break enumeration of the list being looped through.
 
+
+	////////////////////////////////////////////////
+
+	// Stuff related to attacks
 	public void Attack()
 	{
 
@@ -61,6 +65,27 @@ public class Character : MonoBehaviour
 		//}
 	}
 
+	public void StartAttackTrace()
+	{
+
+	}
+
+	public void StopAttackTrace()
+	{
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+	////////////////////////////////////////////////
 
 	public virtual void RestoreHealth( float _Amount )
 	{
