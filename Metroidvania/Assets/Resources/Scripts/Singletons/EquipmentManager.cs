@@ -7,22 +7,23 @@ public class EquipmentManager : MonoBehaviour
 	public static EquipmentManager			Instance => m_Instance; // Public getter used to access singleton from outside
 
 
-	private static EquipmentManager			m_Instance;
-	public GameObject						m_EquipmentSlotsParent;		// only used once, should not be a member TODO:: Remove
-	public GameObject						m_WeaponSlotsParent;		// only used once, should not be a member TODO:: Remove
-	public GameObject						m_ConsumableSlotsParent;	// only used once, should not be a member TODO:: Remove
-	public ItemSlot[]						m_EquipmentSlots;		// An array of references to all of the inventory slots inside the "EquipmentPanel"-object in the scene. Used to store current equipment.
-	public SkinnedMeshRenderer[]			m_EquipmentMeshes;      // An array of the current equipment's meshes
+						private static EquipmentManager			m_Instance;
+	[SerializeField]	private GameObject						m_EquipmentSlotsParent;		// only used once, should not be a member TODO:: Remove
+	[SerializeField]	private GameObject						m_WeaponSlotsParent;		// only used once, should not be a member TODO:: Remove
+	[SerializeField]	private GameObject						m_ConsumableSlotsParent;	// only used once, should not be a member TODO:: Remove
+						private ItemSlot[]						m_EquipmentSlots;		// An array of references to all of the inventory slots inside the "EquipmentPanel"-object in the scene. Used to store current equipment.
+						private SkinnedMeshRenderer[]			m_EquipmentMeshes;      // An array of the current equipment's meshes
+	[SerializeField]	private SkinnedMeshRenderer				m_PlayerMesh;
 
-	[SerializeField] private InventoryItem[] m_DefaultSetupArray;
-	private Dictionary<EquipmentSlot, InventoryItem> m_DefaultEquipment;
+	[SerializeField]	private InventoryItem[]					m_DefaultSetupArray;
+						private Dictionary<EquipmentSlot, InventoryItem> m_DefaultEquipment; // TODO:: Get rid of this later
 
-	private ItemSlot	m_SelectedEquipmentSlot;
-	public  ItemSlot	SelectedEquipmentSlot => m_SelectedEquipmentSlot;
-	private int			m_NumberWeaponSlots;
+						private ItemSlot						m_SelectedEquipmentSlot;
+						public  ItemSlot						SelectedEquipmentSlot => m_SelectedEquipmentSlot;
+						private int								m_NumberWeaponSlots;
 
-	[SerializeField] private EquipmentWheel m_EquipWheel;
-	public EquipmentWheel EquipWheel => m_EquipWheel;
+	[SerializeField]	private EquipmentWheel					m_EquipWheel;
+						public EquipmentWheel					EquipWheel => m_EquipWheel;
 
 	private void Awake()
 	{
@@ -45,6 +46,9 @@ public class EquipmentManager : MonoBehaviour
 
 
 		m_EquipmentSlots	= m_EquipmentSlotsParent.GetComponentsInChildren<ItemSlot>();
+		m_EquipmentMeshes	= new SkinnedMeshRenderer[ m_EquipmentSlots.Length ];
+
+
 		m_NumberWeaponSlots = m_WeaponSlotsParent.GetComponentsInChildren<ItemSlot>().Length;
 
 		m_EquipWheel.SetupWheel( m_ConsumableSlotsParent.GetComponentsInChildren<ItemSlot>() );
@@ -120,9 +124,6 @@ public class EquipmentManager : MonoBehaviour
 	////////////////////////////////////////////////
 	public void Equip( InventoryItem _ItemToEquip, int _Amount = 1, bool _UpdateEquipmentWheel = false, bool _UpdateInventoryUI = true )
 	{
-		// TODO:: Remake this function. It doesn't work anymore becuase weapons are no longer tied to a specific hand. What this means is that: since there is no longer a LHAND/RHAND_Slot in the Equipslot-enum,
-		// this will need to be slightly rworked. TODO:: Remove the right hand / left hand shit, I don't have time for it right now.
-
 		if ( _ItemToEquip == null )
 			return;
 
@@ -136,30 +137,40 @@ public class EquipmentManager : MonoBehaviour
 
 			if ( EquippedSlot ) // If the item that the player wants to equip is already equipped
 			{
-				if ( m_SelectedEquipmentSlot.Item )
+				if ( m_SelectedEquipmentSlot.Item ) // If ItemToEquip is already equipped in another slot, set the item of selected slot to that slot, which reuslts in a swap. 
 					EquippedSlot.AddItemToSlot( m_SelectedEquipmentSlot.Item, m_SelectedEquipmentSlot.Amount );
 				else
 					Unequip( _ItemToEquip );
 			}
 		}
 
-		// If the item we're trying to equip is not the same as the equipped item, try to equip it.
 		if ( _ItemToEquip != m_SelectedEquipmentSlot.Item )
 		{
 			Unequip( m_SelectedEquipmentSlot.Item, true ); // Unequip old item
 
 
 			m_SelectedEquipmentSlot.AddItemToSlot( _ItemToEquip, _Amount ); // Equip new item
+
+
+			//if ( !_ItemToEquip.m_DefaultItem && _ItemToEquip.m_ItemType == ITEMTYPE.ITEMTYPE_EQUIPMENT )
+			//{
+			//	Equipment			NewEquipment			= _ItemToEquip as Equipment;
+			//	SkinnedMeshRenderer NewSkinnedMeshRenderer	= Instantiate<SkinnedMeshRenderer>( NewEquipment.m_Mesh );
+			//	NewSkinnedMeshRenderer.bones				= m_PlayerMesh.bones;
+			//	NewSkinnedMeshRenderer.rootBone				= m_PlayerMesh.rootBone;
+			//	NewSkinnedMeshRenderer.transform.SetParent( m_PlayerMesh.gameObject.transform );
+
+			//	m_EquipmentMeshes[ (int)NewEquipment.EquipmentSlots ] = NewSkinnedMeshRenderer;
+			//}
 		}
+
 
 		if ( _UpdateInventoryUI )
 			UI_Manager.Instance.rInventoryUI.UpdateEquippedIcon();
 
-
 		// Update equipment wheels
 		if ( _UpdateEquipmentWheel )
-			m_EquipWheel.UpdateWheel();
-
+			m_EquipWheel.UpdateWheel(); // Send in type of thing to update here, like weapon/shield or consumable.
 
 		// TODO:: Add stats re-calculation in here
 	}
