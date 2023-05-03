@@ -289,6 +289,9 @@ public class InventoryUI : MonoBehaviour
 			SlotIndex++;
 		}
 		
+		// If slot 0 is already selected, OnSelect methods won't be called.
+		// That's why we select slot1, then slot 0.
+		Slots[ 1 ].GetComponent<Button>().Select(); // Select the first slot
 		Slots[ 0 ].GetComponent<Button>().Select(); // Select the first slot
 	}
 
