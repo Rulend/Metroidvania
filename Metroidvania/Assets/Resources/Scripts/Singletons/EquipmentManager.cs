@@ -197,6 +197,7 @@ public class EquipmentManager : MonoBehaviour
 		if ( _ItemToUnequip.m_ItemType == ITEMTYPE.ITEMTYPE_EQUIPMENT )
 		{
 			m_SelectedEquipmentSlot.RemoveItemFromSlot();
+			m_SelectedEquipmentSlot.HideItemInfo();
 
 			Equipment EquipmentToUnequip = (Equipment)_ItemToUnequip;
 			m_SelectedEquipmentSlot.AddItemToSlot( m_DefaultEquipment[ EquipmentToUnequip.EquipmentSlots ] );
