@@ -151,6 +151,11 @@ public class EquipmentManager : MonoBehaviour
 
 			m_SelectedEquipmentSlot.AddItemToSlot( _ItemToEquip, _Amount ); // Equip new item
 
+			if ( !_ItemToEquip.m_DefaultItem )
+			{
+				m_SelectedEquipmentSlot.DisplayItemInfo();
+			}
+
 
 			//if ( !_ItemToEquip.m_DefaultItem && _ItemToEquip.m_ItemType == ITEMTYPE.ITEMTYPE_EQUIPMENT )
 			//{
