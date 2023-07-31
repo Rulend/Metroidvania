@@ -7,14 +7,47 @@ public class PlayerController : MonoBehaviour
 
 	public enum EPlayerControllerState
 	{
-		PCSTATE_Normal		,
-		PCSTATE_Menu		,
-		PCSTATE_Cutscene	,
-		PCSTATE_Dialogue	,
+		Gameplay	,
+		Menu		,
+		Cutscene	,
+		Dialogue	,
 
 
-		NUM_PCSTATES
+		ControllerStateCount
 	}
+
+	// We use an enum for convenience's sake to access the gameplay actions,
+	// though it comes at the cost of an explicit conversion every time.
+	// This can be fixed by making use of const values instead, but it's annoying having to adjust them when adding new actions, so will do that later.
+	private enum EGameplayActions
+	{
+		Move = 0,
+		UseCurrentConsumable,
+		Interact,
+		Roll,
+		Jump,
+		OpenMenu,
+		PrevConsumable,
+		NextConsumable,
+		DebugReset,
+
+		ActionCount
+	}
+
+	// Same as above enum, might switch this out
+	private enum EMenuActions
+	{
+		Confirm = 0,
+		GoBack,
+		Alternative1,
+		Alternative2,
+		PrevTab,
+		NextTab,
+		ExitMenu,
+
+		ActionCount
+	}
+
 
 	// TODO:: I know this is the PlayerController but uh, another look at how input is taken is defenitively required. There's so many variables in here that aren't needed.
 	// An easy way to solve it would be to have lists with the actions in, and then use an enum to check individual button inputs; another would be to make use of the context-based functions 
@@ -32,28 +65,16 @@ public class PlayerController : MonoBehaviour
 	private InputActionMap[] m_ActionMaps;
 
 	// Normal game
-	private InputAction		m_ActionMovement;
-	private InputAction		m_ActionUseCurrentConsumable;
-	private InputAction		m_ActionInteract;
-	private InputAction		m_ActionRoll;
-	private InputAction		m_ActionJump;
-	private InputAction		m_ActionOpenMenu;
-	private InputAction		m_ActionReset;
-	private InputAction		m_ActionNextConsumable;
-	private InputAction		m_ActionPreviousConsumable;
+	// These are const bytes instead of an enum, since otherwise we have to cast the enum every time since it's C#
+	InputAction[] gameplayActions;
 
+
+	// For menu
+	InputAction[] menuActions;
+
+	// References to the player
 	private Player_Movement m_rPlayerMovement;
 	private Player			m_rPlayer;
-
-
-	// Menu
-	private InputAction		m_ActionMenuConfirm;
-	private InputAction		m_ActionMenuAlternative1;
-	private InputAction		m_ActionMenuAlternative2;
-	private InputAction		m_ActionMenuGoBack;
-	private InputAction		m_ActionMenuPreviousTab;
-	private InputAction		m_ActionMenuNextTab;
-	private InputAction		m_ActionMenuExit;
 
 	// Cutscene
 	private InputAction m_ActionCutsceneSkip;
@@ -65,42 +86,47 @@ public class PlayerController : MonoBehaviour
 
 	void Awake()
     {
-		// Setup all the action maps
-		m_ActionMaps = new InputActionMap[ (int)EPlayerControllerState.NUM_PCSTATES ];
-		m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ]		= m_InputActionAsset.FindActionMap( "MainGame" );
-		m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ]		= m_InputActionAsset.FindActionMap( "Menu" );
-		m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Cutscene ]	= m_InputActionAsset.FindActionMap( "Cutscene" );
-		m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Dialogue ]	= m_InputActionAsset.FindActionMap( "Dialogue" );
-
-
-		// Set up actions for the menu
-		m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].Enable();
-		m_ActionMenuConfirm			= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "Confirm" );
-		m_ActionMenuAlternative1	= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "Alternative1" );
-		m_ActionMenuAlternative2	= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "Alternative2" );
-		m_ActionMenuGoBack			= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "GoBack" );
-		m_ActionMenuPreviousTab		= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "LeftTab" );
-		m_ActionMenuNextTab			= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "RightTab" );
-		m_ActionMenuExit			= m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].FindAction( "ExitMenu" );
-		m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].Disable();
-
-
-		// Setup the actions for gameplay
-		m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].Enable();
-		m_ActionMovement				= 	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "Move" );
-		m_ActionUseCurrentConsumable	= 	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "UseCurrentConsumable" );
-		m_ActionInteract				= 	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "Interact" );
-		m_ActionRoll					= 	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "Roll" );
-		m_ActionJump					= 	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "Jump" );
-		m_ActionOpenMenu				= 	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "OpenMenu" );
-		m_ActionReset					=	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "Reset" );
-		m_ActionNextConsumable			=	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "EquipmentWheelNextConsumable" );
-		m_ActionPreviousConsumable		=	m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].FindAction( "EquipmentWheelPreviousConsumable" );
-
+		SetupActions();
 
 		m_rPlayerMovement	= GetComponent<Player_Movement>();
 		m_rPlayer			= GetComponent<Player>();
 		//m_rInventoryUI		= UI_Manager.Instance.rInventoryUI.gameObject; // Done in start instead
+	}
+
+	private void SetupActions()
+	{
+		// Setup all the action maps
+		m_ActionMaps = new InputActionMap[ (int)EPlayerControllerState.ControllerStateCount ];
+		m_ActionMaps[ (int)EPlayerControllerState.Gameplay ]		= m_InputActionAsset.FindActionMap( "MainGame" );
+		m_ActionMaps[ (int)EPlayerControllerState.Menu ]		= m_InputActionAsset.FindActionMap( "Menu" );
+		m_ActionMaps[ (int)EPlayerControllerState.Cutscene ]	= m_InputActionAsset.FindActionMap( "Cutscene" );
+		m_ActionMaps[ (int)EPlayerControllerState.Dialogue ]	= m_InputActionAsset.FindActionMap( "Dialogue" );
+
+		// Set up actions for the menu
+		m_ActionMaps[ (int)EPlayerControllerState.Menu ].Enable();
+		menuActions = new InputAction[ (int)EMenuActions.ActionCount ];
+		menuActions[ (int)EMenuActions.Confirm ]			= m_ActionMaps[ (int)EPlayerControllerState.Menu ].FindAction( "Confirm" );
+		menuActions[ (int)EMenuActions.GoBack ]			= m_ActionMaps[ (int)EPlayerControllerState.Menu ].FindAction( "GoBack" );
+		menuActions[ (int)EMenuActions.Alternative1 ]	= m_ActionMaps[ (int)EPlayerControllerState.Menu ].FindAction( "Alternative1" );
+		menuActions[ (int)EMenuActions.Alternative2 ]	= m_ActionMaps[ (int)EPlayerControllerState.Menu ].FindAction( "Alternative2" );
+		menuActions[ (int)EMenuActions.PrevTab ]			= m_ActionMaps[ (int)EPlayerControllerState.Menu ].FindAction( "LeftTab" );
+		menuActions[ (int)EMenuActions.NextTab ]			= m_ActionMaps[ (int)EPlayerControllerState.Menu ].FindAction( "RightTab" );
+		menuActions[ (int)EMenuActions.ExitMenu ]		= m_ActionMaps[ (int)EPlayerControllerState.Menu ].FindAction( "ExitMenu" );
+		m_ActionMaps[ (int)EPlayerControllerState.Menu ].Disable();
+
+
+		// Setup the actions for gameplay
+		m_ActionMaps[ (int)EPlayerControllerState.Gameplay ].Enable();
+		gameplayActions = new InputAction[ (int)EGameplayActions.ActionCount ];
+		gameplayActions[ (int)EGameplayActions.Move ]					= m_ActionMaps[ (int)EPlayerControllerState.Gameplay ].FindAction( "Move" );
+		gameplayActions[ (int)EGameplayActions.UseCurrentConsumable ]	= m_ActionMaps[ (int)EPlayerControllerState.Gameplay ].FindAction( "UseCurrentConsumable" );
+		gameplayActions[ (int)EGameplayActions.Interact ]				= m_ActionMaps[ (int)EPlayerControllerState.Gameplay ].FindAction( "Interact" );
+		gameplayActions[ (int)EGameplayActions.Roll ]					= m_ActionMaps[ (int)EPlayerControllerState.Gameplay ].FindAction( "Roll" );
+		gameplayActions[ (int)EGameplayActions.Jump ]					= m_ActionMaps[ (int)EPlayerControllerState.Gameplay ].FindAction( "Jump" );
+		gameplayActions[ (int)EGameplayActions.OpenMenu ]				= m_ActionMaps[ (int)EPlayerControllerState.Gameplay ].FindAction( "OpenMenu" );
+		gameplayActions[ (int)EGameplayActions.PrevConsumable ]			= m_ActionMaps[ (int)EPlayerControllerState.Gameplay ].FindAction( "EquipmentWheelPreviousConsumable" );
+		gameplayActions[ (int)EGameplayActions.NextConsumable ]			= m_ActionMaps[ (int)EPlayerControllerState.Gameplay ].FindAction( "EquipmentWheelNextConsumable" );
+		gameplayActions[ (int)EGameplayActions.DebugReset ]				= m_ActionMaps[ (int)EPlayerControllerState.Gameplay ].FindAction( "Reset" );
 	}
 
 	// Update is called once per frame
@@ -144,7 +170,7 @@ public class PlayerController : MonoBehaviour
 		// TODO:: Optimize this monster of a mess
 
 		// Temporary reset function. Once a loading screen has been implemented, play the loading screen and respawn player at last checkpoint.
-		if ( m_ActionReset.triggered )
+		if ( gameplayActions[ (int)EGameplayActions.DebugReset ].triggered )
 		{
 			m_ActiveInput = true;
 			transform.position = new Vector3( 0.0f, 0.0f, 0.0f );
@@ -156,7 +182,7 @@ public class PlayerController : MonoBehaviour
 
 		switch ( m_CurrentState )
 		{
-			case EPlayerControllerState.PCSTATE_Normal:
+			case EPlayerControllerState.Gameplay:
 				{
 					// The movement we want to apply is the input (taken here) multiplied by our chosen speed (done later).
 
@@ -166,61 +192,61 @@ public class PlayerController : MonoBehaviour
 					// The actions themselves are defined inside PlayerGameControls.inputactions	//
 					//																				//
 					//////////////////////////////////////////////////////////////////////////////////
-					if ( m_ActionMovement.triggered )
-					{
-						//Debug.Log( "Move-action triggered...(-w- ')??" );
-						m_UDInput = m_ActionMovement.ReadValue<Vector2>().y;
-					}
+					//if ( m_ActionMovement.triggered )
+					//{
+					//	//Debug.Log( "Move-action triggered...(-w- ')??" );
+					//	m_UDInput = m_ActionMovement.ReadValue<Vector2>().y;
+					//}
 
-					// Always read this input TODO:: cHECK IF READING ALWAYS IS NECESSARY!	
-					m_LRInput = m_ActionMovement.ReadValue<Vector2>().x;
+					// Always read this input
+					Vector2 movementInput =  gameplayActions[ (int)EGameplayActions.Move ].ReadValue<Vector2>();
+					m_LRInput = movementInput.x;
+					m_UDInput = movementInput.y;
 
 					// Jump (button south)
-					if ( m_ActionJump.triggered )
+					if ( gameplayActions[ (int)EGameplayActions.Jump ].triggered )
 					{
-						if ( m_UDInput < 0.0f ) // If player presses down while jumping, slide instead. TODO::
-							m_rPlayerMovement.StartSlide();
-						else
-							m_rPlayerMovement.Jump();
+						if ( m_UDInput < 0.0f ) // If player presses down while jumping, slide instead
+						{ m_rPlayerMovement.StartSlide(); }
+						else 
+						{ m_rPlayerMovement.Jump(); }
 					}
 
 					// Interact (button north)
-					if ( m_ActionInteract.triggered )
+					if ( gameplayActions[ (int)EGameplayActions.Interact ].triggered )
 					{
 						if ( CanInteract() )
-							m_rPlayer.m_CurrentlyFocusedInteractable.Interact(); //TODO:: Invoke an event called Interact, which invokes it on the closest one which should be subscribed to the event.
+						{ m_rPlayer.m_CurrentlyFocusedInteractable.Interact(); } //TODO:: Invoke an event called Interact, which invokes it on the closest one which should be subscribed to the event.
 					}
 
 					// Use consumable (button west)
-					if ( m_ActionUseCurrentConsumable.triggered )
-						EquipmentManager.Instance.EquipWheel.UseCurrentConsumable( m_rPlayer );
+					if ( gameplayActions[ (int)EGameplayActions.UseCurrentConsumable ].triggered )
+					{ EquipmentManager.Instance.EquipWheel.UseCurrentConsumable( m_rPlayer ); }
 
 					// Cycle consumables next (dpad down)
-					if ( m_ActionNextConsumable.triggered )	
-						EquipmentManager.Instance.EquipWheel.CycleConsumables( 1 );
+					if ( gameplayActions[ (int)EGameplayActions.NextConsumable ].triggered )
+					{ EquipmentManager.Instance.EquipWheel.CycleConsumables( 1 ); }
 
 					// Cycle consumables previous (dpad up) (Idk if I'm gonna use this, might do like most souls-likes and have some other type of item in the top slot)
-					if ( m_ActionPreviousConsumable.triggered )
-						EquipmentManager.Instance.EquipWheel.CycleConsumables( -1 );
-
-
+					if ( gameplayActions[ (int)EGameplayActions.PrevConsumable ].triggered )
+					{ EquipmentManager.Instance.EquipWheel.CycleConsumables( -1 ); }
 
 					// Roll (button east)
-					if ( m_ActionRoll.triggered )
-						m_rPlayerMovement.StartRoll();
+					if ( gameplayActions[ (int)EGameplayActions.Roll ].triggered )
+					{ m_rPlayerMovement.StartRoll(); }
 
 
 					// Open the menu (start button)
-					if ( m_ActionOpenMenu.triggered )
+					if ( gameplayActions[ (int)EGameplayActions.OpenMenu ].triggered )
 					{
 						//			if ( CanOpenMenu() ) // TODO:: Implement this function when it becomes necessary.
 
 						m_LRInput = 0.0f;
 						UI_Manager.Instance.rMenu.OpenMenu();
 
-						m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Normal ].Disable();
-						m_ActionMaps[ (int)EPlayerControllerState.PCSTATE_Menu ].Enable();
-						m_CurrentState = EPlayerControllerState.PCSTATE_Menu;
+						m_ActionMaps[ (int)EPlayerControllerState.Gameplay ].Disable();
+						m_ActionMaps[ (int)EPlayerControllerState.Menu ].Enable();
+						m_CurrentState = EPlayerControllerState.Menu;
 					}
 
 
@@ -231,65 +257,50 @@ public class PlayerController : MonoBehaviour
 					//																				//
 					//////////////////////////////////////////////////////////////////////////////////
 
-					if ( m_ActionMovement.WasReleasedThisFrame() )
+					if ( gameplayActions[ (int)EGameplayActions.Move ].WasReleasedThisFrame() )
 					{
 						//Debug.Log( "Move-action released!!(-w- ')!" );
 						m_UDInput = 0.0f;
 					}
 
-
-					if ( m_ActionJump.WasReleasedThisFrame() )
-						m_rPlayerMovement.StopJump();
+					if ( gameplayActions[ (int)EGameplayActions.Jump ].WasReleasedThisFrame() )
+					{ m_rPlayerMovement.StopJump(); }
 				}
 				break;
 
-			case EPlayerControllerState.PCSTATE_Menu:
+			case EPlayerControllerState.Menu:
 				{
-					if ( m_ActionMenuConfirm.triggered )
-					{
-					}
+					// When confirm is pressed, the EventSystem already takes care of it, because it counts as pressing a UI-button, so we don't need to handle this input.
+					//if ( menuActions[ACTON_MENU_Confirm].triggered )
+					//{
+					//}
 
+					// 
+					if ( menuActions[ (int)EMenuActions.Alternative1 ].triggered )
+					{ UI_Manager.Instance.rMenu.AlternativeButton1(); } 
 
-					if ( m_ActionMenuAlternative1.triggered )
-					{
-						UI_Manager.Instance.rMenu.AlternativeButton1();
-					}
+					if ( menuActions[ (int)EMenuActions.Alternative2 ].triggered )
+					{ UI_Manager.Instance.rMenu.AlternativeButton2(); } 
 
+					if ( menuActions[ (int)EMenuActions.GoBack ].triggered )
+					{ UI_Manager.Instance.rMenu.GoBackToPreviousWindow(); }
 
-					if ( m_ActionMenuAlternative2.triggered )
-					{
-						UI_Manager.Instance.rMenu.AlternativeButton2();
-					}
+					if ( menuActions[ (int)EMenuActions.PrevTab ].triggered )
+					{ UI_Manager.Instance.rMenu.LeftShoulderButton(); }
 
+					if ( menuActions[ (int)EMenuActions.NextTab ].triggered )
+					{ UI_Manager.Instance.rMenu.RightShoulderButton(); }
 
-					if ( m_ActionMenuGoBack.triggered )
-					{
-						UI_Manager.Instance.rMenu.GoBackToPreviousWindow();
-					}
-
-					if ( m_ActionMenuPreviousTab.triggered )
-					{
-						UI_Manager.Instance.rMenu.LeftShoulderButton();
-					}
-
-					if ( m_ActionMenuNextTab.triggered )
-					{
-						UI_Manager.Instance.rMenu.RightShoulderButton();
-					}
-
-					if ( m_ActionMenuExit.triggered )
-					{
-						UI_Manager.Instance.rMenu.CloseMenu();
-						//SetState( EPlayerControllerState.PCSTATE_Normal ); // This is done inside CloseMenu, since you can exit that menu by pressing back repeatedly too.
-					}
+					if ( menuActions[ (int)EMenuActions.ExitMenu ].triggered )
+					{ UI_Manager.Instance.rMenu.CloseMenu(); }
 				}
 				break;
 
-			case EPlayerControllerState.PCSTATE_Cutscene:
+			case EPlayerControllerState.Cutscene:
 
 				break;
 
-			case EPlayerControllerState.PCSTATE_Dialogue:
+			case EPlayerControllerState.Dialogue:
 
 				break;
 		}

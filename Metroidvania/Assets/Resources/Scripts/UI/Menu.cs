@@ -74,7 +74,7 @@ public class Menu : MonoBehaviour
 
 		SetMenuState( EMenuState.Closed );
 
-		GameManager.Instance.rPlayer1.GetComponent<PlayerController>().SetState( PlayerController.EPlayerControllerState.PCSTATE_Normal );
+		GameManager.Instance.rPlayer1.GetComponent<PlayerController>().SetState( PlayerController.EPlayerControllerState.Gameplay );
 	}
 
 
@@ -111,6 +111,7 @@ public class Menu : MonoBehaviour
 
 	public void ButtonOpenInventoryScreen()
 	{
+
 		gameObject.SetActive( false );
 
 		SetMenuState( EMenuState.InventoryScreen );
