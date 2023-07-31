@@ -150,7 +150,7 @@ public class Menu : MonoBehaviour
 		GoBackButtonEvent.Invoke();
 	}
 
-
+	// Face button west. Square for PS, X for Xbox.
 	public void AlternativeButton1()
 	{
 		switch ( m_CurrentState )
@@ -165,7 +165,7 @@ public class Menu : MonoBehaviour
 		}
 	}
 
-
+	// Face button North. Triangle for PS, Y for Xbox.
 	public void AlternativeButton2()
 	{
 		switch ( m_CurrentState )
@@ -231,7 +231,9 @@ public class Menu : MonoBehaviour
 					if ( GoBackButtonEvent != null ) // If the amount of subscribers is more than 0
 					{
 						foreach ( var SubscribedFunction in GoBackButtonEvent.GetInvocationList() ) // Unsubscribe all subscribers
+						{
 							GoBackButtonEvent -= ( SubscribedFunction as GoBackButtonHandler );
+						}	
 					}
 				}
 				break;

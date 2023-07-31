@@ -12,7 +12,6 @@ public class PlayerController : MonoBehaviour
 		Cutscene	,
 		Dialogue	,
 
-
 		ControllerStateCount
 	}
 
@@ -21,8 +20,8 @@ public class PlayerController : MonoBehaviour
 	// An easy way to solve it would be to have lists with the actions in, and then use an enum to check individual button inputs; another would be to make use of the context-based functions 
 
 	// Movement variables.
-	private float	m_LRInput		= 0.0f;
-	private float	m_UDInput		= 0.0f;
+	private float	m_LRInput	= 0.0f;
+	private float	m_UDInput	= 0.0f;
 
 	// Used for controlling stuff, move to controller script later.
 	[SerializeField] private InputActionAsset	m_InputActionAsset;
@@ -34,13 +33,6 @@ public class PlayerController : MonoBehaviour
 	// References to the player
 	private Player_Movement m_rPlayerMovement;
 	private Player			m_rPlayer;
-
-	// Cutscene
-	private InputAction m_ActionCutsceneSkip;
-	private InputAction m_ActionCutscenePause;
-
-	// Cutscene
-	private InputAction m_ActionDialogueConfirm;
 
 
 	void Awake()
@@ -155,17 +147,18 @@ public class PlayerController : MonoBehaviour
 		m_LRInput = 0.0f;
 		UI_Manager.Instance.rMenu.OpenMenu();
 
-		m_ActionMaps[ (int)EPlayerControllerState.Gameplay ].Disable();
-		m_ActionMaps[ (int)EPlayerControllerState.Menu ].Enable();
-		m_CurrentState = EPlayerControllerState.Menu;
+		SetState( EPlayerControllerState.Menu );
+	}
+
+	private void OnMenuClosed()
+	{
+
 	}
 
 	private void StartDebugReset( InputAction.CallbackContext context )
 	{
 		transform.position = new Vector3( 0.0f, 0.0f, 0.0f );
 	}
-
-
 
 
 	// Menu functions
@@ -200,6 +193,7 @@ public class PlayerController : MonoBehaviour
 	}
 
 
+
 	public void SetState( EPlayerControllerState _NewState )
 	{
 		EPlayerControllerState PreviousState = m_CurrentState;
@@ -214,7 +208,6 @@ public class PlayerController : MonoBehaviour
 	{
 		if ( m_rPlayer.m_CurrentlyFocusedInteractable == null )
 			return false;
-
 
 		return true;
 	}
